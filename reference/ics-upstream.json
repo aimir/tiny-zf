@@ -1,0 +1,9 @@
+{
+  "repository": "https://github.com/CatsAreFluffy/metamath-turing-machines",
+  "commit": "74a0e042f5f0ba433b3161b7c6b35ab319113844",
+  "commit_date": "2025-10-17",
+  "files_sha256": {
+    "LICENSE": "4c7865ef0cd64846547b21588f114c4a940d49ef4790cc3bad566fb08632513f",
+    "zf2.nql": "77a23392a25d42f6bc5db6402a504ed8f107828f6386d9dd52552118e8efd925"
+  }
+}

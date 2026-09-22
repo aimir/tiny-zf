@@ -1,0 +1,69 @@
+{
+  "date": "2026-09-23",
+  "command": "python3 tools/verify_ics.py --windows",
+  "regression_tests": 16,
+  "status": "experimental; computational checks only",
+  "states": 339,
+  "source": {
+    "published_constructor_sequences": 5,
+    "schema_renaming_cases": 90
+  },
+  "arithmetic": {
+    "guard_cases": 500,
+    "detachment_cases": 48,
+    "constructor_cases": 1440
+  },
+  "smoke": {
+    "steps": 1000000,
+    "dispatches": 1006,
+    "register_entries": 985,
+    "minimum_observed_gap": 7,
+    "head": 300,
+    "state": "2.ret1",
+    "ones": 231
+  },
+  "windows": [
+    {
+      "left": 3,
+      "right": 3,
+      "abstract_configurations": 10781,
+      "allowed_state_reads": 678
+    },
+    {
+      "left": 8,
+      "right": 2,
+      "abstract_configurations": 54282,
+      "allowed_state_reads": 678
+    },
+    {
+      "left": 2,
+      "right": 8,
+      "abstract_configurations": 245403,
+      "allowed_state_reads": 678
+    },
+    {
+      "left": 5,
+      "right": 5,
+      "abstract_configurations": 91943,
+      "allowed_state_reads": 678
+    },
+    {
+      "left": 10,
+      "right": 2,
+      "abstract_configurations": 163418,
+      "allowed_state_reads": 678
+    },
+    {
+      "left": 2,
+      "right": 10,
+      "abstract_configurations": 980791,
+      "allowed_state_reads": 678
+    },
+    {
+      "left": 6,
+      "right": 6,
+      "abstract_configurations": 279612,
+      "allowed_state_reads": 678
+    }
+  ]
+}

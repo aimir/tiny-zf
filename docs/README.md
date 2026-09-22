@@ -1,4 +1,5 @@
 # Documentation
 
-- [Survey](SURVEY.md): source history, backend, experiments, and next directions.
-- [Verification](VERIFICATION.md): checked facts and the missing formal proof.
+- [Experiments](EXPERIMENTS.md): the current 339-state candidate, transformations, and replay commands.
+- [Survey](SURVEY.md): source history, competing formulations, and known correctness issues.
+- [Verification](VERIFICATION.md): computational checks and the deferred formal obligations.

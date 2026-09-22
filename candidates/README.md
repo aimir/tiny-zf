@@ -1,10 +1,16 @@
-# Current candidate
+# Candidate tables
 
-`best.tm` is the literal **392-state** partial transition table; `best.json`
-records its clause order and the search that found it. The table uses upstream's
-text format and starts on a blank two-way binary tape. No reduction beyond the
-compiler is needed to obtain this count.
+- **Current experimental candidate: 339 states**, in [ics-best.tm](ics-best.tm),
+  with [configuration and table hash](ics-best.json). Uses ICS, ten active
+  registers, and reversed binary formula payloads. Run `python3 tools/verify_ics.py`.
+- **Conservative baseline: 392 states**, in [best.tm](best.tm), with
+  [configuration](best.json). Retains all distinct Wade axiom clauses. Run
+  `python3 tools/verify.py`.
 
-Run `python3 tools/verify.py` from the repository root to regenerate and compare
-it. This is a reproducible candidate, **not a formally verified ZF-independence
-result**. See [verification scope](../docs/VERIFICATION.md).
+Both tables use the upstream partial-transition text format and start on a blank
+two-way binary tape. No post-compilation table reduction is needed for their
+advertised counts. Neither is formally verified. The 392-state baseline is
+retained because it avoids the ICS theory/encoding changes, making it a useful
+comparison rather than a competing headline result.
+
+See [experiments](../docs/EXPERIMENTS.md) and [verification scope](../docs/VERIFICATION.md).

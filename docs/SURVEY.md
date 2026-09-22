@@ -3,7 +3,8 @@
 Surveyed 22 September 2026. State counts below distinguish published claims,
 locally counted tables, and exact local reproduction. None is a lower bound.
 The smallest upstream table located and reproduced here has **393 states**;
-our first conservative source candidate has **392**. Neither carries an
+our conservative source candidate has **392**. A subsequent experimental ICS
+round reached **339**; see [the experiments](EXPERIMENTS.md). None carries an
 end-to-end formal verification in this repository.
 
 ## Sources and development lines
@@ -31,9 +32,9 @@ It drops Extensionality as well as Regularity and Choice, and combines Infinity,
 Collection and Separation into an **ICS scheme**, retaining Powerset and Union.
 Its source sketches an interpretation through a constructible universe. This is
 a distinct logical development, not an obsolete version of Wade's current
-393-state program. Porting its corrected logical core to Wade's newer backend
-is an attractive research direction, but the equiconsistency argument needs
-careful scrutiny before such a result could replace the conservative baseline.
+393-state program. The experimental port to Wade's newer backend now reaches 339 states; see
+[the follow-up experiments](EXPERIMENTS.md). The equiconsistency argument still
+needs scrutiny before this could replace the conservative baseline as a verified result.
 
 [Matthew House's 372-state construction](https://github.com/LegionMammal978/turing_machine_explorer/blob/main/pa.py)
 targets **Peano arithmetic**, using an adjunction/separation scheme. It is not
@@ -41,7 +42,7 @@ a smaller machine for the same ZF task. The associated
 [interpretation discussion](https://mathoverflow.net/questions/508137/interpreting-pa-with-only-adjunction-separation/508161)
 is relevant when considering alternative theories, not as a ZF record.
 
-## What the current 393-state program actually does
+## What the upstream 393-state program actually does
 
 The mathematical source is a modified Tarski-style predicate calculus plus
 Extensionality, Replacement/Separation, Powerset, Union and Infinity. Regularity
@@ -110,7 +111,8 @@ with the other experiments.
 
 ## Best next directions
 
-1. **Port and audit the corrected ICS logical core.** Combining a smaller logical
+1. **Continue auditing and optimizing the ICS port.** The experimental port now
+   reaches 339 states; see [the follow-up](EXPERIMENTS.md). Combining a smaller logical
    representation with the newer backend might yield much more than another
    permutation search. Preserve a separate theory definition and establish its
    consistency-strength relationship; do not silently change the target theory.

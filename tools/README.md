@@ -1,36 +1,79 @@
 # Tools
 
-All tools use Python's standard library. Invoke them from the repository root.
+Python standard library only. Invoke commands from the repository root.
 
-| File | Purpose |
+## Current candidate construction
+
+The source flow is **ICS formulas → parameter naming → comparison storage →
+formula constructors/encoding → the unchanged Wade compiler**.
+
+| File | Role |
 | --- | --- |
-| `machines.py` | Locate and compile pinned upstream; validate clause orders; strictly read and totalize blank-tape tables. |
-| `verify.py` | Rebuild the upstream and candidate tables, check exact equality and structured clause coverage, and run bounded smoke tests. |
-| `reduce.py` | Enumerate all local tape branches for short contractions, check exact state quotients, and run finite-window reachability. Adapted from the Riemann project at `c05cef7`. |
-| `search.py` | Deterministic beam search over clause orders, scoring the actual final table. |
-| `probes.py` | Experimental randomized / estimated-savings factoring and six alternative constant-lowering choices for each of `v_1`…`v_4`. No candidate is promoted automatically. |
+| `ics.py` | Port the five protected formulas and enforce logical-before-safety phase ordering. |
+| `joint.py` | Permute schema parameters, validate configurations and assemble the selected implementation. |
+| `storage.py` | Reuse `topwff` as comparison scratch, saving/restoring the theorem at the safety boundary. |
+| `constructors.py` | Construct tagged formulas directly with alternative scratch assignments. |
+| `encoding.py` | Reverse inner binary payloads while keeping outer tags and formula-stack coding unchanged. |
+| `machines.py` | Locate the pinned compiler, validate the conservative baseline, read strict blank-tape tables and totalize partial transitions. |
 
-To reproduce the initial search:
+`build_joint(decode(configuration))` is the entry point for the saved ICS
+configuration. The unused third scratch name still exists in the inherited
+builder, but its operations are absent from the reachable 339-state machine.
+
+## Checking
+
+| File | Role |
+| --- | --- |
+| `verify_ics.py` | Rebuild the ICS table; check formula transcription, schema renaming, local arithmetic and finite tape execution. |
+| `register_check.py` | Independent interpreter for binary structured register IR and relative jumps; used for local differential tests. |
+| `verify.py` | Reproduce the conservative 392/393 pair and check clause coverage. |
+| `reduce.py` | All-tape short contractions, exact checked state quotients and finite-window reachability. Adapted from the Riemann project at `c05cef7`. |
 
 ```sh
-python3 tools/search.py --output scratch/order-search.json
-python3 tools/search.py --distinct --output scratch/distinct-search.json
+python3 tools/verify_ics.py --windows
+python3 tools/verify.py
+python3 -m unittest discover -s tests
 ```
 
-To reproduce the other probes:
+These are computational checks. See [verification scope](../docs/VERIFICATION.md).
+
+## Search and replay
+
+| File | Role |
+| --- | --- |
+| `experiment.py` | Replay a curated experiment, including its initial configuration and seed. |
+| `search_ics.py` | Search clause order within the safety phases. |
+| `search_joint.py` | Search order, parameter permutations, constructor lowering, comparison storage and payload order. |
+| `operators.py`, `search_operators.py` | Independently choose each operator's lowering and exhaust all 2,500 combinations at a fixed layout. |
+| `search.py`, `probes.py` | Preserve the original conservative order and factoring experiments. |
 
 ```sh
-python3 tools/probes.py grammar --output scratch/grammar-probe.json
-python3 tools/probes.py cost --output scratch/cost-probe.json
-python3 tools/probes.py lowering --output scratch/lowering-probe.json
+python3 tools/search_joint.py --storage --encoding --output scratch/search.json
+python3 tools/experiment.py ics-encoding
+python3 tools/experiment.py ics-operators
 ```
 
-Both search tools accept `--workers 1` to limit process count. Raw console output
-is disposable; curated result JSON contains configurations and aggregate counts.
-The emitted search `.tm` contains the raw compiler output. Before promoting any
-future reduced table, add and check its transformation certificate.
+Recorded experiment IDs are `ics-order`, `ics-joint`, `ics-storage`,
+`ics-encoding` and `ics-operators`. Use `--workers 1` for fewer processes. A replay
+can use `--generations 1` as a short smoke test, which does not reproduce the full
+run. Search outputs go under ignored `scratch/`; raw console traces and beam
+frontiers are not committed.
 
-The experiments preserve the upstream debug-off setting. The vendored compiler
-has unexercised error paths (including a missing `reachable()` call in duplicate
-sequence handling); the exploratory factoring implementation corrects that call
-locally without changing the pinned source.
+Every search scores the actual final count after local reduction. Its saved
+`.tm` is the raw compiler output, with both counts recorded in JSON. The current
+candidate needs no post-compilation rewrite. A future reduced artifact needs its
+own checked transformation certificate before promotion.
+
+## Alternate source experiments
+
+These modules retain bounded unsuccessful approaches for further research:
+
+- `selected.py`: construct only the selected clause using a structured decision chain.
+- `arithmetic.py`: in-place comparison with restoration and destructive selected detachment.
+- `grouping.py`: conjoined B6a or POW/UNI clauses and the optional common-witness POW/UNI formula.
+
+They do not participate in the saved candidate. Their `__main__` entry points
+report probe counts using curated checkpoints, so they work without old scratch
+files. Operator, constructor, storage and encoding modules also provide small
+standalone count probes. The experimental branches have no formal equivalence
+proof, and stronger mathematical transformations require their own justification.

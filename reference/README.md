@@ -23,3 +23,16 @@ increments. These are bounded experiments, not optimality proofs.
 [Tool documentation](../tools/README.md) gives the reproduction commands. The
 one-million-step smoke checks enter the main dispatch 1,037 times for each
 machine. They do not exercise an unbounded proof search or prove tape separation.
+
+## ICS round: 23 September 2026
+
+| File | What it records |
+| --- | --- |
+| [ics-upstream.json](ics-upstream.json) | Corrected ICS source commit and hashes. |
+| [ics-experiments.json](ics-experiments.json) | Exact initial/final configurations and budgets for five independent replayable searches: 56,264 scored configurations. |
+| [ics-checks.json](ics-checks.json) | Curated rebuild, local differential, finite simulation and reachability results for the 339-state table. |
+| [../candidates/ics-best.json](../candidates/ics-best.json) | Current 339-state candidate configuration, table hash and state breakdown. |
+
+These add to the initial survey experiments above. Full generation traces and
+beam frontiers are intentionally absent. Use `python3 tools/experiment.py ID` to
+replay a run; see [the experiment report](../docs/EXPERIMENTS.md).

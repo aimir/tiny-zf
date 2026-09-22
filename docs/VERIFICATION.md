@@ -2,9 +2,11 @@
 
 **Status: exact reproduction and computational checks, not a formal proof.**
 There is no Lean development or verified ZF-independence theorem in this repo.
-The 392-state table is a candidate based on the corrected upstream source.
+The conservative 392-state table follows the corrected Wade source. The current
+339-state experiment uses the ICS formulation and a different formula coding.
+Lean verification is deliberately deferred while these experiments continue.
 
-## What `python3 tools/verify.py` checks
+## Conservative 392-state baseline: `python3 tools/verify.py`
 
 1. Every vendored file matches the SHA-256 digest recorded for the pinned commit.
 2. Compiling the documented upstream order produces exactly the saved 393-state
@@ -28,13 +30,36 @@ some bounded behavior. Equality of clause sets alone is not an end-to-end
 halting-equivalence proof: selector semantics, proof encoding, instruction
 lowering, and tape layout are additional obligations.
 
+## Experimental 339-state candidate: `python3 tools/verify_ics.py`
+
+This command checks the candidate table hash, exact recompilation, the 67 + 272
+state split and ten active registers. It compares five formula-construction
+sequences with the pinned corrected ICS source, checks 90 schema-renaming
+round trips, and runs 500 guard, 48 detachment, and 1,440 constructor cases in
+an independent register-IR interpreter. The latter compare arithmetic results,
+untouched stack tails and scratch cleanup; they do not formally verify the
+interpreter or its correspondence with tape execution.
+
+A separate literal one-million-step tape simulation visits the main dispatch
+1,006 times and enters register primitives 985 times. The minimum observed
+zero gap before the next register-file 1 is seven cells. This is a diagnostic
+for that finite execution, not a proof of perpetual separation. `--windows`
+adds the seven finite-window reachability experiments.
+
+The theory has changed: the source omits Extensionality and uses the published
+ICS scheme. Its claimed equiconsistency with ZF remains an explicit dependency.
+The formula recoding must also be included in any later proof. Matching the
+published constructor sequences and passing finite tests do not discharge
+these obligations. [Experiments](EXPERIMENTS.md) describes both transformations.
+
 ## Literal machine semantics
 
 A configuration is a control state, an integer head position, and a map from
 integers to bits, initially zero everywhere. Each table row reads the head bit,
 writes one bit, moves one cell left or right and selects the next state. A
 missing transition halts. The designated label `halt` has no outgoing edges.
-There are 392 operational states in the candidate, excluding that label.
+There are 339 operational states in the ICS candidate and 392 in the
+conservative baseline, excluding that label.
 
 The reduction tools use a complete table with a separate `HALT` target. Missing
 source transitions become a write of the read bit, a move right, and `HALT`.
