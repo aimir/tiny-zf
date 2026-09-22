@@ -1,6 +1,6 @@
 # Regression tests
 
-Run `python3 -m unittest discover -s tests` from the root. The 23 tests cover:
+Run `python3 -m unittest discover -s tests` from the root. The 29 tests cover:
 
 - Strict table parsing, missing-read totalization and rejected malformed inputs.
 - Valid and invalid quotient certificates and local tape-cell preservation.
@@ -10,6 +10,9 @@ Run `python3 -m unittest discover -s tests` from the root. The 23 tests cover:
 - Preservation of the distinguished codes 0 and 1 after formula recoding.
 - 4,280 stack/copy/guard/detachment cases for shared arithmetic.
 - Closed-block summaries checked against explicit jump resolution.
+- All 268 protected-formula choices, checked independently using Boolean decision diagrams.
+- Rejected changes to Boolean meaning, atoms and binders, and malformed rewrite configurations.
+- A CFG audit that uses the rewritten source and rejects comparison with the original syntax.
 - Complete factoring CFG equivalence, with negative cases for changed registers,
   replacing halt by return, and removing unconditional divergence.
 

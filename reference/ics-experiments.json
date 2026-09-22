@@ -1,7 +1,7 @@
 {
   "date": "2026-09-23",
   "workers": 4,
-  "scored_configurations": 115440,
+  "scored_configurations": 135921,
   "runs": [
     {
       "id": "ics-order",
@@ -933,6 +933,132 @@
       "raw_states": 316,
       "final_states": 316,
       "preserve_main": true
+    },
+    {
+      "id": "ics-rewrites",
+      "search": "rewrites",
+      "seed": 20261002,
+      "width": 128,
+      "batch": 256,
+      "generations": 80,
+      "evaluations": 20481,
+      "initial": {
+        "kind": "ics-shared-grammar",
+        "status": "experimental; not formally verified",
+        "raw_states": 316,
+        "final_states": 316,
+        "framework_states": 65,
+        "dag_states": 251,
+        "active_registers": 10,
+        "order": [
+          10,
+          7,
+          3,
+          8,
+          2,
+          4,
+          0,
+          9,
+          5,
+          1,
+          11,
+          6,
+          16,
+          12,
+          13,
+          14,
+          15
+        ],
+        "parameter_permutations": {
+          "B1": 5,
+          "B2": 0,
+          "B3": 2,
+          "B4": 3,
+          "B6b": 2,
+          "B6c": 2,
+          "B7": 0,
+          "B8a": 1,
+          "B8b": 0,
+          "B8c": 1
+        },
+        "protected_permutation": 1,
+        "fusion": 2,
+        "two_scratch": true,
+        "reverse_payload": true,
+        "shared_operations": true,
+        "grammar": {
+          "kind": "cost",
+          "inline_probability": 0.75,
+          "seed": 12213566,
+          "inline_main": false
+        },
+        "wade_commit": "9c5c2e82f6ad5ceb5fb7a2d946aa3b1f1d05b1fce7340fd79029cc9d4756f429",
+        "ics_formula_commit": "74a0e042f5f0ba433b3161b7c6b35ab319113844",
+        "table_sha256": "a99d209c26315cdf33b32831f74dd6754a9606aefbee4b2df40f3a92836c125f"
+      },
+      "best": {
+        "raw_states": 315,
+        "generations": 80,
+        "evaluations": 20481,
+        "formula_choices": {
+          "POW": 0,
+          "UNI": 0,
+          "ICS": 162,
+          "B6a1": 0
+        },
+        "order": [
+          10,
+          7,
+          3,
+          8,
+          2,
+          4,
+          0,
+          9,
+          5,
+          1,
+          11,
+          6,
+          16,
+          13,
+          12,
+          14,
+          15
+        ],
+        "parameter_permutations": {
+          "B1": 5,
+          "B2": 0,
+          "B3": 2,
+          "B4": 2,
+          "B6b": 2,
+          "B6c": 2,
+          "B7": 0,
+          "B8a": 1,
+          "B8b": 0,
+          "B8c": 1
+        },
+        "protected_permutation": 1,
+        "fusion": 2,
+        "two_scratch": true,
+        "reverse_payload": true,
+        "grammar": {
+          "kind": "cost",
+          "inline_probability": 0.75,
+          "seed": 15385382,
+          "inline_main": false
+        },
+        "shared_operations": true,
+        "final_states": 315,
+        "kind": "ics-formula-rewrites",
+        "status": "experimental; not formally verified",
+        "wade_commit": "9c5c2e82f6ad5ceb5fb7a2d946aa3b1f1d05b1fce7340fd79029cc9d4756f429",
+        "ics_formula_commit": "74a0e042f5f0ba433b3161b7c6b35ab319113844",
+        "framework_states": 65,
+        "dag_states": 250,
+        "active_registers": 10,
+        "table_sha256": "75e30e7c76a881dd1c8d97949b77e022cea2b8abb4dd603c4bb638558b8f3ef5"
+      },
+      "final_states": 315
     }
   ],
   "followup_scored_configurations": 59176

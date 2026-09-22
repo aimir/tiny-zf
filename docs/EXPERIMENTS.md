@@ -1,6 +1,6 @@
 # ICS and compiler experiments — 23 September 2026
 
-**Best candidate: 316 states, down from 392 (76 states / 19.4%).**
+**Best candidate: 315 states, down from 392 (77 states / 19.6%).**
 This round is experimental. There is no Lean proof and no claim that the local
 computational checks establish the theory's equivalence to ZF.
 
@@ -17,7 +17,8 @@ computational checks establish the theory's equivalence to ZF.
 | Shared stack pop | 333 | Leave the new theorem in its register and reuse the existing unpair routine. |
 | Shared stack push | 326 | Move operands to the constructor pairing routine instead of keeping a second pairing implementation. |
 | Shared parameter copies | 320 | Match the increment order used by detachment and safety comparisons. |
-| Joint source and factoring search | **316** | Search safe inlining and grammar choices together with source layout and parameter naming. |
+| Joint source and factoring search | 316 | Search safe inlining and grammar choices together with source layout and parameter naming. |
+| Protected-formula rewrites and joint search | **315** | Preserve the logical/inference clauses; search equivalent protected formulas, source layout and factoring seeds. |
 
 These are measured configurations, not additive cost estimates. Different beam
 runs can choose different layouts; in particular the storage search started from
@@ -122,6 +123,31 @@ match, with unconditional jumps hidden. Normal completion and contradiction
 halting are distinct exits. This finite check is stronger than sampling execution
 traces, but it does not verify the checker, compiler backend, or theory in Lean.
 
+### Equivalent protected formulas
+
+The new beam first converts each protected schema to negation normal form,
+chooses the operand order of each Boolean conjunction/disjunction, and lowers it
+back to implication, negation and universal quantification. Existentials use
+`not forall not`; quantifier scopes are preserved. The source macros for
+conjunction and existential quantification are recovered where they match.
+These syntactic changes alter repeated compiler instruction patterns.
+
+There are 4 POW, 4 UNI, 256 ICS, 2 B6a1 and 2 B6a2 rewrite choices, plus the
+original syntax for each. The beam varies these together with source order,
+parameter naming, arithmetic lowering and the factoring seed. Its width is 128,
+with 256 new configurations per generation, four workers and 80 generations.
+Every score uses full table reduction. The best result appeared at generation
+47: **65 framework + 250 DAG = 315 states**. It changes UNI and ICS syntax;
+its POW/B6a1 choices reproduce their originals and B6a2 stays original.
+
+An independent Boolean decision diagram checker checks the selected identities,
+treating quantifiers as congruent operators on canonically equal bodies.
+It does not use the rewrite generator's NNF algorithm. All 268 generated
+individual choices pass, and deliberate invalid changes fail. The logical
+axiom basis and inference rules are fixed throughout. This makes the intended
+equivalence argument much narrower than replacing that logical basis, but the
+identities and their use in the proof enumeration still need formal derivations.
+
 ## Searches and negative results
 
 | Search | Configurations scored | Best final count |
@@ -142,6 +168,10 @@ traces, but it does not verify the checker, compiler backend, or theory in Lean.
 | Per-operator lowerings with sharing and factoring | 2,500 | 316 |
 | Continued joint beam, 40 generations | 10,241 | 316 |
 | **Follow-up total** | **59,176** | **316** |
+
+| Further search | Configurations scored | Best final count |
+| --- | ---: | ---: |
+| Protected formulas, layout and factoring, 80 generations | 20,481 | **315** |
 
 Counts include initial configurations and do not imply distinct transition
 tables. Four worker processes were used. Search generations and complete beam
@@ -175,7 +205,20 @@ The inference and expression-order prototypes are retained for investigation;
 they do not participate in the candidate and have no end-to-end equivalence
 check. A globally dual pairing prototype was also larger and was discarded.
 
-Local 3/5/7-step contractions and exact quotienting leave the candidate at 316.
+Further bounded structural probes from the 316-state layout tried:
+
+- Reassociating closed binary instruction blocks, with an exact CFG audit: 316.
+- Linear `5 * payload + tag` coding: best 324 in the tested variants.
+- Keeping a separate theorem accumulator: 325 with factoring.
+- Stopping clause construction once the selector is exhausted: 335 with factoring.
+- Simpler premise-selection control flow: best 322 across 16 tested variants.
+- Permuting the three non-atomic tags at the retained 316/315 layouts: no improvement.
+
+These discarded prototypes are not part of the candidate; their measured sizes
+do not establish semantic correctness or rule out better implementations of the
+same ideas. Raw prototypes and search traces are not repository artifacts.
+
+Local 3/5/7-step contractions and exact quotienting leave the candidate at 315.
 Finite-window analysis still excludes no state/read pairs in the tested windows.
 These failures are limits of the experiments, not lower bounds on equivalent
 machines.
@@ -195,6 +238,7 @@ python3 tools/experiment.py ics-grammar-probe
 python3 tools/experiment.py ics-grammar
 python3 tools/experiment.py ics-shared-operators
 python3 tools/experiment.py ics-grammar-followup
+python3 tools/experiment.py ics-rewrites
 ```
 
 The recorded experiments supply their own initial configurations, so they can be
@@ -205,6 +249,7 @@ for exactly what the checks establish.
 
 ## Next useful experiments
 
+Getting below 300 requires at least 16 more states from the current candidate.
 The large gains in this round came from changing representations and sharing
 whole arithmetic routines. Further work should target a cheaper instruction
 backend and larger arithmetic or expression-level rewrites. The current

@@ -22,7 +22,7 @@ def main():
     directory.mkdir(parents=True,exist_ok=True)
     initial=directory/'initial.json'
     initial.write_text(json.dumps(run['initial'],indent=2)+'\n')
-    script={'order':'search_ics.py','joint':'search_joint.py','operators':'search_operators.py','grammar':'search_grammar.py','grammar-probe':'search_grammar.py'}[run['search']]
+    script={'order':'search_ics.py','joint':'search_joint.py','operators':'search_operators.py','grammar':'search_grammar.py','grammar-probe':'search_grammar.py','rewrites':'search_rewrites.py'}[run['search']]
     output=directory/'result.json'
     command=[sys.executable,'-B',str(ROOT/'tools'/script),'--initial',str(initial),
              '--workers',str(args.workers),'--output',str(output)]

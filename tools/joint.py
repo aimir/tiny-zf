@@ -55,7 +55,7 @@ class FusedPermutedICS(FusedICS, PermutedICS):
     pass
 
 
-def build_joint(config, sharing=False, grammar=None, compile_machine=True):
+def build_joint(config, sharing=False, grammar=None, compile_machine=True, formula_choices=None):
     order, permutations, protected, fusion, storage, reverse = config
     require(len(permutations) == len(SCHEMAS) and all(i in range(6) for i in permutations), 'bad parameter permutation')
     require(protected in range(6) and fusion in range(-1, 8), 'bad lowering configuration')
@@ -88,6 +88,12 @@ def build_joint(config, sharing=False, grammar=None, compile_machine=True):
         cls = type("FactoredICS", (GrammarCompiler, type(machine)), {})
         machine = cls()
         machine.grammar_options = grammar
+    if formula_choices is not None:
+        from formula_rewrite import RewrittenFormulas, validate_choices
+        validate_choices(formula_choices)
+        cls = type("RewrittenICS", (RewrittenFormulas, type(machine)), {})
+        machine.__class__ = cls
+        machine.rewrite_choices = dict(formula_choices)
     machine.AXIOMORDER = list(order)
     machine.permutations = tuple(permutations)
     machine.protected_permutation = protected

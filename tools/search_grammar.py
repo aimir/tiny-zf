@@ -18,9 +18,9 @@ def options(gene,preserve_main=False):
     return {'kind':kind,'inline_probability':PROBABILITIES[probability],'seed':seed,'inline_main':not preserve_main}
 
 
-def score(candidate,preserve_main=False):
+def score(candidate,preserve_main=False,formula_choices=None):
     config,gene=candidate
-    m=build_joint(config,sharing=True,grammar=options(gene,preserve_main))
+    m=build_joint(config,sharing=True,grammar=options(gene,preserve_main),formula_choices=formula_choices)
     return len(reduce(totalize(m.tm.start,m.tm.states))),count(m.tm.states),candidate
 
 
@@ -40,11 +40,12 @@ def mutate(candidate,rng):
 
 def run(args):
     initial_record=json.loads(args.initial.read_text())
+    formula_choices=initial_record.get("formula_choices")
     grammar=initial_record.get('grammar',{'kind':'random','inline_probability':.75,'seed':36})
     initial=(decode(initial_record),(grammar['kind'],PROBABILITIES.index(grammar['inline_probability']),grammar['seed']))
     if not initial[0][4]:raise ValueError('grammar search requires two-scratch source')
     preserve_main=args.preserve_main or not grammar.get("inline_main",True)
-    evaluate=partial(score,preserve_main=preserve_main)
+    evaluate=partial(score,preserve_main=preserve_main,formula_choices=formula_choices)
     champion=evaluate(initial);beam=[champion];seen={initial};rng=random.Random(args.seed)
     with mp.Pool(args.workers) as pool:
         for generation in range(args.generations):
@@ -57,13 +58,13 @@ def run(args):
             rng.shuffle(union);union.sort(key=lambda x:x[0]);beam=union[:args.width]
             if beam[0][0]<champion[0]:champion=beam[0]
             final,raw,(config,gene)=champion
-            report={'kind':'ics-grammar','shared_operations':True, 'grammar':options(gene,preserve_main),
+            report={'kind':'ics-grammar','shared_operations':True, 'formula_choices':formula_choices, 'grammar':options(gene,preserve_main),
                     'seed':args.seed,'generations':generation+1,'width':args.width,'batch':args.batch,
                     'evaluations':len(seen),'raw_states':raw,'final_states':final,**encode(config)}
             args.output.parent.mkdir(parents=True,exist_ok=True)
             args.output.write_text(json.dumps(report,indent=2)+'\n')
             print(f'generation {generation+1}: {final}, frontier {beam[0][0]}..{beam[-1][0]}, {len(seen)} evaluated',flush=True)
-    m=build_joint(config,sharing=True,grammar=options(gene,preserve_main))
+    m=build_joint(config,sharing=True,grammar=options(gene,preserve_main),formula_choices=formula_choices)
     write_table(args.output.with_suffix('.tm'),m)
 
 
@@ -80,21 +81,23 @@ if __name__=='__main__':
     p.add_argument('--output',type=Path,default=ROOT/'scratch/ics-grammar.json')
     args=p.parse_args()
     if args.probe_grid:
-        config=decode(json.loads(args.initial.read_text()))
+        initial_record=json.loads(args.initial.read_text())
+        config=decode(initial_record)
+        formula_choices=initial_record.get('formula_choices')
         tasks=[(config,(kind,PROBABILITIES.index(probability),seed))
                for kind in ('random','cost') for probability in (None,.25,.5,.75)
                for seed in range(100)]
         champion=None
         with mp.Pool(args.workers) as pool:
-            for n,result in enumerate(pool.imap(score,tasks),1):
+            for n,result in enumerate(pool.imap(partial(score,formula_choices=formula_choices),tasks),1):
                 if champion is None or result[0]<champion[0]:champion=result
                 if n%100==0:print(f'checked {n}: {champion[0]}',flush=True)
         final,raw,(config,gene)=champion
-        report={'kind':'ics-grammar-probe','evaluations':len(tasks),
+        report={'kind':'ics-grammar-probe','evaluations':len(tasks),'formula_choices':formula_choices,
                 'raw_states':raw,'final_states':final,'shared_operations':True,
                 'grammar':options(gene),**encode(config)}
         args.output.parent.mkdir(parents=True,exist_ok=True)
         args.output.write_text(json.dumps(report,indent=2)+'\n')
-        write_table(args.output.with_suffix('.tm'),build_joint(config,sharing=True,grammar=options(gene)))
+        write_table(args.output.with_suffix('.tm'),build_joint(config,sharing=True,grammar=options(gene),formula_choices=formula_choices))
     else:
         run(args)

@@ -1,6 +1,6 @@
 # Candidate tables
 
-- **Current experimental candidate: 316 states**, in [ics-best.tm](ics-best.tm),
+- **Current experimental candidate: 315 states**, in [ics-best.tm](ics-best.tm),
   with [configuration and table hash](ics-best.json). Uses ICS, ten active
   registers, and reversed binary formula payloads. Run `python3 tools/verify_ics.py`.
 - **Conservative baseline: 392 states**, in [best.tm](best.tm), with

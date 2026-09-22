@@ -4,13 +4,14 @@ Python standard library only. Invoke commands from the repository root.
 
 ## Current candidate construction
 
-The source flow is **ICS formulas → parameter naming → comparison storage →
+The source flow is **ICS formulas → equivalent protected-formula syntax → parameter naming → comparison storage →
 formula constructors/encoding → shared arithmetic → safe inlining and factoring
 → the unchanged Wade tape backend**.
 
 | File | Role |
 | --- | --- |
 | `ics.py` | Port the five protected formulas and enforce logical-before-safety phase ordering. |
+| `formula_rewrite.py` | NNF-based protected-schema rewrites and an independent Boolean/quantifier-congruence checker. |
 | `joint.py` | Permute schema parameters, validate configurations and assemble the selected implementation. |
 | `storage.py` | Reuse `topwff` as comparison scratch, saving/restoring the theorem at the safety boundary. |
 | `constructors.py` | Construct tagged formulas directly with alternative scratch assignments. |
@@ -20,8 +21,8 @@ formula constructors/encoding → shared arithmetic → safe inlining and factor
 | `machines.py` | Locate the pinned compiler, validate the conservative baseline, read strict blank-tape tables and totalize partial transitions. |
 
 `build_joint(decode(record), sharing=record.get("shared_operations", False),
-grammar=record.get("grammar"))` rebuilds a complete saved configuration. The unused third scratch name still exists in the inherited
-builder, but its operations are absent from the reachable 316-state machine.
+grammar=record.get("grammar"), formula_choices=record.get("formula_choices"))` rebuilds a complete saved configuration. The unused third scratch name still exists in the inherited
+builder, but its operations are absent from the reachable 315-state machine.
 
 ## Checking
 
@@ -47,6 +48,7 @@ These are computational checks. See [verification scope](../docs/VERIFICATION.md
 | --- | --- |
 | `experiment.py` | Replay a curated experiment, including its initial configuration and seed. |
 | `search_ics.py` | Search clause order within the safety phases. |
+| `search_rewrites.py` | Joint beam over protected-formula syntax, source layout and factoring seeds. |
 | `search_grammar.py` | Joint beam over source and compiler choices; `--preserve-main` keeps the main boundary. |
 | `search_joint.py` | Search order, parameter permutations, constructor lowering, comparison storage and payload order; preserve a supplied sharing/factoring configuration. |
 | `operators.py`, `search_operators.py` | Independently choose each operator's lowering and exhaust all 2,500 combinations at a fixed layout. |
@@ -61,10 +63,14 @@ python3 tools/experiment.py ics-operators
 Recorded experiment IDs are `ics-order`, `ics-joint`, `ics-storage`,
 `ics-encoding`, `ics-operators`, `ics-sharing`, `ics-grammar-probe`,
 `ics-grammar-wide`, `ics-grammar`, `ics-shared-operators` and
-`ics-grammar-followup`. Use `--workers 1` for fewer processes. A replay
+`ics-grammar-followup` and `ics-rewrites`. Use `--workers 1` for fewer processes. A replay
 can use `--generations 1` as a short smoke test, which does not reproduce the full
 run. Search outputs go under ignored `scratch/`; raw console traces and beam
 frontiers are not committed.
+
+The joint, grammar and operator search drivers preserve any supplied formula
+rewrite configuration. The original `search_ics.py` is an order-only experiment
+on the original port; its `--initial` reads only the order.
 
 Every search scores the actual final count after local reduction. Its saved
 `.tm` is the raw compiler output, with both counts recorded in JSON. The current

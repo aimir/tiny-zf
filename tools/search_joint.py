@@ -12,8 +12,8 @@ from reduce import reduce
 from search import mutate
 
 
-def score(config, sharing=False, grammar=None):
-    machine = build_joint(config, sharing=sharing, grammar=grammar)
+def score(config, sharing=False, grammar=None, formula_choices=None):
+    machine = build_joint(config, sharing=sharing, grammar=grammar, formula_choices=formula_choices)
     return len(reduce(totalize(machine.tm.start, machine.tm.states))), count(machine.tm.states), config
 
 
@@ -49,7 +49,8 @@ def run(args):
     initial = decode(initial_record)
     sharing = getattr(args, "sharing", False) or initial_record.get("shared_operations", False)
     grammar = initial_record.get("grammar")
-    evaluate = partial(score, sharing=sharing, grammar=grammar)
+    formula_choices = initial_record.get("formula_choices")
+    evaluate = partial(score, sharing=sharing, grammar=grammar, formula_choices=formula_choices)
     if args.fusion is not None:
         initial = (*initial[:3], args.fusion, *initial[4:])
     if args.storage:
@@ -77,16 +78,16 @@ def run(args):
             if beam[0][0] < champion[0]:
                 champion = beam[0]
                 history.append({'generation': gen+1, 'states':champion[0], **encode(champion[2])})
-            report = {'kind':'ics-joint', 'shared_operations':sharing, 'grammar':grammar, 'seed':args.seed, 'width':args.width, 'batch':args.batch,
+            report = {'kind':'ics-joint', 'shared_operations':sharing, 'grammar':grammar, 'formula_choices':formula_choices, 'seed':args.seed, 'width':args.width, 'batch':args.batch,
                       'generations':gen+1, 'evaluations':len(seen), 'initial_states':initial_states, 'storage_search':args.storage, 'encoding_search':args.encoding,
                       'raw_states':champion[1], 'final_states':champion[0], **encode(champion[2]),
                       'improvements':history}
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(json.dumps(report, indent=2)+'\n')
             if args.frontier:
-                args.frontier.write_text(json.dumps([{'score':s, 'raw':r, 'shared_operations':sharing, 'grammar':grammar, **encode(c)} for s,r,c in beam],indent=2)+'\n')
+                args.frontier.write_text(json.dumps([{'score':s, 'raw':r, 'shared_operations':sharing, 'grammar':grammar, 'formula_choices':formula_choices, **encode(c)} for s,r,c in beam],indent=2)+'\n')
             print(f'generation {gen+1}: {champion[0]}, frontier {beam[0][0]}..{beam[-1][0]}, {len(seen)} evaluated',flush=True)
-    write_table(args.output.with_suffix('.tm'), build_joint(champion[2], sharing=sharing, grammar=grammar))
+    write_table(args.output.with_suffix('.tm'), build_joint(champion[2], sharing=sharing, grammar=grammar, formula_choices=formula_choices))
 
 
 if __name__ == '__main__':

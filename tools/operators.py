@@ -68,7 +68,7 @@ class OperatorICS(TwoScratchICS):
     def wal(self):return self.operator(4)
 
 
-def build_operators(config,modes,mask=15,sharing=False,grammar=None):
+def build_operators(config,modes,mask=15,sharing=False,grammar=None,formula_choices=None):
     cls=OperatorICS
     if sharing:
         from stack_ops import SharedCopy,SharedPair,SharedPop
@@ -76,7 +76,11 @@ def build_operators(config,modes,mask=15,sharing=False,grammar=None):
     if grammar is not None:
         from grammar import GrammarCompiler
         cls=type("FactoredOperators",(GrammarCompiler,cls),{})
-    m=cls();m.grammar_options=grammar;m.AXIOMORDER=list(config[0]);m.permutations=config[1];m.protected_permutation=config[2]
+    if formula_choices is not None:
+        from formula_rewrite import RewrittenFormulas, validate_choices
+        validate_choices(formula_choices)
+        cls=type("RewrittenOperators",(RewrittenFormulas,cls),{})
+    m=cls();m.rewrite_choices=dict(formula_choices or {});m.grammar_options=grammar;m.AXIOMORDER=list(config[0]);m.permutations=config[1];m.protected_permutation=config[2]
     m.operator_modes=tuple(modes);m.payload_mask=mask;m.build_machine()
     return m
 

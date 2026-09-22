@@ -3,7 +3,7 @@
 **Status: exact reproduction and computational checks, not a formal proof.**
 There is no Lean development or verified ZF-independence theorem in this repo.
 The conservative 392-state table follows the corrected Wade source. The current
-316-state experiment uses the ICS formulation and a different formula coding.
+315-state experiment uses the ICS formulation and a different formula coding.
 Lean verification is deliberately deferred while these experiments continue.
 
 ## Conservative 392-state baseline: `python3 tools/verify.py`
@@ -30,9 +30,9 @@ some bounded behavior. Equality of clause sets alone is not an end-to-end
 halting-equivalence proof: selector semantics, proof encoding, instruction
 lowering, and tape layout are additional obligations.
 
-## Experimental 316-state candidate: `python3 tools/verify_ics.py`
+## Experimental 315-state candidate: `python3 tools/verify_ics.py`
 
-This command checks the candidate table hash, exact recompilation, the 65 + 251
+This command checks the candidate table hash, exact recompilation, the 65 + 250
 state split and ten active registers. It compares five formula-construction
 sequences with the pinned corrected ICS source, checks 90 schema-renaming
 round trips, and runs 500 guard, 48 detachment, and 1,440 constructor cases in
@@ -40,14 +40,28 @@ an independent register-IR interpreter. The latter compare arithmetic results,
 untouched stack tails and scratch cleanup; they do not formally verify the
 interpreter or its correspondence with tape execution.
 
+The current candidate rewrites UNI and ICS; POW and B6a1 choices happen to
+reproduce their original syntax, and B6a2 is left unchanged. An independent
+reduced ordered Boolean decision diagram checker compares each selected formula
+with the pinned original. Atomic formulas remain opaque; universal quantifiers
+are indexed by their bound variable and the canonical Boolean form of their
+body. Existential quantification expands as `not forall not`. Thus the check
+permits classical Boolean equivalence and congruence under unchanged quantifier
+scopes. It does not permit arbitrary changes to atoms, binders, or quantifier
+order. Regression tests check all 268 individual rewrite choices and reject
+changed connectives, membership/equality atoms, and binders. The twelve logical
+axiom/inference clauses remain unchanged. A future formal proof must translate
+these identities into derivations in that fixed calculus; a BDD check alone is
+not a kernel-checked proof of halting equivalence.
+
 The sharing pass adds 4,280 differential cases: 800 stack pushes, 2,400
 selections, 540 parameter copies, 500 complete protected guards, and 40 selected
 or inactive detachments. Each comparison checks every register, including scratch
 cleanup and preservation of unrelated values. Together with the earlier checks,
 there are 6,268 local arithmetic/differential cases.
 
-The factoring audit compares the complete unfactored source CFG with the
-candidate's factored CFG. Each graph has 6,806 nodes; 4,707 reachable pairs of
+The factoring audit compares the complete unfactored rewritten-source CFG with the
+candidate's factored CFG. Each graph has 6,742 nodes; 4,659 reachable pairs of
 operations/exits are matched after following unconditional jumps. Register names,
 operations, and both decrement outcomes must agree. A normal return from `main`
 and an explicit `halt` are different labels. An unconditional jump cycle is
@@ -60,13 +74,14 @@ A separate literal one-million-step tape simulation visits the main dispatch
 1,010 times and enters register primitives 993 times. The minimum observed
 zero gap before the next register-file 1 is seven cells. This is a diagnostic
 for that finite execution, not a proof of perpetual separation. `--windows`
-adds seven finite-window reachability experiments; all retain the 632 state/read
-pairs, with a largest exploration of 915,223 abstract configurations.
+adds seven finite-window reachability experiments; all retain the 630 state/read
+pairs, with a largest exploration of 930,583 abstract configurations.
 
 Relative to the conservative baseline, the source omits Extensionality and uses
-the published ICS scheme. The new sharing/factoring passes keep these schemas
-and their formula encoding unchanged. The claimed equiconsistency of ICS with
-ZF remains an explicit dependency.
+the published ICS scheme. The sharing/factoring passes keep their input schemas
+and formula encoding unchanged; the separate formula pass supplies the identities
+described above. The claimed equiconsistency of ICS with ZF remains an explicit
+dependency.
 The formula recoding must also be included in any later proof. Matching the
 published constructor sequences and passing finite tests do not discharge
 these obligations. [Experiments](EXPERIMENTS.md) describes both transformations.
@@ -77,7 +92,7 @@ A configuration is a control state, an integer head position, and a map from
 integers to bits, initially zero everywhere. Each table row reads the head bit,
 writes one bit, moves one cell left or right and selects the next state. A
 missing transition halts. The designated label `halt` has no outgoing edges.
-There are 316 operational states in the ICS candidate and 392 in the
+There are 315 operational states in the ICS candidate and 392 in the
 conservative baseline, excluding that label.
 
 The reduction tools use a complete table with a separate `HALT` target. Missing
