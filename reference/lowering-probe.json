@@ -1,0 +1,35 @@
+{
+  "kind": "lowering",
+  "evaluations": 1296,
+  "order": [
+    16,
+    17,
+    3,
+    18,
+    4,
+    7,
+    8,
+    9,
+    11,
+    5,
+    12,
+    13,
+    14,
+    2,
+    15,
+    0,
+    1,
+    6,
+    10,
+    19
+  ],
+  "best_final_states": 393,
+  "best_final_raw_states": 393,
+  "best_raw_states": 393,
+  "best_config": [
+    0,
+    0,
+    0,
+    0
+  ]
+}

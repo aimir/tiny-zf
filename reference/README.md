@@ -1,0 +1,25 @@
+# Reference and experiment summaries
+
+These are small, curated metadata files, not execution logs or exhaustive search
+traces. All final counts include the local reduction pipeline.
+
+| File | What it records |
+| --- | --- |
+| [upstream.json](upstream.json) | Exact source commit, file hashes, reference order, and 393 = 69 + 324 state split. |
+| [history.json](history.json) | Recent upstream commit dates and counts of their saved transition tables. |
+| [checks.json](checks.json) | Rebuild checks, bounded simulations, regression count, and reachability-window summary. |
+| [order-search.json](order-search.json) | 6,401 orders of the original 20-clause program: best 393. |
+| [../candidates/best.json](../candidates/best.json) | 6,401 orders with duplicate copies removed: best 392. |
+| [grammar-probe.json](grammar-probe.json) | 2,000 randomized factoring seeds: best 393. |
+| [cost-probe.json](cost-probe.json) | 200 estimated-savings factoring seeds: best 395. |
+| [lowering-probe.json](lowering-probe.json) | All 1,296 combinations of six constructor lowerings for four constants: best 393. |
+
+The two beam runs and three probe runs total **16,298 scored configurations**;
+this includes each beam's initial configuration and does not imply that every
+compiled transition table is distinct. Randomized factoring changes source
+traversal order, while the constant probe changes nesting of the same pushes and
+increments. These are bounded experiments, not optimality proofs.
+
+[Tool documentation](../tools/README.md) gives the reproduction commands. The
+one-million-step smoke checks enter the main dispatch 1,037 times for each
+machine. They do not exercise an unbounded proof search or prove tape separation.

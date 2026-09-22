@@ -1,0 +1,38 @@
+[
+  {
+    "commit": "33b30300054242201a95679aacf7e74312bd8803b0df9a85d2314095efd6804e",
+    "date": "2025-08-19",
+    "subject": "Base zf2.py on the zf2.nql version by sorear.",
+    "saved_states": 432
+  },
+  {
+    "commit": "10fcf152b34d0d4677dff737da0b2da34392fe1481c81d0957f57c0aab12336d",
+    "date": "2025-08-31",
+    "subject": "Bugfix for B6a where correct variables were not being restored.",
+    "saved_states": 432
+  },
+  {
+    "commit": "a340ea2fbde0b8049a96e1e6f1f1e32acef18ec516abba243e87f09c0ab29760",
+    "date": "2026-08-16",
+    "subject": "Rework bootstrap and register operations.",
+    "saved_states": 410
+  },
+  {
+    "commit": "c94e319387507857f8d6853b3cad3992228b38af75cb0f0afea7408dcea1d47e",
+    "date": "2026-08-16",
+    "subject": "Take advantage of run-length limits of 0s in IP to reduce dispatch state count.",
+    "saved_states": 406
+  },
+  {
+    "commit": "719a58c90c24ca5b72328fac92923cda9bacb78ce0ace926b626b6f34d394cb0",
+    "date": "2026-08-18",
+    "subject": "Force a particular lowering in v_2()..v_4()",
+    "saved_states": 405
+  },
+  {
+    "commit": "9c5c2e82f6ad5ceb5fb7a2d946aa3b1f1d05b1fce7340fd79029cc9d4756f429",
+    "date": "2026-08-30",
+    "subject": "Optimize order of axioms in zf2",
+    "saved_states": 393
+  }
+]

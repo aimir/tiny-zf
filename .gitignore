@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.venv/
+.DS_Store
+scratch/
+logs/
+*.log
+*.out
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.pdf
+*.png
+*.prof

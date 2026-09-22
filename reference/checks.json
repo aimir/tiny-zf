@@ -1,0 +1,59 @@
+{
+  "checked_date": "2026-09-22",
+  "command": "python3 tools/verify.py --windows",
+  "formal_verification": false,
+  "upstream_states": 393,
+  "upstream_framework_states": 69,
+  "upstream_dag_states": 324,
+  "candidate_states": 392,
+  "exact_upstream_rebuild": true,
+  "exact_candidate_rebuild": true,
+  "distinct_source_clauses": 18,
+  "smoke_steps_per_machine": 1000000,
+  "smoke_dispatches_per_machine": 1037,
+  "reference_windows": [
+    {
+      "left": 3,
+      "right": 3,
+      "abstract_configurations": 12253,
+      "allowed_state_reads": 786
+    },
+    {
+      "left": 8,
+      "right": 2,
+      "abstract_configurations": 58430,
+      "allowed_state_reads": 786
+    },
+    {
+      "left": 2,
+      "right": 8,
+      "abstract_configurations": 285851,
+      "allowed_state_reads": 786
+    },
+    {
+      "left": 5,
+      "right": 5,
+      "abstract_configurations": 100823,
+      "allowed_state_reads": 786
+    },
+    {
+      "left": 10,
+      "right": 2,
+      "abstract_configurations": 174674,
+      "allowed_state_reads": 786
+    },
+    {
+      "left": 2,
+      "right": 10,
+      "abstract_configurations": 1142583,
+      "allowed_state_reads": 786
+    },
+    {
+      "left": 6,
+      "right": 6,
+      "abstract_configurations": 304960,
+      "allowed_state_reads": 786
+    }
+  ],
+  "regression_tests": 10
+}

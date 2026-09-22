@@ -1,0 +1,42 @@
+{
+  "repository": "https://codeberg.org/ajwade/turing_machine_explorer",
+  "commit": "9c5c2e82f6ad5ceb5fb7a2d946aa3b1f1d05b1fce7340fd79029cc9d4756f429",
+  "commit_date": "2026-08-30",
+  "survey_date": "2026-09-22",
+  "states": 393,
+  "framework_states": 69,
+  "dag_states": 324,
+  "axiom_order": [
+    16,
+    17,
+    3,
+    18,
+    4,
+    7,
+    8,
+    9,
+    11,
+    5,
+    12,
+    13,
+    14,
+    2,
+    15,
+    0,
+    1,
+    6,
+    10,
+    19
+  ],
+  "files_sha256": {
+    "LICENSE": "c1dffee77db98625debe39b47538e1d2f3b7956cbc7bcd6ed9363701b2177cfa",
+    "README.md": "8b0a895a1cf55c32b2fe88c70af32aaac82630e8fbd2d131651945d17af512e6",
+    "TMBuilder.py": "03d3a636404e1bcdeceafd98b9478b7a367ab334f3ab9f8a00df1d5c03fdf517",
+    "loop_test.py": "3b7df532657af396831e99aa59ade8c30820ef4c0391c757a362fce63a0e37ca",
+    "pair_test.py": "b535590d26306948bc8956253981ee1ab38bdad94089d8025c0b57da3b141ac3",
+    "tm.py": "2d00bf8c8324d8e9bc5639ba14e508091d854a7c93ecb96ab598f41c15ae9787",
+    "tmdb.py": "4ccf4dab37438109a350d77259b5eb52e33ce110a954cd2d56a218e84e653526",
+    "zf2.py": "9c16c52c6a72a195ae2ccfdc1beaba5b8d1b3ec1f92ac4130c1564978f651495",
+    "zf2.tm": "a1a777fb3994c5b098228f0bd6f27fefcb47a091f36ef8c723bb668c43caf135"
+  }
+}
