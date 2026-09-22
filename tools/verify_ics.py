@@ -153,7 +153,7 @@ def verify(candidate=None,steps=1_000_000,windows=False):
     result=json.loads(candidate.read_text())
     require(hashlib.sha256(candidate.with_suffix('.tm').read_bytes()).hexdigest()==result['table_sha256'],'candidate table hash mismatch')
     config=decode(result)
-    m=build_joint(config)
+    m=build_joint(config,sharing=result.get("shared_operations",False),grammar=result.get("grammar"))
     start,edges=read_table(candidate.with_suffix('.tm'))
     require(start==m.tm.start and edges==m.tm.states,'candidate does not rebuild exactly')
     require(count(edges)==result['raw_states'],'raw state count mismatch')
@@ -167,6 +167,12 @@ def verify(candidate=None,steps=1_000_000,windows=False):
     require(not any('scratch3' in q for q,b in edges),'third scratch register remains reachable')
     report={'status':'experimental; computational checks only','states':count(edges),
             'source':source_checks(),'arithmetic':arithmetic_checks(),'smoke':smoke(start,edges,steps)}
+    if result.get("shared_operations"):
+        from verify_sharing import sharing_checks
+        report["shared_operations"]=sharing_checks(result)
+    if result.get("grammar"):
+        from verify_sharing import grammar_check
+        report["grammar"]=grammar_check(result,m)
     if windows:
         rows=totalize(start,edges);allowed={q:3 for q in rows};report['windows']=[]
         for left,right in ((3,3),(8,2),(2,8),(5,5),(10,2),(2,10),(6,6)):

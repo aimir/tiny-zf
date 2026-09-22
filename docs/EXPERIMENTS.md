@@ -1,6 +1,6 @@
 # ICS and compiler experiments — 23 September 2026
 
-**Best candidate: 339 states, down from 392 (53 states / 13.5%).**
+**Best candidate: 316 states, down from 392 (76 states / 19.4%).**
 This round is experimental. There is no Lean proof and no claim that the local
 computational checks establish the theory's equivalence to ZF.
 
@@ -13,7 +13,11 @@ computational checks establish the theory's equivalence to ZF.
 | ICS clause-order beam | 352 | Reorder within the two safety phases. |
 | Joint source/layout beam | 347 | Also permute schema parameters and explore constructor lowering. |
 | Shared comparison scratch | 343 | Save the current theorem temporarily, reuse its register, remove the third scratch register, and search again. |
-| Reversed payloads + fused tags | **339** | Change inner formula coding to share arithmetic with direct tag construction. |
+| Reversed payloads + fused tags | 339 | Change inner formula coding to share arithmetic with direct tag construction. |
+| Shared stack pop | 333 | Leave the new theorem in its register and reuse the existing unpair routine. |
+| Shared stack push | 326 | Move operands to the constructor pairing routine instead of keeping a second pairing implementation. |
+| Shared parameter copies | 320 | Match the increment order used by detachment and safety comparisons. |
+| Joint source and factoring search | **316** | Search safe inlining and grammar choices together with source layout and parameter naming. |
 
 These are measured configurations, not additive cost estimates. Different beam
 runs can choose different layouts; in particular the storage search started from
@@ -86,6 +90,38 @@ worked even though direct tag fusion by itself did not improve the incumbent.
 Tests check both encodings against the pairing formula and check untouched stack
 tails and cleared scratch registers.
 
+### Sharing the arithmetic routines
+
+The current selector first unpairs the old theorem into scratch registers while
+leaving the new candidate in `topwff`. A zero selector restores the old theorem;
+a positive selector keeps the candidate. Both cases decrement the selector with
+saturation, restore the stack tail, and clear scratch. The safety-phase restore
+uses the same unpair routine. This removes a separate unpair specialization.
+
+Stack push moves the old stack into scratch and calls the exact pairing routine
+already used by formula constructors. It computes the same stack code while
+removing another arithmetic specialization. Parameter copies then increment
+scratch before the output register, matching the order already used by
+comparison routines. Independent increments commute; the identical instruction
+patterns can share nodes. These changes keep the axiom schemas, formula coding,
+proof enumeration and register interface unchanged.
+
+### Inlining and factoring
+
+The compiler identifies straight-line sequences of closed blocks: each block's
+relative jumps stay inside it apart from normal completion. It selectively
+inlines these wrappers, then tries randomized common-subsequence extraction or
+factoring by estimated savings. The final score is the actual machine count
+after the complete reduction pipeline. A beam keeps multiple alternatives.
+
+Inlining the main procedure itself made the search much slower without a better
+result in the bounded probe. The focused search keeps that boundary and still
+varies internal procedures. The chosen artifact is audited against the entire
+unfactored source CFG: register operations and both decrement branches must
+match, with unconditional jumps hidden. Normal completion and contradiction
+halting are distinct exits. This finite check is stronger than sampling execution
+traces, but it does not verify the checker, compiler backend, or theory in Lean.
+
 ## Searches and negative results
 
 | Search | Configurations scored | Best final count |
@@ -95,7 +131,17 @@ tails and cleared scratch registers.
 | Add comparison-register reuse, 60 generations, width 128 | 15,361 | 343 |
 | Add reversed payload encoding, 60 generations, width 128 | 15,361 | 339 |
 | Exhaust per-operator lowering choices at the retained layout | 2,500 | 339 |
-| **Total** | **56,264** | **339** |
+| **First ICS round** | **56,264** | **339** |
+
+| Follow-up search | Configurations scored | Best final count |
+| --- | ---: | ---: |
+| Layout/parameters after arithmetic sharing | 23,041 | 320 |
+| Inlining/factoring grid | 800 | 318 |
+| Unrestricted grammar beam, 11 complete generations | 2,113 | 318 |
+| Focused joint beam, 80 generations | 20,481 | 316 |
+| Per-operator lowerings with sharing and factoring | 2,500 | 316 |
+| Continued joint beam, 40 generations | 10,241 | 316 |
+| **Follow-up total** | **59,176** | **316** |
 
 Counts include initial configurations and do not imply distinct transition
 tables. Four worker processes were used. Search generations and complete beam
@@ -115,10 +161,24 @@ Additional bounded probes tested:
   fixed lowering. Uniform reversal was best in that probe.
 - All 2,500 per-operator scratch/fusion choices. The shared lowering remained best.
 
-Local 3/5/7-step contractions and exact quotienting leave the final count at 339.
-Seven finite-window reachability analyses retain all 678 state/read pairs; the
-largest explores 980,791 abstract configurations. These failures are limits of
-these experiments, not lower bounds on equivalent machines.
+The follow-up search budgets and initial/final configurations are recorded in
+[the same manifest](../reference/ics-experiments.json): arithmetic sharing,
+an 800-configuration factoring probe, an 11-generation unrestricted beam, an
+80-generation focused beam, all 2,500 operator lowerings with sharing enabled,
+and a further 40-generation beam from the new incumbent. Only complete recorded
+generations count in these summaries; they are not counts of distinct machines.
+
+Additional prototypes tested selective inference dispatch (332 states), all 16
+formula evaluation-order masks (best 320 before factoring), and 15 adjacent-pair
+factoring choices (best 325). These do not improve the shared 320-state source.
+The inference and expression-order prototypes are retained for investigation;
+they do not participate in the candidate and have no end-to-end equivalence
+check. A globally dual pairing prototype was also larger and was discarded.
+
+Local 3/5/7-step contractions and exact quotienting leave the candidate at 316.
+Finite-window analysis still excludes no state/read pairs in the tested windows.
+These failures are limits of the experiments, not lower bounds on equivalent
+machines.
 
 ## Reproduce
 
@@ -130,6 +190,11 @@ python3 tools/experiment.py ics-joint
 python3 tools/experiment.py ics-storage
 python3 tools/experiment.py ics-encoding
 python3 tools/experiment.py ics-operators
+python3 tools/experiment.py ics-sharing
+python3 tools/experiment.py ics-grammar-probe
+python3 tools/experiment.py ics-grammar
+python3 tools/experiment.py ics-shared-operators
+python3 tools/experiment.py ics-grammar-followup
 ```
 
 The recorded experiments supply their own initial configurations, so they can be
@@ -142,7 +207,7 @@ for exactly what the checks establish.
 
 The large gains in this round came from changing representations and sharing
 whole arithmetic routines. Further work should target a cheaper instruction
-backend, coordinated stack/pairing operations, and larger expression-level
-rewrites searched jointly with layout. Another long run of the same local
+backend and larger arithmetic or expression-level rewrites. The current
+implementation already shares stack pairing and searches inlining with layout. Another long run of the same local
 permutations is less promising than expanding the compiler's choices. Keep the
 conservative baseline and the ICS dependency explicit while exploring these.

@@ -1,4 +1,7 @@
-"""Bounded exploratory compiler probes. Not used to generate the accepted candidate.
+"""Factoring alternatives and bounded probes for the conservative source.
+
+The current ICS grammar pass reuses RandomZF2 and CostZF2 as compiler methods;
+the standalone driver retains the original conservative-source experiments.
 
 Alternative factoring follows upstream's factoring approach, with a fix for
 its uncalled reachable() iterator in the duplicate-sequence branch. These

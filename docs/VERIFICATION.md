@@ -3,7 +3,7 @@
 **Status: exact reproduction and computational checks, not a formal proof.**
 There is no Lean development or verified ZF-independence theorem in this repo.
 The conservative 392-state table follows the corrected Wade source. The current
-339-state experiment uses the ICS formulation and a different formula coding.
+316-state experiment uses the ICS formulation and a different formula coding.
 Lean verification is deliberately deferred while these experiments continue.
 
 ## Conservative 392-state baseline: `python3 tools/verify.py`
@@ -30,9 +30,9 @@ some bounded behavior. Equality of clause sets alone is not an end-to-end
 halting-equivalence proof: selector semantics, proof encoding, instruction
 lowering, and tape layout are additional obligations.
 
-## Experimental 339-state candidate: `python3 tools/verify_ics.py`
+## Experimental 316-state candidate: `python3 tools/verify_ics.py`
 
-This command checks the candidate table hash, exact recompilation, the 67 + 272
+This command checks the candidate table hash, exact recompilation, the 65 + 251
 state split and ten active registers. It compares five formula-construction
 sequences with the pinned corrected ICS source, checks 90 schema-renaming
 round trips, and runs 500 guard, 48 detachment, and 1,440 constructor cases in
@@ -40,14 +40,33 @@ an independent register-IR interpreter. The latter compare arithmetic results,
 untouched stack tails and scratch cleanup; they do not formally verify the
 interpreter or its correspondence with tape execution.
 
+The sharing pass adds 4,280 differential cases: 800 stack pushes, 2,400
+selections, 540 parameter copies, 500 complete protected guards, and 40 selected
+or inactive detachments. Each comparison checks every register, including scratch
+cleanup and preservation of unrelated values. Together with the earlier checks,
+there are 6,268 local arithmetic/differential cases.
+
+The factoring audit compares the complete unfactored source CFG with the
+candidate's factored CFG. Each graph has 6,806 nodes; 4,707 reachable pairs of
+operations/exits are matched after following unconditional jumps. Register names,
+operations, and both decrement outcomes must agree. A normal return from `main`
+and an explicit `halt` are different labels. An unconditional jump cycle is
+also distinguished from termination. Regression tests reject alterations at
+these boundaries. This checks all CFG branches, rather than a bounded execution
+sample, but trusts the Python compiler/checker and does not prove tape-backend
+correctness or the arithmetic sharing rewrites in Lean.
+
 A separate literal one-million-step tape simulation visits the main dispatch
-1,006 times and enters register primitives 985 times. The minimum observed
+1,010 times and enters register primitives 993 times. The minimum observed
 zero gap before the next register-file 1 is seven cells. This is a diagnostic
 for that finite execution, not a proof of perpetual separation. `--windows`
-adds the seven finite-window reachability experiments.
+adds seven finite-window reachability experiments; all retain the 632 state/read
+pairs, with a largest exploration of 915,223 abstract configurations.
 
-The theory has changed: the source omits Extensionality and uses the published
-ICS scheme. Its claimed equiconsistency with ZF remains an explicit dependency.
+Relative to the conservative baseline, the source omits Extensionality and uses
+the published ICS scheme. The new sharing/factoring passes keep these schemas
+and their formula encoding unchanged. The claimed equiconsistency of ICS with
+ZF remains an explicit dependency.
 The formula recoding must also be included in any later proof. Matching the
 published constructor sequences and passing finite tests do not discharge
 these obligations. [Experiments](EXPERIMENTS.md) describes both transformations.
@@ -58,7 +77,7 @@ A configuration is a control state, an integer head position, and a map from
 integers to bits, initially zero everywhere. Each table row reads the head bit,
 writes one bit, moves one cell left or right and selects the next state. A
 missing transition halts. The designated label `halt` has no outgoing edges.
-There are 339 operational states in the ICS candidate and 392 in the
+There are 316 operational states in the ICS candidate and 392 in the
 conservative baseline, excluding that label.
 
 The reduction tools use a complete table with a separate `HALT` target. Missing

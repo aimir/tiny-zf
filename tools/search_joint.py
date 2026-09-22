@@ -1,5 +1,6 @@
 """Beam search over layout, schema parameter naming and arithmetic lowering."""
 import argparse
+from functools import partial
 import json
 import multiprocessing as mp
 from pathlib import Path
@@ -11,8 +12,8 @@ from reduce import reduce
 from search import mutate
 
 
-def score(config):
-    machine = build_joint(config)
+def score(config, sharing=False, grammar=None):
+    machine = build_joint(config, sharing=sharing, grammar=grammar)
     return len(reduce(totalize(machine.tm.start, machine.tm.states))), count(machine.tm.states), config
 
 
@@ -44,12 +45,16 @@ def mutation(config, rng, storage_search=False, encoding_search=False):
 
 
 def run(args):
-    initial = decode(json.loads(args.initial.read_text()))
+    initial_record = json.loads(args.initial.read_text())
+    initial = decode(initial_record)
+    sharing = getattr(args, "sharing", False) or initial_record.get("shared_operations", False)
+    grammar = initial_record.get("grammar")
+    evaluate = partial(score, sharing=sharing, grammar=grammar)
     if args.fusion is not None:
         initial = (*initial[:3], args.fusion, *initial[4:])
     if args.storage:
         initial = (*initial[:4], True, initial[5])
-    beam = [score(initial)]
+    beam = [evaluate(initial)]
     champion = beam[0]
     initial_states = champion[0]
     seen = {initial}
@@ -60,26 +65,28 @@ def run(args):
             batch = set()
             while len(batch) < args.batch:
                 candidate = mutation(rng.choice(beam)[2], rng, args.storage, args.encoding)
+                if sharing and not candidate[4]:
+                    continue
                 if candidate not in seen:
                     batch.add(candidate)
             seen.update(batch)
-            union = beam + pool.map(score, sorted(batch))
+            union = beam + pool.map(evaluate, sorted(batch))
             rng.shuffle(union)
             union.sort(key=lambda x:x[0])
             beam = union[:args.width]
             if beam[0][0] < champion[0]:
                 champion = beam[0]
                 history.append({'generation': gen+1, 'states':champion[0], **encode(champion[2])})
-            report = {'kind':'ics-joint', 'seed':args.seed, 'width':args.width, 'batch':args.batch,
+            report = {'kind':'ics-joint', 'shared_operations':sharing, 'grammar':grammar, 'seed':args.seed, 'width':args.width, 'batch':args.batch,
                       'generations':gen+1, 'evaluations':len(seen), 'initial_states':initial_states, 'storage_search':args.storage, 'encoding_search':args.encoding,
                       'raw_states':champion[1], 'final_states':champion[0], **encode(champion[2]),
                       'improvements':history}
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(json.dumps(report, indent=2)+'\n')
             if args.frontier:
-                args.frontier.write_text(json.dumps([{'score':s, 'raw':r, **encode(c)} for s,r,c in beam],indent=2)+'\n')
+                args.frontier.write_text(json.dumps([{'score':s, 'raw':r, 'shared_operations':sharing, 'grammar':grammar, **encode(c)} for s,r,c in beam],indent=2)+'\n')
             print(f'generation {gen+1}: {champion[0]}, frontier {beam[0][0]}..{beam[-1][0]}, {len(seen)} evaluated',flush=True)
-    write_table(args.output.with_suffix('.tm'), build_joint(champion[2]))
+    write_table(args.output.with_suffix('.tm'), build_joint(champion[2], sharing=sharing, grammar=grammar))
 
 
 if __name__ == '__main__':
@@ -87,6 +94,7 @@ if __name__ == '__main__':
     p.add_argument('--initial',type=Path,default=ROOT/'candidates/ics-best.json')
     p.add_argument('--fusion',type=int)
     p.add_argument('--storage',action='store_true')
+    p.add_argument('--sharing',action='store_true')
     p.add_argument('--encoding',action='store_true')
     p.add_argument('--seed',type=int,default=20260924)
     p.add_argument('--width',type=int,default=128)

@@ -68,8 +68,15 @@ class OperatorICS(TwoScratchICS):
     def wal(self):return self.operator(4)
 
 
-def build_operators(config,modes,mask=15):
-    m=OperatorICS();m.AXIOMORDER=list(config[0]);m.permutations=config[1];m.protected_permutation=config[2]
+def build_operators(config,modes,mask=15,sharing=False,grammar=None):
+    cls=OperatorICS
+    if sharing:
+        from stack_ops import SharedCopy,SharedPair,SharedPop
+        cls=type("SharedOperators",(SharedCopy,SharedPair,SharedPop,cls),{})
+    if grammar is not None:
+        from grammar import GrammarCompiler
+        cls=type("FactoredOperators",(GrammarCompiler,cls),{})
+    m=cls();m.grammar_options=grammar;m.AXIOMORDER=list(config[0]);m.permutations=config[1];m.protected_permutation=config[2]
     m.operator_modes=tuple(modes);m.payload_mask=mask;m.build_machine()
     return m
 

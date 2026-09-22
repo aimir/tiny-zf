@@ -6,7 +6,9 @@ It is useful for differential testing of local arithmetic/constructor changes.
 from functools import lru_cache
 
 
-def compile_fragment(machine, fragment):
+def compile_fragment(machine, fragment, *, terminal="halt"):
+    if terminal not in ("halt", "return"):
+        raise ValueError("unknown fragment terminal")
     def tree(value):
         if isinstance(value, int):
             return node(value)
@@ -24,7 +26,7 @@ def compile_fragment(machine, fragment):
     def node(index):
         return tree(machine.sequences[index].seq)
 
-    root = (tree(fragment), 'halt')
+    root = (tree(fragment), terminal)
     leaves = {}
     def visit(value, path):
         if isinstance(value, tuple):
@@ -57,8 +59,8 @@ def compile_fragment(machine, fragment):
 
     cfg = {}
     for path, op in leaves.items():
-        if op == 'halt':
-            cfg[path] = ('halt',)
+        if op in ('halt', 'return'):
+            cfg[path] = (op,)
         elif op.startswith('_'):
             kind, level = op[1:].split('.')
             cfg[path] = ('goto', jump(path, kind, int(level)))
@@ -75,7 +77,7 @@ def execute(compiled, registers=None, limit=10_000_000):
     regs = dict(registers or {})
     for step in range(limit):
         op = cfg[pc]
-        if op[0] == 'halt':
+        if op[0] in ('halt', 'return'):
             return regs, step
         if op[0] == 'goto':
             pc = op[1]

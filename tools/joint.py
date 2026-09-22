@@ -55,7 +55,7 @@ class FusedPermutedICS(FusedICS, PermutedICS):
     pass
 
 
-def build_joint(config):
+def build_joint(config, sharing=False, grammar=None, compile_machine=True):
     order, permutations, protected, fusion, storage, reverse = config
     require(len(permutations) == len(SCHEMAS) and all(i in range(6) for i in permutations), 'bad parameter permutation')
     require(protected in range(6) and fusion in range(-1, 8), 'bad lowering configuration')
@@ -78,13 +78,24 @@ def build_joint(config):
             machine = FusedTwoScratch()
     else:
         machine = PermutedICS() if fusion == -1 else FusedPermutedICS()
+    if sharing:
+        require(storage, "shared stack operations require the two-scratch source")
+        from stack_ops import SharedCopy, SharedPair, SharedPop
+        cls = type("SharedICS", (SharedCopy, SharedPair, SharedPop, type(machine)), {})
+        machine = cls()
+    if grammar is not None:
+        from grammar import GrammarCompiler
+        cls = type("FactoredICS", (GrammarCompiler, type(machine)), {})
+        machine = cls()
+        machine.grammar_options = grammar
     machine.AXIOMORDER = list(order)
     machine.permutations = tuple(permutations)
     machine.protected_permutation = protected
     if fusion != -1:
         machine.tag_mode = fusion // 2
         machine.binary_mode = fusion % 2
-    machine.build_machine()
+    if compile_machine:
+        machine.build_machine()
     return machine
 
 
