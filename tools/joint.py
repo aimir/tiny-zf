@@ -101,6 +101,10 @@ def build_joint(config, sharing=False, grammar=None, compile_machine=True, formu
     if decoder is not None:
         from decoder import apply_decoder
         machine=apply_decoder(machine,decoder)
+    if native is not None and native.get('unpair'):
+        from unpair_fusion import apply_unpair
+        require(sharing,'unpair fusion requires shared stack routines')
+        machine=apply_unpair(machine,native)
     if instruction_tree is not None:
         from instruction_tree import TreeCompiler
         cls = type("TreeICS", (TreeCompiler, type(machine)), {})

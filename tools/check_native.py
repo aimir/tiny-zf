@@ -43,6 +43,9 @@ def kernel_checks(record,cases=2000,seed=901,direction="movr"):
 
 
 def source_check(record):
+    if (record.get('native') or {}).get('unpair'):
+        from check_unpair import source_contract_check
+        return source_contract_check(record)
     candidate=build_native(record)
     reference=build_native({**record,'native':None})
     return equivalent_cfg(compile_fragment(reference,reference.find_seq('main().0'),terminal='return'),
@@ -58,7 +61,7 @@ def literal_check(machine,checks=512,limit=20000000):
     """
     pc,cfg=compile_fragment(machine,machine.find_seq('main().0'),terminal='return',expand_native=False)
     root=pc;expected={};ones=set();head=0;q=machine.tm.start;pending=None;done=0;gap_min=None;counts=Counter()
-    active={op[1] for op in cfg.values() if op[0] in ('inc','decnz','movr','movl')}
+    active={op[1] for op in cfg.values() if op[0] in ('inc','decnz','movr','movl','cstep')}
     address_mode=getattr(machine,'native_addresses',False);selected=0
     declared=list(machine.registers);names=declared[:max(declared.index(x) for x in active)+1]
     moves={(a,op.split('.')[-1]):b for (a,b),op in getattr(machine,'native_opcodes',{}).items()}
@@ -72,7 +75,7 @@ def literal_check(machine,checks=512,limit=20000000):
         if not q[0].isdigit() and target.startswith('3.'):pending=target.split('.')[1:]
         address_call=address_mode and not q[0].isdigit()
         if address_call and target=='1.sel':selected+=1
-        if (q.startswith('3.') or address_call) and target in ('1.inc','1.decnz','1.movr','1.movl'):
+        if (q.startswith('3.') or address_call) and target in ('1.inc','1.decnz','1.movr','1.movl','1.cstep'):
             if address_mode:
                 require(0<selected<=len(names),'literal native selector index is invalid')
                 reg,kind=names[selected-1],target.split('.')[1];selected=0
@@ -101,6 +104,9 @@ def literal_check(machine,checks=512,limit=20000000):
             elif kind=='decnz':
                 expected[reg]=max(0,value-1)
                 if not value:pc=op[3]
+            elif kind=='cstep':
+                a,b=machine.native_options['unpair']['step_pair'];x,y=expected.get(a,0),expected.get(b,0)
+                expected[a],expected[b]=(x+1,y-1) if y else (0,x+1)
             elif kind in ('movr','movl'):
                 dest=moves[reg,kind];expected[dest]=expected.get(dest,0)+value;expected[reg]=0
             else:raise ValueError('unknown native operation')

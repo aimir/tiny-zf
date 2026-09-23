@@ -145,6 +145,16 @@ flow, compares the entire resolved CFG, rebuilds the table exactly and compares
 1,024 literal operations with the independent IR model. It currently supports
 ordinary increments/decrements. See [native contracts and recipes](NATIVE.md).
 
+The [fused-unpair experiment](UNPAIR.md) adds a Cantor diagonal-step contract and
+an exit that restores the tail into the consumed input. Numerical checks include
+nonzero initial outputs, comparison with the integer Cantor inverse, 1,000 decoder
+boundaries and literal `cstep` execution. Its source audit expands fused calls
+into the old contracts and checks the complete resulting CFG. Increment-first
+variants also require a direct expanded-source CFG match; decrement-first variants
+can change the operation trace. The reports distinguish contract-based
+matches from direct matches. Factoring and tree checks use the actual new program.
+None of these finite checks proves the unbounded tape invariant.
+
 ## Literal machine semantics
 
 The separate [dyadic pairing experiment](PAIRING.md) has its own builder and

@@ -250,3 +250,28 @@ Replay IDs are `native-pilot`, `native-active`, `native-left`, `native-addresses
 regenerate the required source/tree frontiers; the deep replay regenerates its
 placement input. Add `--generations 1` for a short smoke run. See
 [contracts, limitations and results](../docs/NATIVE.md).
+
+## Fused unpairing
+
+`unpair_fusion.py` supplies four Cantor loop arrangements, optional tail restoration
+at decoder/selection/guard sites, and the seven-state rightmost-pair `cstep` kernel.
+`check_unpair.py` checks the arithmetic, literal kernel and source wiring under
+explicit contracts. `search_unpair.py` combines these with allocation and physical
+placement using separate search pools and fully reduced tree finalists.
+
+```sh
+python3 tools/search_unpair.py
+python3 tools/experiment.py unpair-fusion
+python3 tools/experiment.py unpair-whole-tree
+python3 tools/experiment.py unpair-expanded
+python3 tools/verify_native.py --candidate scratch/unpair-native.json
+```
+
+The whole-tree replay regenerates the source frontier, independently audits each
+source against the incumbent tree, and refines the compatible sources. The expansion
+replay replaces optimized native operations with their ordinary IR contracts and
+fully reduces the resulting trees; `inline_step` records that source lowering. The default
+search reserves native-Cantor slots for emitted kernels, not configuration flags.
+Existing source searches reject fused records when they cannot preserve them.
+The ordinary tree search and verifier retain fusion options. See
+[contracts, verification scope and recipes](../docs/UNPAIR.md).

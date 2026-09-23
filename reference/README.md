@@ -37,6 +37,7 @@ machine. They do not exercise an unbounded proof search or prove tape separation
 | [decoder-experiments.json](decoder-experiments.json) | Decoder allocation and packed-counter recipes, counts, winning configurations and check summaries; results 308 and 313. |
 | [native-experiments.json](native-experiments.json) | Native transfer/allocation beams, exact selector placement, exposed-address and dispatch probes, replay recipes and aggregate checks; the incumbent stays 308. |
 | [native-initial-tree.json](native-initial-tree.json) | Pinned 308-state tree used to seed native experiments; configuration and hash are in the native manifest. |
+| [unpair-experiments.json](unpair-experiments.json) | Fused unpair/tail restoration, native Cantor-step and whole-tree replay settings, final counts and selected verification results. |
 | [ics-checks.json](ics-checks.json) | Curated rebuild, local differential, finite simulation and reachability results for the 308-state table (without a new window experiment). |
 | [../candidates/ics-best.json](../candidates/ics-best.json) | Current 308-state candidate configuration, table hash and state breakdown. |
 

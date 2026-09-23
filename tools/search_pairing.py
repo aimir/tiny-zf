@@ -51,7 +51,8 @@ def inspect_source(record, *, builder=build_pairing):
     return {'record': record, 'raw_states': raw,
             'final_states': len(reduce(totalize(machine.tm.start, machine.tm.states))),
             'source_hash': digest,
-            'native_active': any((name,'0') in machine.tm.states for name in ('1.movr','1.movl'))}
+            'cantor_active': ('1.cstep','0') in machine.tm.states,
+            'native_active': any((name,'0') in machine.tm.states for name in ('1.movr','1.movl','1.cstep'))}
 
 
 def save(path, row, tree=None, *, builder=build_pairing, kind='ics-dyadic-experiment'):
@@ -81,7 +82,7 @@ def save(path, row, tree=None, *, builder=build_pairing, kind='ics-dyadic-experi
             'active_registers': len(active),
             'table_sha256': hashlib.sha256(path.with_suffix('.tm').read_bytes()).hexdigest()}
     if record.get('native') is not None:
-        data['native_operations']=[kind for kind in ('movr','movl') if '1.'+kind in names]
+        data['native_operations']=[kind for kind in ('movr','movl','cstep') if '1.'+kind in names]
     if tree is not None:
         data.update(instruction_tree=tree_path.name,
                     instruction_tree_sha256=hashlib.sha256(tree_path.read_bytes()).hexdigest())

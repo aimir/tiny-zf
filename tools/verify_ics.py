@@ -181,8 +181,13 @@ def verify(candidate=None,steps=1_000_000,windows=False,tree_boundaries=512):
         order=result['native']['register_order']
         directions=sorted({'movr' if order.index(a)>order.index(b) else 'movl' for a,b in result['native']['moves']})
         report['native']={'kernels':{d:kernel_checks(result,direction=d) for d in directions},
-                          'expanded_source_cfg_pairs':source_check(result),
+                          ('source_cfg_pairs_assuming_unpair_contracts' if result['native'].get('unpair') else 'expanded_source_cfg_pairs'):source_check(result),
                           'literal_ir':literal_check(m,checks=1024)}
+    if (result.get('native') or {}).get('unpair'):
+        from check_unpair import arithmetic_checks as unpair_arithmetic_checks,direct_source_check,kernel_checks as check_cantor
+        report['unpair_fusion']=unpair_arithmetic_checks(result)
+        report['unpair_fusion']['direct_source_cfg_pairs']=direct_source_check(result)
+        if result['native']['unpair'].get('step'):report['unpair_fusion'].update(check_cantor(result))
     if result.get("shared_operations"):
         from verify_sharing import sharing_checks
         report["shared_operations"]=sharing_checks(result)

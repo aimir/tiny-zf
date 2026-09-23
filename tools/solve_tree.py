@@ -140,7 +140,7 @@ def run(args):
         if proposed.size(root)+backend>incumbent:
             proposed.clear_caches()
             return
-        m=build_joint(decode(record),compile_machine=False,decoder=record.get('decoder'),native=record.get('native'))
+        m=build_joint(decode(record),sharing=record.get('shared_operations',False),compile_machine=False,decoder=record.get('decoder'),native=record.get('native'))
         proposed.install(m,root);m.name_sequences();m.generate();m.tm.gc()
         pairs=equivalent_increment_cfg(original,compile_fragment(m,m.find_seq('main().0'),terminal='return'))
         raw=count(m.tm.states);final=len(reduce(totalize(m.tm.start,m.tm.states)));proposals+=1

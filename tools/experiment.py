@@ -52,7 +52,7 @@ def main():
     p.add_argument('--generations',type=int,help='optional shorter exploratory run')
     args=p.parse_args()
     data=json.loads((ROOT/'reference/ics-experiments.json').read_text())
-    for name in ('backend-experiments.json', 'combined-experiments.json', 'pairing-experiments.json', 'decoder-experiments.json', 'native-experiments.json'):
+    for name in ('backend-experiments.json', 'combined-experiments.json', 'pairing-experiments.json', 'decoder-experiments.json', 'native-experiments.json', 'unpair-experiments.json'):
         manifest=ROOT/'reference'/name
         if manifest.exists():
             extra=json.loads(manifest.read_text())
@@ -83,11 +83,17 @@ def main():
     if run['search'].startswith('native'):
         replay_native(run,args,directory,initial)
         return
-    script={'order':'search_ics.py','joint':'search_joint.py','operators':'search_operators.py','grammar':'search_grammar.py','grammar-probe':'search_grammar.py','rewrites':'search_rewrites.py','tree':'search_tree.py','combined':'search_combined.py','pairing':'search_pairing.py','decoder':'search_decoder.py'}[run['search']]
+    script={'order':'search_ics.py','joint':'search_joint.py','operators':'search_operators.py','grammar':'search_grammar.py','grammar-probe':'search_grammar.py','rewrites':'search_rewrites.py','tree':'search_tree.py','combined':'search_combined.py','pairing':'search_pairing.py','decoder':'search_decoder.py','unpair':'search_unpair.py','unpair-refine':'search_unpair.py'}[run['search']]
     output=directory/'result.json'
     command=[sys.executable,'-B',str(ROOT/'tools'/script),'--initial',str(initial),
              '--output',str(output)]
-    if run['search'] not in ('tree','pairing','decoder'):command+=['--workers',str(workers)]
+    if run['search'] not in ('tree','pairing','decoder','unpair','unpair-refine'):command+=['--workers',str(workers)]
+    if run['search']=='unpair-refine':
+        parent=run['frontier_from_run']
+        replay=[sys.executable,'-B',str(Path(__file__).resolve()),parent]
+        if args.generations is not None:replay+=['--generations',str(args.generations)]
+        subprocess.run(replay,check=True)
+        command+=['--expand-native-frontier' if run.get('expand_native') else '--whole-tree-refinement',str(ROOT/'scratch'/('replay-'+parent)/'result.frontier.json')]
     if run.get('resume_frontier'):
         command+=['--initial-frontier',str(parent_file.with_suffix('.frontier.json'))]
     if run['search']=='grammar-probe':
@@ -98,7 +104,7 @@ def main():
         for name in ('seed','width','batch'):
             command+=['--'+name,str(run[name])]
         command+=['--generations',str(args.generations or run['generations'])]
-        if run['search'] in ('pairing','decoder'):
+        if run['search'] in ('pairing','decoder','unpair','unpair-refine'):
             for name in ('tree_candidates','tree_batch','tree_width','tree_screen','memory_mb'):
                 command+=['--'+name.replace('_','-'),str(run[name])]
             command+=['--tree-generations',str(min(args.generations,run['tree_generations']) if args.generations else run['tree_generations'])]

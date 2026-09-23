@@ -32,7 +32,7 @@ def run(args):
     args.output.parent.mkdir(parents=True,exist_ok=True)
 
     def compile_tree(arena,root):
-        m=build_joint(decode(record),compile_machine=False,decoder=record.get('decoder'),native=record.get('native'))
+        m=build_joint(decode(record),sharing=record.get('shared_operations',False),compile_machine=False,decoder=record.get('decoder'),native=record.get('native'))
         arena.install(m,root);m.name_sequences();m.generate();m.tm.gc()
         return m
 

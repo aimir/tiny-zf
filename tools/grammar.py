@@ -12,7 +12,7 @@ def context_requirements(machine):
         # enclosing right edges. Natural completion needs one left edge.
         if isinstance(v,str):
             if v=='halt':return (0,0)
-            if v.endswith(('.inc','.movr','.movl')):return (1,0)
+            if v.endswith(('.inc','.movr','.movl','.cstep')):return (1,0)
             if v.endswith('.decnz'):return (2,0)
             kind,level=v[1:].split('.')
             return (int(level)+1,0) if kind=='break' else (0,int(level))

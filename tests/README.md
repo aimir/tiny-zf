@@ -1,6 +1,6 @@
 # Regression tests
 
-Run `python3 -m unittest discover -s tests` from the root. The 75 tests cover:
+Run `python3 -m unittest discover -s tests` from the root. The 87 tests cover:
 
 - Strict table parsing, missing-read totalization and rejected malformed inputs.
 - Valid and invalid quotient certificates and local tape-cell preservation.
@@ -49,6 +49,13 @@ Run `python3 -m unittest discover -s tests` from the root. The 75 tests cover:
   selector placement.
 - Exposed-address CFG resolution rejects missing, excessive and unfinished
   selections; hardware increments cannot use register-level commutation rules.
+
+- Fused unpair and restored-tail interfaces against the integer Cantor inverse,
+  including nonzero initial outputs; all fusion-site masks preserve source wiring.
+- Native Cantor-step tape fixtures, literal dispatch/IR agreement, invalid layouts,
+  damaged kernels, incorrect arithmetic and corrupted fusion-site rejection.
+- Expanding optimized native operations preserves the complete register program.
+- The default candidate verifier retains its original arithmetic checks.
 
 Legacy combined/pairing fixtures use their pinned 310-state configurations; current
 instruction-tree tests use all settings from the current candidate.

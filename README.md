@@ -54,6 +54,13 @@ The [native-tape experiments](docs/NATIVE.md) combine adjacent transfers, physic
 register placement and decoder allocation with width-128 beams and 32 tree
 finalists per campaign. Their best transfer result is **311 states**; exposing
 register selection to tree search reaches **309**. Neither improves 308.
+The [fused-unpair experiment](docs/UNPAIR.md) combines a native Cantor step with
+unpair/tail restoration, allocation and separate source/tree search pools. Its
+[curated results and replay settings](reference/unpair-experiments.json) include
+an additional search seeded with the entire validated incumbent tree. Across
+**3,998 source evaluations** and **404,480 tree mutations**, source fusion matched
+308; the native kernel reached 313. Expanding all 16 native finalists back into
+ordinary instructions also bottomed out at 308.
 [Experiments](docs/EXPERIMENTS.md) explains what worked, what failed, and how to repeat the searches. Search limits are not lower bounds.
 
 ## Reproduce and check
@@ -75,7 +82,7 @@ audits decoder register allocation, checks **1,000 decoder boundaries**, and
 simulates one million literal tape steps. It also compares all ten registers
 at **512 decrement boundaries** against the pre-tree source, covering about
 12.8 million tape steps per machine. The second checks the conservative 392/393 pair.
-The regression suite has **75 tests**, including checks for separate dyadic pairing
+The regression suite has **87 tests**, including checks for separate dyadic pairing
 experiments. These checks do not establish end-to-end
 halting equivalence or the mathematical equivalence of the axiom systems.
 [Verification scope](docs/VERIFICATION.md) states the remaining obligations.

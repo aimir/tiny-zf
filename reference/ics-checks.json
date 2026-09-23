@@ -87,5 +87,5 @@
     "source_minimum_observed_gap": 7,
     "candidate_minimum_observed_gap": 7
   },
-  "regression_tests": 75
+  "regression_tests": 87
 }

@@ -16,6 +16,7 @@ import search_pairing as engine
 
 
 def placements(record, tree, width=4):
+    require(not (record.get('native') or {}).get('unpair'),'use search_unpair.py to preserve fused arithmetic')
     machine=build_native(record,compile_machine=False)
     leaves={x for pair in tree['nodes'] for x in pair if isinstance(x,str)}
     pairs=[p for p,op in machine.native_opcodes.items() if op in leaves]

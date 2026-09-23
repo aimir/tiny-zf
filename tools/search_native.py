@@ -63,6 +63,7 @@ def family(row):
 
 def run(args):
     base=json.loads(args.initial.read_text());rng=random.Random(args.seed)
+    require(not (base.get('native') or {}).get('unpair'),'use search_unpair.py to preserve fused arithmetic')
     original=read_record(base,args.initial.parent);donor=fragment_bank(original) if original else {}
     args.output.parent.mkdir(parents=True,exist_ok=True)
     seen=set();evaluations=invalid=0;all_best={};loaded=[]

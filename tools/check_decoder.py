@@ -65,9 +65,15 @@ def check(record, cases=100, seed=8103):
     # Original main has enum + four clears + twelve split/move entries, then
     # its default push. Everything after that boundary must be unchanged.
     require(original[17]==ref.add_sequence(ref.v_0()),'reference boundary changed')
+    fusion=(record.get('native') or {}).get('unpair')
+    if fusion:
+        from unpair_fusion import build_contract
+        body_machine=build_contract({**record,'grammar':None});body_machine.main()
+        suffix=body_machine.decoder_sections[2]
+    else:body_machine=m
     if not(packed or borrow):suffix=suffix[1:]
     matched=equivalent_cfg(compile_fragment(ref,original[18:],terminal='return'),
-                           compile_fragment(m,suffix,terminal='return'))
+                           compile_fragment(body_machine,suffix,terminal='return'))
     rng=random.Random(seed)
     for i in range(cases):
         proof=(0 if i%5==0 else rng.randrange(1,64 if packed else 2000))
@@ -86,7 +92,7 @@ def check(record, cases=100, seed=8103):
         if not packed:expected['nextproof']=nextcounter
         require(all(after.get(k,0)==expected.get(k,0) for k in set(after)|set(expected)),
                 f'decoder boundary differs: {options}, input={initial}, got={after}, want={expected}')
-    return {'boundary_cases':cases,'unchanged_body_cfg_pairs':matched,'symbolic_plan_operations':check_plan(options)}
+    return {'boundary_cases':cases,('body_cfg_pairs_assuming_unpair_contracts' if fusion else 'unchanged_body_cfg_pairs'):matched,'symbolic_plan_operations':check_plan(options)}
 
 
 if __name__=='__main__':

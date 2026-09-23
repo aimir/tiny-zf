@@ -368,6 +368,19 @@ shortening the existing dispatcher fails its control-context checks. The 308-sta
 incumbent is unchanged; exact recipes and aggregate checks are in the
 [native manifest](../reference/native-experiments.json).
 
+## Fused unpairing and tail restoration
+
+The [fused-unpair experiment](UNPAIR.md) varies four arithmetic loop arrangements
+and three independent restoration sites. A seven-state native kernel implements
+the common Cantor diagonal step, with two selector states. A width-128 beam
+combines these with allocation and the existing source choices, then optimizes
+32 trees. A further whole-tree search reuses the 308-state incumbent only after
+a complete CFG match. The [manifest](../reference/unpair-experiments.json) records
+all counts and results: 3,998 source evaluations, 404,480 tree mutations, and
+16 native-tree expansions. Source fusion and expansion both reached 308; the
+native kernel reached 313. The incumbent remains unchanged. Arithmetic contract checks remain separate from compiler
+and tape checks; there is no new Lean theorem.
+
 ## Reproduce
 
 ```sh
@@ -392,6 +405,9 @@ python3 tools/experiment.py decoder-allocation
 python3 tools/experiment.py decoder-packed-counter
 python3 tools/experiment.py native-placement
 python3 tools/experiment.py native-addresses
+python3 tools/experiment.py unpair-fusion
+python3 tools/experiment.py unpair-whole-tree
+python3 tools/experiment.py unpair-expanded
 ```
 
 The recorded experiments supply their own initial configurations, so they can be
