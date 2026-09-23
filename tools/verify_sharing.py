@@ -63,10 +63,10 @@ def grammar_check(record,compiled=None):
     validation of the IR interpreter/tape backend.
     """
     config=decode(record);sharing=record.get('shared_operations',False)
-    before=build_joint(config,sharing=sharing,compile_machine=False,formula_choices=record.get("formula_choices"))
+    before=build_joint(config,sharing=sharing,compile_machine=False,formula_choices=record.get("formula_choices"),decoder=record.get('decoder'))
     fragment=before.main()
     a=compile_fragment(before,fragment,terminal='return')
-    after=compiled or build_joint(config,sharing=sharing,grammar=record.get('grammar'),formula_choices=record.get('formula_choices'))
+    after=compiled or build_joint(config,sharing=sharing,grammar=record.get('grammar'),formula_choices=record.get('formula_choices'),decoder=record.get('decoder'))
     b=compile_fragment(after,after.find_seq('main().0'),terminal='return')
     pairs=equivalent_cfg(a,b)
     return {'source_cfg_nodes':len(a[1]),'compiled_cfg_nodes':len(b[1]),

@@ -1,7 +1,8 @@
 # Pairing and unpairing experiments
 
 **Result: 321 states for ordinary dyadic pairing and 323 for reversed dyadic
-pairing. The 310-state Cantor incumbent is unchanged.**
+pairing. Neither improved the then-current 310-state Cantor incumbent;
+the later [decoder search](DECODER.md) reached 308 with Cantor arithmetic.**
 
 | Run | Source evaluations | Tree mutation attempts | Tree evaluations with full reduction | Best source | Best final |
 | --- | ---: | ---: | ---: | ---: | ---: |

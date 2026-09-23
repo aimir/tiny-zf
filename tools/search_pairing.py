@@ -43,8 +43,8 @@ def clean(record):
     return {**source_record(gene_of(record)), 'pairing': deepcopy(record.get('pairing', {}))}
 
 
-def inspect_source(record):
-    machine = build_pairing(record)
+def inspect_source(record, *, builder=build_pairing):
+    machine = builder(record)
     arena = Trees(); root = arena.import_machine(machine)
     digest = fingerprint(arena.export(root)); arena.clear_caches()
     raw = count(machine.tm.states)
@@ -53,13 +53,13 @@ def inspect_source(record):
             'source_hash': digest}
 
 
-def save(path, row, tree=None):
+def save(path, row, tree=None, *, builder=build_pairing, kind='ics-dyadic-experiment'):
     record = row['record']
-    machine = build_pairing(record)
+    machine = builder(record)
     tree_path = path.with_suffix('.tree.json')
     if tree is not None:
         arena = Trees(); root = arena.import_record(tree, machine.registers)
-        machine = build_pairing(record, compile_machine=False)
+        machine = builder(record, compile_machine=False)
         arena.install(machine, root); machine.name_sequences(); machine.generate(); machine.tm.gc()
         tree_path.write_text(json.dumps(tree, indent=2)+'\n')
         arena.clear_caches()
@@ -67,9 +67,14 @@ def save(path, row, tree=None):
     raw = count(machine.tm.states)
     final = len(reduce(totalize(machine.tm.start, machine.tm.states)))
     assert (raw, final) == (row['raw_states'], row['final_states'])
-    data = {**record, 'kind': 'ics-dyadic-experiment',
+    names={q for q,b in machine.tm.states}
+    framework=sum(q[0].isdigit() for q in names)
+    active={q.split('.')[1] for q in names if q.startswith('3.')}
+    data = {**record, 'kind': kind,
             'status': 'experimental; computational checks only; not formally verified',
             'raw_states': raw, 'final_states': final,
+            'framework_states': framework, 'dag_states': raw-framework,
+            'active_registers': len(active),
             'table_sha256': hashlib.sha256(path.with_suffix('.tm').read_bytes()).hexdigest()}
     if tree is not None:
         data.update(instruction_tree=tree_path.name,
@@ -77,10 +82,10 @@ def save(path, row, tree=None):
     path.write_text(json.dumps(data, indent=2)+'\n')
 
 
-def tree_search(row, donor, args, seed):
-    machine = build_pairing(row['record'])
+def tree_search(row, donor, args, seed, *, builder=build_pairing):
+    machine = builder(row['record'])
     original = compile_fragment(machine, machine.find_seq('main().0'), terminal='return')
-    plain = build_pairing({**row['record'], 'grammar': None}, compile_machine=False)
+    plain = builder({**row['record'], 'grammar': None}, compile_machine=False)
     plain.main()
     equivalent_cfg(compile_fragment(plain, plain.find_seq('main().0'), terminal='return'), original)
     arena = Trees('general', True, 1); root = arena.import_machine(machine)
@@ -97,7 +102,7 @@ def tree_search(row, donor, args, seed):
         nonlocal reductions, best
         data = arena.export(v); key = fingerprint(data)
         if key in cached: return cached[key]
-        m = build_pairing(row['record'], compile_machine=False)
+        m = builder(row['record'], compile_machine=False)
         arena.install(m, v); m.name_sequences(); m.generate(); m.tm.gc()
         raw = count(m.tm.states); final = len(reduce(totalize(m.tm.start, m.tm.states)))
         if raw != fixed_states+arena.size(v):

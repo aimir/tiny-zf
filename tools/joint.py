@@ -55,7 +55,7 @@ class FusedPermutedICS(FusedICS, PermutedICS):
     pass
 
 
-def build_joint(config, sharing=False, grammar=None, compile_machine=True, formula_choices=None, instruction_tree=None):
+def build_joint(config, sharing=False, grammar=None, compile_machine=True, formula_choices=None, instruction_tree=None, decoder=None):
     order, permutations, protected, fusion, storage, reverse = config
     require(len(permutations) == len(SCHEMAS) and all(i in range(6) for i in permutations), 'bad parameter permutation')
     require(protected in range(6) and fusion in range(-1, 8), 'bad lowering configuration')
@@ -94,6 +94,9 @@ def build_joint(config, sharing=False, grammar=None, compile_machine=True, formu
         cls = type("RewrittenICS", (RewrittenFormulas, type(machine)), {})
         machine.__class__ = cls
         machine.rewrite_choices = dict(formula_choices)
+    if decoder is not None:
+        from decoder import apply_decoder
+        machine=apply_decoder(machine,decoder)
     if instruction_tree is not None:
         from instruction_tree import TreeCompiler
         cls = type("TreeICS", (TreeCompiler, type(machine)), {})

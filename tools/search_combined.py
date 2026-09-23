@@ -288,7 +288,9 @@ def save(candidate, initial, path, summary):
 
 
 def run(args):
-    initial = json.loads(args.initial.read_text()); gene = gene_of(initial)
+    initial = json.loads(args.initial.read_text())
+    if initial.get('decoder'):raise ValueError('decoder allocation present: use search_decoder.py to preserve it')
+    gene = gene_of(initial)
     if not initial.get('shared_operations') or not gene[0][4]:
         raise ValueError('combined search requires the shared two-scratch source')
     args.output.parent.mkdir(parents=True, exist_ok=True)

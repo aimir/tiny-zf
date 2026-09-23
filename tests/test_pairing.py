@@ -28,19 +28,19 @@ class PairingTests(unittest.TestCase):
             self.assertLess(unpair(n-1)[1],n)
 
     def test_invalid_tag_permutation_rejected(self):
-        r=json.loads((ROOT/'candidates/ics-best.json').read_text())
+        r=json.loads((ROOT/'reference/pairing-experiments.json').read_text())['runs'][0]['initial']
         for order in ((1,3,4),(2,2,4),(2,3)):
             with self.assertRaises(ValueError):
                 build_pairing(r,tag_order=order,compile_machine=False)
 
     def test_aliased_arithmetic_registers_rejected(self):
-        r=json.loads((ROOT/'candidates/ics-best.json').read_text())
+        r=json.loads((ROOT/'reference/pairing-experiments.json').read_text())['runs'][0]['initial']
         m=build_pairing(r,compile_machine=False)
         with self.assertRaises(AssertionError):m.pair(m.param1,m.param1,m.param2)
         with self.assertRaises(AssertionError):m.unpair(m.param1,m.param1,m.param2)
 
     def test_factoring_preserves_recoded_source(self):
-        r=json.loads((ROOT/'candidates/ics-best.json').read_text())
+        r=json.loads((ROOT/'reference/pairing-experiments.json').read_text())['runs'][0]['initial']
         r['pairing']={'kernel':'dyadic-alternating','positive_inverse':True,
                       'tags':'repeat2','tag_order':[4,2,3]}
         source=build_pairing({**r,'grammar':None},compile_machine=False);source.main()
@@ -52,8 +52,9 @@ class PairingTests(unittest.TestCase):
     def test_incumbent_tree_cannot_replace_dyadic_arithmetic(self):
         from search_pairing import inspect_source,tree_search
         from instruction_tree import read_record
-        r=json.loads((ROOT/'candidates/ics-best.json').read_text())
-        row=inspect_source(r);row['tree']=read_record(r,ROOT/'candidates')
+        r=json.loads((ROOT/'reference/pairing-experiments.json').read_text())['runs'][0]['initial']
+        r['instruction_tree']='combined-initial-tree.json'
+        row=inspect_source(r);row['tree']=read_record(r,ROOT/'reference')
         args=SimpleNamespace(tree_generations=0,tree_batch=1,tree_width=4,tree_screen=1)
         with self.assertRaises(ValueError):tree_search(row,{},args,1)
 

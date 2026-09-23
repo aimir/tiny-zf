@@ -1,6 +1,6 @@
 # Smaller ZF proof-search Turing machines
 
-**Current experimental candidate: 310 states — 82 fewer than our 392-state baseline (20.9% smaller).**
+**Current experimental candidate: 308 states — 84 fewer than our 392-state baseline (21.4% smaller).**
 
 The candidate combines the corrected ICS axiom formulation with Wade's compiler,
 searches axiom order and parameter naming together, reuses one register during
@@ -9,8 +9,10 @@ Shared stack and copy routines plus a joint source/inlining/factoring search fur
 A further search changes the syntax of the protected UNI and ICS formulas using
 classical Boolean identities and quantifier duality. The final dispatcher tree
 then saves five states by reassociating instruction blocks and sharing equivalent
-increment sequences.
-It uses **10 active registers** and **65 framework + 245 instruction-DAG states**.
+increment sequences. Joint proof-field decoding and register allocation then save
+two more states by delaying clears and changing field order, followed by a new
+search of the final instruction tree.
+It uses **10 active registers** and **65 framework + 243 instruction-DAG states**.
 
 This is a reproducible experimental machine, **not a formally verified
 ZF-independence result**. Lean work is deferred. The mathematical dependency on
@@ -21,7 +23,7 @@ computational checks.
 
 | Machine | States | Artifact and scope |
 | --- | ---: | --- |
-| Current ICS candidate | **310** | [Table](candidates/ics-best.tm), [configuration and hashes](candidates/ics-best.json), [instruction tree](candidates/ics-tree.json). Changed axiomatization and formula coding; computational checks. |
+| Current ICS candidate | **308** | [Table](candidates/ics-best.tm), [configuration and hashes](candidates/ics-best.json), [instruction tree](candidates/ics-tree.json). Changed axiomatization and formula coding; computational checks. |
 | Conservative baseline | 392 | [Table](candidates/best.tm), [configuration](candidates/best.json). Same distinct axiom clauses as Wade's source, deduplicated and reordered. |
 | Pinned Wade reference | 393 | [Unmodified source/table](vendor/wade/), [provenance](reference/upstream.json). Reproduced transition for transition. |
 
@@ -38,13 +40,16 @@ reached **310**; its recipes and bounded solver experiments are recorded in
 [the backend manifest](reference/backend-experiments.json).
 A combined source/tree search then evaluated **12,065 source configurations** and
 **1,581,312 tree mutation attempts**, with **28,548 full tree reductions**. It found
-alternative 310-state constructions but no smaller machine; the saved candidate
-remains unchanged. [Exact recipes and aggregate results](reference/combined-experiments.json)
+alternative 310-state constructions but no smaller machine; that round left the then-current 310-state candidate
+unchanged. [Exact recipes and aggregate results](reference/combined-experiments.json)
 cover all three runs. These counts include repetitions, not distinct machines.
 A subsequent [pairing/unpairing experiment](docs/PAIRING.md) tested ordinary and
 reversed dyadic encodings across **9,909 source evaluations** and **245,760 tree
 mutation attempts**. Their best fully reduced results were **321 and 323 states**;
-the 310-state incumbent remains unchanged.
+neither improved the then-current 310-state candidate.
+The [decoder/allocation experiment](docs/DECODER.md) reached **308 states**, retaining
+16 source finalists for complete tree optimization. Packing the proof counter
+into the remaining proof removed a register but finished at 313 states.
 [Experiments](docs/EXPERIMENTS.md) explains what worked, what failed, and how to repeat the searches. Search limits are not lower bounds.
 
 ## Reproduce and check
@@ -58,46 +63,49 @@ python3 tools/verify.py
 python3 -m unittest discover -s tests
 ```
 
-The first command rebuilds the 310-state table, checks the ported formulas and
+The first command rebuilds the 308-state table, checks the ported formulas and
 parameter renamings, runs **6,268 local arithmetic/differential cases**, compares
 the complete factored register control flow against the rewritten source, checks
 the selected formula identities independently, audits the final instruction tree,
-and simulates one million literal tape steps. It also compares all ten registers
+audits decoder register allocation, checks **1,000 decoder boundaries**, and
+simulates one million literal tape steps. It also compares all ten registers
 at **512 decrement boundaries** against the pre-tree source, covering about
 12.8 million tape steps per machine. The second checks the conservative 392/393 pair.
-The regression suite has **51 tests**, including checks for separate dyadic pairing
+The regression suite has **60 tests**, including checks for separate dyadic pairing
 experiments. These checks do not establish end-to-end
 halting equivalence or the mathematical equivalence of the axiom systems.
 [Verification scope](docs/VERIFICATION.md) states the remaining obligations.
 
 Add `--windows` to either verifier to repeat its finite-window reachability
-experiment. The tested windows exclude no state/read pairs for either incumbent.
+experiment. The earlier 310-state and conservative-baseline window experiments excluded no
+state/read pairs; windows have not been rerun for the 308-state candidate.
 
 ## Continue experimenting
 
 ```sh
-python3 tools/search_combined.py --workers 2 --edge-rewrites --parent-donors --exploration-slots 4
+python3 tools/search_decoder.py --generations 40 --tree-generations 80 --tree-candidates 16
 python3 tools/search_tree.py --stratified --edge-rewrites
-python3 tools/experiment.py backend-tree-commute
+python3 tools/experiment.py decoder-allocation
 ```
 
-The combined search alternates source changes and tree optimization, keeps
-multiple sources with their own saved trees, and ranks survivors by the fully
-reduced final machines. It can reuse closed fragments after matching their
-register control flow. It defaults to two workers with a cooperative memory budget.
+The decoder search varies field order, scratch placement, transfers, clearing,
+source layout and factoring. It fully reduces source candidates, then optimizes
+multiple finalists using checked fragment transfer and fully reduced tree scores.
+It runs in one process with a cooperative 512 MiB memory budget. Saved trees are
+rechecked and scored when resuming a frontier.
 
-The separate tree search continues from the saved 310-state tree. It screens candidates by
-exact raw state count, fully reduces leading candidates, and checks every saved
-improvement against the source CFG. The replay command repeats the two stages that led
-to 310, starting from the recorded 315-state source. Tree search uses one process
-and compacts its working arena each generation.
+The separate tree search continues from the saved 308-state tree while holding
+the source fixed. The replay command repeats the decoder campaign from its pinned
+310-state starting configuration. Older source searches reject decoder records
+rather than silently discard their allocation settings; their historical recipes
+still work with the recorded inputs.
 
 `tools/solve_tree.py` offers an optional global constraint search over a finite
 dictionary of shared instruction sequences. Its bounds concern that model only.
 [Tools](tools/README.md) documents both searches and the source-changing searches.
 
 The emitted search `.tm` is the raw compiled table; metadata records both raw
-and reduced counts. They are both 310 for the saved candidate. A future result
+and reduced counts. They are both 308 for the saved candidate. A future result
 that relies on table reduction needs a checked reduction certificate before
 promotion. [Tools](tools/README.md) documents the implementation.
 

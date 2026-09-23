@@ -50,6 +50,7 @@ def mutate(gene, rng):
 
 def run(args):
     record = json.loads(args.initial.read_text())
+    if record.get('decoder'):raise ValueError('decoder allocation present: use search_decoder.py to preserve it')
     if record.get("instruction_tree"):
         print("Source search rebuilds the saved source; run search_tree.py on its output to optimize the changed tree.",flush=True)
     if not record.get('shared_operations') or not record.get('two_scratch'):

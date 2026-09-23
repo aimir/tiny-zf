@@ -31,11 +31,12 @@ machine. They do not exercise an unbounded proof search or prove tape separation
 | [ics-upstream.json](ics-upstream.json) | Corrected ICS source commit and hashes. |
 | [ics-experiments.json](ics-experiments.json) | Exact initial/final configurations and budgets for twelve replayable runs: 56,264 initial, 59,176 sharing/factoring and 20,481 formula-rewrite configurations. |
 | [backend-experiments.json](backend-experiments.json) | Dispatcher-tree search recipes and bounded backend/constraint experiments. |
-| [combined-experiments.json](combined-experiments.json) | Three combined source/tree recipes, 12,065 source evaluations, 1,581,312 tree mutation attempts, and aggregate checks; best remains 310. |
+| [combined-experiments.json](combined-experiments.json) | Three combined source/tree recipes, 12,065 source evaluations, 1,581,312 tree mutation attempts, and aggregate checks; best for those runs was 310. |
 | [combined-initial-tree.json](combined-initial-tree.json) | Exact 310-state starting tree for replay; its source and hash are in the combined manifest. |
 | [pairing-experiments.json](pairing-experiments.json) | Two dyadic-pairing recipes, 9,909 source evaluations, 245,760 tree mutation attempts, and winning configurations/check summaries; results 321 and 323. |
-| [ics-checks.json](ics-checks.json) | Curated rebuild, local differential, finite simulation and reachability results for the 310-state table. |
-| [../candidates/ics-best.json](../candidates/ics-best.json) | Current 310-state candidate configuration, table hash and state breakdown. |
+| [decoder-experiments.json](decoder-experiments.json) | Decoder allocation and packed-counter recipes, counts, winning configurations and check summaries; results 308 and 313. |
+| [ics-checks.json](ics-checks.json) | Curated rebuild, local differential, finite simulation and reachability results for the 308-state table (without a new window experiment). |
+| [../candidates/ics-best.json](../candidates/ics-best.json) | Current 308-state candidate configuration, table hash and state breakdown. |
 
 These add to the initial survey experiments above. Full generation traces and
 beam frontiers are intentionally absent. Use `python3 tools/experiment.py ID` to

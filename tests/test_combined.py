@@ -25,8 +25,9 @@ def linear(ops, terminal='return'):
 class CombinedSearchTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.record = json.loads((ROOT/'candidates/ics-best.json').read_text())
-        cls.data = read_record(cls.record, ROOT/'candidates')
+        cls.record = json.loads((ROOT/'reference/combined-experiments.json').read_text())['runs'][0]['initial']
+        cls.record['instruction_tree'] = 'combined-initial-tree.json'
+        cls.data = read_record(cls.record, ROOT/'reference')
         cls.gene = gene_of(cls.record)
         cls.bank = fragment_bank(cls.data)
 

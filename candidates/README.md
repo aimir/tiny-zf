@@ -1,8 +1,9 @@
 # Candidate tables
 
-- **Current experimental candidate: 310 states**, in [ics-best.tm](ics-best.tm),
+- **Current experimental candidate: 308 states**, in [ics-best.tm](ics-best.tm),
   with [configuration and hashes](ics-best.json) and the [final instruction tree](ics-tree.json). Uses ICS, ten active
-  registers, and reversed binary formula payloads. Run `python3 tools/verify_ics.py`.
+  registers, reversed binary formula payloads, and the field order
+  `param1, param3, param2, axiomcode` with delayed clears. Run `python3 tools/verify_ics.py`.
 - **Conservative baseline: 392 states**, in [best.tm](best.tm), with
   [configuration](best.json). Retains all distinct Wade axiom clauses. Run
   `python3 tools/verify.py`.

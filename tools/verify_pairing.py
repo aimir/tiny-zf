@@ -35,7 +35,7 @@ def check_registers(actual, initial, updates):
 
 
 def arithmetic_checks(record=None):
-    record=record or json.loads((ROOT/'candidates/ics-best.json').read_text())
+    record=record or json.loads((ROOT/'reference/pairing-experiments.json').read_text())['runs'][0]['initial']
     cases={'pair':0,'unpair':0,'constructors':0,'stack':0,'guard':0,'decoder':0,'detachment':0}
     sentinel={'nextproof':19,'axiomcode':7,'topwff':5,'wffstack':3,'param3':11,'scratch3':13}
     for kernel,inverse,dual in itertools.product(KERNELS,(False,True),(False,True)):

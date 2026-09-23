@@ -1,6 +1,6 @@
 # Regression tests
 
-Run `python3 -m unittest discover -s tests` from the root. The 51 tests cover:
+Run `python3 -m unittest discover -s tests` from the root. The 60 tests cover:
 
 - Strict table parsing, missing-read totalization and rejected malformed inputs.
 - Valid and invalid quotient certificates and local tape-cell preservation.
@@ -34,6 +34,16 @@ Run `python3 -m unittest discover -s tests` from the root. The 51 tests cover:
 - Dyadic distinguished codes and numerical round trips, invalid tag/alias
   rejection, factoring equivalence, and rejection of the old Cantor tree when
   checking a recoded source.
+
+- Decoder live-value contracts for all 1,024 grid plans and rejection of aliased,
+  occupied or invalid destinations; the symbolic checker also rejects corrupt plans.
+- Numerical boundaries for direct, rotating, deferred, borrowed-stack and packed-counter
+  variants; the packed design has nine active registers.
+- Proof-field permutation round trips, decreasing positive tails, rejection of
+  the stale 310-state tree, and preservation of an optimized tree on search restart.
+
+Legacy combined/pairing fixtures use their pinned 310-state configurations; current
+instruction-tree tests use all settings from the current candidate.
 
 Exact artifact reproduction and finite tape simulation are separately checked by
 `python3 tools/verify_ics.py` and `python3 tools/verify.py`. These commands do not

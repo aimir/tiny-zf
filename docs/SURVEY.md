@@ -4,7 +4,7 @@ Surveyed 22 September 2026. State counts below distinguish published claims,
 locally counted tables, and exact local reproduction. None is a lower bound.
 The smallest upstream table located and reproduced here has **393 states**;
 our conservative source candidate has **392**. A subsequent experimental ICS
-port and subsequent arithmetic/factoring work reached **310**; see [the experiments](EXPERIMENTS.md). None carries an
+port and subsequent arithmetic/factoring work reached **308**; see [the experiments](EXPERIMENTS.md). None carries an
 end-to-end formal verification in this repository.
 
 ## Sources and development lines
@@ -32,7 +32,7 @@ It drops Extensionality as well as Regularity and Choice, and combines Infinity,
 Collection and Separation into an **ICS scheme**, retaining Powerset and Union.
 Its source sketches an interpretation through a constructible universe. This is
 a distinct logical development, not an obsolete version of Wade's current
-393-state program. The experimental port to Wade's newer backend now reaches 310 states; see
+393-state program. The experimental port to Wade's newer backend now reaches 308 states; see
 [the follow-up experiments](EXPERIMENTS.md). The equiconsistency argument still
 needs scrutiny before this could replace the conservative baseline as a verified result.
 
@@ -112,7 +112,7 @@ with the other experiments.
 ## Best next directions
 
 1. **Continue auditing and optimizing the ICS port.** The experimental port now
-   reaches 310 states; see [the follow-up](EXPERIMENTS.md). Combining a smaller logical
+   reaches 308 states; see [the follow-up](EXPERIMENTS.md). Combining a smaller logical
    representation with the newer backend might yield much more than another
    permutation search. Preserve a separate theory definition and establish its
    consistency-strength relationship; do not silently change the target theory.

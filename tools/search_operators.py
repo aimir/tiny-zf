@@ -23,7 +23,9 @@ if __name__=='__main__':
     p.add_argument('--workers',type=int,default=4)
     p.add_argument('--output',type=Path,default=ROOT/'scratch/ics-operators.json')
     args=p.parse_args()
-    initial=json.loads(args.initial.read_text());config=decode(initial);best=None
+    initial=json.loads(args.initial.read_text())
+    if initial.get('decoder'):raise ValueError('decoder allocation present: use search_decoder.py to preserve it')
+    config=decode(initial);best=None
     if initial.get('instruction_tree'):print('Operator search rebuilds the source; run search_tree.py on its output.',flush=True)
     sharing=initial.get('shared_operations',False);grammar=initial.get('grammar');formula_choices=initial.get('formula_choices')
     tasks=((config,modes,args.mask,sharing,grammar,formula_choices) for modes in itertools.product(range(5),range(5),range(5),range(4),range(5)))

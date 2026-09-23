@@ -1,6 +1,6 @@
 {
   "status": "experimental; computational checks only",
-  "states": 310,
+  "states": 308,
   "source": {
     "published_constructor_sequences": 5,
     "schema_renaming_cases": 90
@@ -12,12 +12,12 @@
   },
   "smoke": {
     "steps": 1000000,
-    "dispatches": 1011,
-    "register_entries": 994,
+    "dispatches": 1010,
+    "register_entries": 993,
     "minimum_observed_gap": 7,
-    "head": 78,
-    "state": "1.sel.b",
-    "ones": 220
+    "head": -16,
+    "state": "6.continue.0",
+    "ones": 223
   },
   "formula_rewrites": {
     "POW": {
@@ -43,7 +43,18 @@
       "rpn": "p1 p2 weq p3 p1 p2 weq wal wim",
       "atoms": 2,
       "bdd_nodes": 3
+    },
+    "B6a2": {
+      "choice": 0,
+      "rpn": "p1 p2 wel p3 p1 p2 wel wal wim",
+      "atoms": 2,
+      "bdd_nodes": 3
     }
+  },
+  "decoder": {
+    "boundary_cases": 1000,
+    "unchanged_body_cfg_pairs": 4601,
+    "symbolic_plan_operations": 16
   },
   "shared_operations": {
     "push": 800,
@@ -71,54 +82,10 @@
     "decrement_boundaries": 512,
     "increments_between_boundaries": 535,
     "compared_registers": 10,
-    "source_steps": 12810220,
-    "candidate_steps": 12805670,
+    "source_steps": 12809467,
+    "candidate_steps": 12808639,
     "source_minimum_observed_gap": 7,
     "candidate_minimum_observed_gap": 7
   },
-  "windows": [
-    {
-      "left": 3,
-      "right": 3,
-      "abstract_configurations": 10873,
-      "allowed_state_reads": 620
-    },
-    {
-      "left": 8,
-      "right": 2,
-      "abstract_configurations": 55008,
-      "allowed_state_reads": 620
-    },
-    {
-      "left": 2,
-      "right": 8,
-      "abstract_configurations": 241413,
-      "allowed_state_reads": 620
-    },
-    {
-      "left": 5,
-      "right": 5,
-      "abstract_configurations": 94081,
-      "allowed_state_reads": 620
-    },
-    {
-      "left": 10,
-      "right": 2,
-      "abstract_configurations": 165854,
-      "allowed_state_reads": 620
-    },
-    {
-      "left": 2,
-      "right": 10,
-      "abstract_configurations": 964875,
-      "allowed_state_reads": 620
-    },
-    {
-      "left": 6,
-      "right": 6,
-      "abstract_configurations": 286894,
-      "allowed_state_reads": 620
-    }
-  ],
-  "regression_tests": 51
+  "regression_tests": 60
 }

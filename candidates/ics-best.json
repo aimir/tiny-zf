@@ -1,11 +1,4 @@
 {
-  "raw_states": 310,
-  "formula_choices": {
-    "POW": 0,
-    "UNI": 0,
-    "ICS": 162,
-    "B6a1": 0
-  },
   "order": [
     10,
     7,
@@ -41,22 +34,69 @@
   "fusion": 2,
   "two_scratch": true,
   "reverse_payload": true,
+  "formula_choices": {
+    "POW": 0,
+    "UNI": 0,
+    "ICS": 162,
+    "B6a1": 0,
+    "B6a2": 0
+  },
+  "shared_operations": true,
   "grammar": {
     "kind": "cost",
     "inline_probability": 0.75,
-    "seed": 15385382,
-    "inline_main": false
+    "seed": 12277335,
+    "inline_main": false,
+    "inline_seed": 15385382
   },
-  "shared_operations": true,
-  "final_states": 310,
-  "kind": "ics-instruction-tree",
-  "status": "experimental; not formally verified",
-  "wade_commit": "9c5c2e82f6ad5ceb5fb7a2d946aa3b1f1d05b1fce7340fd79029cc9d4756f429",
-  "ics_formula_commit": "74a0e042f5f0ba433b3161b7c6b35ab319113844",
-  "framework_states": 65,
-  "dag_states": 245,
-  "active_registers": 10,
-  "table_sha256": "a156659a40e7129632823c9e973afd501d1e0cc5837024919ee3c2ccc04e5846",
+  "decoder": {
+    "order": [
+      "param1",
+      "param3",
+      "param2",
+      "axiomcode"
+    ],
+    "clear_order": [
+      "param1",
+      "param3",
+      "param2",
+      "axiomcode"
+    ],
+    "eager": false,
+    "stages": [
+      [
+        "scratch1",
+        "scratch2",
+        false
+      ],
+      [
+        "scratch1",
+        "scratch2",
+        false
+      ],
+      [
+        "scratch1",
+        "scratch2",
+        false
+      ],
+      [
+        "scratch1",
+        "scratch2",
+        false
+      ]
+    ],
+    "defer_heads": false
+  },
+  "kind": "ics-decoder-instruction-tree",
+  "status": "experimental; computational checks only; not formally verified",
+  "raw_states": 308,
+  "final_states": 308,
+  "table_sha256": "c4083dd0239b8f5c9bd231c69caff51bca8c5a3d0a0679e92f89bae158817d16",
   "instruction_tree": "ics-tree.json",
-  "instruction_tree_sha256": "0815b1525150b36a479821ad3dae554a3c7944152b107d79a0fd20f6262aa983"
+  "instruction_tree_sha256": "42d6abd5c4d97ec9cb6ef35d0de22f1c0e93a7dc9fb31fd4141dceddf6713b84",
+  "framework_states": 65,
+  "dag_states": 243,
+  "active_registers": 10,
+  "wade_commit": "9c5c2e82f6ad5ceb5fb7a2d946aa3b1f1d05b1fce7340fd79029cc9d4756f429",
+  "ics_formula_commit": "74a0e042f5f0ba433b3161b7c6b35ab319113844"
 }

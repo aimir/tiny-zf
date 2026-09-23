@@ -3,7 +3,7 @@
 **Status: exact reproduction and computational checks, not a formal proof.**
 There is no Lean development or verified ZF-independence theorem in this repo.
 The conservative 392-state table follows the corrected Wade source. The current
-310-state experiment uses the ICS formulation and a different formula coding.
+308-state experiment uses the ICS formulation and a different formula coding.
 Lean verification is deliberately deferred while these experiments continue.
 
 ## Conservative 392-state baseline: `python3 tools/verify.py`
@@ -30,9 +30,9 @@ some bounded behavior. Equality of clause sets alone is not an end-to-end
 halting-equivalence proof: selector semantics, proof encoding, instruction
 lowering, and tape layout are additional obligations.
 
-## Experimental 310-state candidate: `python3 tools/verify_ics.py`
+## Experimental 308-state candidate: `python3 tools/verify_ics.py`
 
-This command checks the candidate table hash, exact recompilation, the 65 + 245
+This command checks the candidate table hash, exact recompilation, the 65 + 243
 state split and ten active registers. It compares five formula-construction
 sequences with the pinned corrected ICS source, checks 90 schema-renaming
 round trips, and runs 500 guard, 48 detachment, and 1,440 constructor cases in
@@ -40,8 +40,8 @@ an independent register-IR interpreter. The latter compare arithmetic results,
 untouched stack tails and scratch cleanup; they do not formally verify the
 interpreter or its correspondence with tape execution.
 
-The current candidate rewrites UNI and ICS; POW and B6a1 choices happen to
-reproduce their original syntax, and B6a2 is left unchanged. An independent
+The current candidate rewrites UNI and ICS; POW, B6a1 and B6a2 choices happen to
+reproduce their original syntax. An independent
 reduced ordered Boolean decision diagram checker compares each selected formula
 with the pinned original. Atomic formulas remain opaque; universal quantifiers
 are indexed by their bound variable and the canonical Boolean form of their
@@ -59,6 +59,24 @@ selections, 540 parameter copies, 500 complete protected guards, and 40 selected
 or inactive detachments. Each comparison checks every register, including scratch
 cleanup and preservation of unrelated values. Together with the earlier checks,
 there are 6,268 local arithmetic/differential cases.
+
+The decoder audit checks the generated allocation with distinct symbolic tokens:
+clears discard only old field values, moves target zero registers, each unpair
+consumes the next proof tail into two zero registers, and all four fields and
+scratch values satisfy the boundary contract. This assumes the existing arithmetic
+primitive contracts; it is a Python resource check, not a Lean proof. A separate
+integer model checks 1,000 decoder/enumerator boundaries, including arbitrary old
+field values, theorem-stack contents and the empty-proof refill case. The remaining
+inference body and halt test match the original body in a complete CFG comparison
+(4,601 matched pairs).
+
+The winning field order is `param1, param3, param2, axiomcode`. This changes the
+numeric proof encoding. Nested Cantor pairing and a field permutation give a
+bijection on instruction tuples; the positive-tail convention still makes every
+finite tail traversal terminate. Connecting this coding argument to soundness
+and completeness of the whole proof enumerator remains a formal obligation.
+The literal-tape differential below compares the new tree with its **own decoder
+source**, not with the old machine on the same proof numbers.
 
 The pre-tree factoring audit compares the complete unfactored rewritten-source CFG with the
 candidate's factored CFG. Each graph has 6,742 nodes; 4,659 reachable pairs of
@@ -86,21 +104,21 @@ old whole-program tree after a formula mutation. Regression tests reject
 changed increment counts/registers, movement across a decrement, swapped branch
 outcomes and malformed tree references. They also audit every available single
 rewrite at the incumbent and confirm that all 65 native framework states are
-unchanged from the 315-state source.
+unchanged from the 313-state decoder source.
 
 A literal differential check compares all ten registers at **512 decrement
 boundaries**, including the 535 increments between them. The source takes
-12,810,220 tape steps and the candidate 12,805,670 to reach those boundaries;
+12,809,467 tape steps and the candidate 12,808,639 to reach those boundaries;
 both have a minimum observed gap of seven cells. This is finite evidence that
 the new dispatch paths implement the intended operations, not an unbounded
 backend proof. Use `--tree-boundaries 0` to omit this longer check.
 
 A separate literal one-million-step tape simulation visits the main dispatch
-1,011 times and enters register primitives 994 times. The minimum observed
+1,010 times and enters register primitives 993 times. The minimum observed
 zero gap before the next register-file 1 is seven cells. This is a diagnostic
 for that finite execution, not a proof of perpetual separation. `--windows`
-adds seven finite-window reachability experiments; all retain the 620 state/read
-pairs, with a largest exploration of 964,875 abstract configurations.
+adds seven finite-window reachability experiments. They have not been rerun for
+308; the earlier 310-state table retained all 620 state/read pairs in those windows.
 
 Relative to the conservative baseline, the source omits Extensionality and uses
 the published ICS scheme. The sharing/factoring passes keep their input schemas
@@ -117,14 +135,14 @@ The separate [dyadic pairing experiment](PAIRING.md) has its own builder and
 `verify_pairing.py` checker. It checks numerical arithmetic contracts, consistent
 constructor/stack/decoder interfaces and each finalist's CFG and finite tape
 behavior against its recoded source. It does not compare that arithmetic trace
-with the incumbent's Cantor computation. The current candidate and this
-document's 310-state theorem target are unchanged.
+with the incumbent's Cantor computation. The current candidate retains Cantor arithmetic. Its decoder allocation and field
+order are described in [the decoder report](DECODER.md).
 
 A configuration is a control state, an integer head position, and a map from
 integers to bits, initially zero everywhere. Each table row reads the head bit,
 writes one bit, moves one cell left or right and selects the next state. A
 missing transition halts. The designated label `halt` has no outgoing edges.
-There are 310 operational states in the ICS candidate and 392 in the
+There are 308 operational states in the ICS candidate and 392 in the
 conservative baseline, excluding that label.
 
 The reduction tools use a complete table with a separate `HALT` target. Missing
@@ -159,8 +177,8 @@ The proof obligations are:
   pairing, proof enumeration and the distinguished target; justify treatment of
   numeric codes that are not well-formed formulas.
 - **Enumeration:** show soundness and completeness of the stack enumeration,
-  including default clauses, inactive premise-loading clauses and out-of-range
-  axiom selectors.
+  including field-order recoding, default clauses, inactive premise-loading clauses
+  and out-of-range axiom selectors.
 - **Deduplication / reordering:** translate finite derivations in both directions
   by renumbering clause selectors and their encodings. Repeated copies of a
   schema are unnecessary, but the renumbering argument must be formalized.

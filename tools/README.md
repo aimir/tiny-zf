@@ -7,12 +7,13 @@ The optional global solver needs OR-Tools. Invoke commands from the repository r
 
 The source flow is **ICS formulas → equivalent protected-formula syntax → parameter naming → comparison storage →
 formula constructors/encoding → shared arithmetic → safe inlining and factoring
-→ an explicit final instruction tree → the unchanged Wade tape backend**.
+→ allocated proof-field decoding → an explicit final instruction tree → the unchanged Wade tape backend**.
 
 | File | Role |
 | --- | --- |
 | `ics.py` | Port the five protected formulas and enforce logical-before-safety phase ordering. |
 | `formula_rewrite.py` | NNF-based protected-schema rewrites and an independent Boolean/quantifier-congruence checker. |
+| `decoder.py` | Plan live-register use for proof-field decoding, delayed clears, direct writes and packed-counter experiments. |
 | `joint.py` | Permute schema parameters, validate configurations and assemble the selected implementation. |
 | `storage.py` | Reuse `topwff` as comparison scratch, saving/restoring the theorem at the safety boundary. |
 | `constructors.py` | Construct tagged formulas directly with alternative scratch assignments. |
@@ -24,15 +25,16 @@ formula constructors/encoding → shared arithmetic → safe inlining and factor
 
 `build_joint(decode(record), sharing=record.get("shared_operations", False),
 grammar=record.get("grammar"), formula_choices=record.get("formula_choices"),
-instruction_tree=read_record(record, ROOT / "candidates"))` rebuilds a complete saved configuration (`read_record` comes from
+instruction_tree=read_record(record, ROOT / "candidates"), decoder=record.get("decoder"))` rebuilds a complete saved configuration (`read_record` comes from
 `instruction_tree.py`; use the configuration file’s directory for search outputs). The unused third scratch name still exists in the inherited
-builder, but its operations are absent from the reachable 310-state machine.
+builder, but its operations are absent from the reachable 308-state machine.
 
 ## Checking
 
 | File | Role |
 | --- | --- |
 | `verify_ics.py` | Rebuild the ICS table; check formula transcription, schema renaming, local arithmetic and finite tape execution. |
+| `check_decoder.py` | Independently audit symbolic live-value tokens, numerical decoder boundaries and the unchanged inference body. |
 | `verify_tree.py` | Audit all branches of the final IR while normalizing consecutive increments; reject altered operations/exits. |
 | `tape_check.py` | Compare literal tape executions at decrement boundaries, including all active register values. |
 | `verify_sharing.py` | Check 4,280 local sharing cases and audit the complete factored CFG against source. |
@@ -55,6 +57,7 @@ These are computational checks. See [verification scope](../docs/VERIFICATION.md
 | `experiment.py` | Replay a curated experiment, including its initial configuration and seed. |
 | `search_ics.py` | Search clause order within the safety phases. |
 | `search_combined.py` | Alternate source changes and tree optimization, reuse checked closed fragments, and select source survivors by final reduced size. |
+| `search_decoder.py` | Search allocation, field order and source choices, then fully reduce multiple tree finalists; preserves decoder settings and rechecks resumed trees. |
 | `search_pairing.py` | Compare ordinary/reversed dyadic kernels, tag implementations and source layouts, then optimize multiple finalists' trees. |
 | `search_tree.py` | Continue tree optimization from the saved artifact; raw screening, full reduction and CFG checks. |
 | `solve_tree.py` | Optional OR-Tools model choosing a binary grammar globally within a finite dictionary. |
@@ -65,7 +68,7 @@ These are computational checks. See [verification scope](../docs/VERIFICATION.md
 | `search.py`, `probes.py` | Preserve the original conservative order and factoring experiments. |
 
 ```sh
-python3 tools/search_grammar.py --preserve-main --output scratch/search.json
+python3 tools/search_decoder.py --output scratch/search.json
 python3 tools/experiment.py ics-encoding
 python3 tools/experiment.py ics-operators
 ```
@@ -75,14 +78,17 @@ Recorded experiment IDs are `ics-order`, `ics-joint`, `ics-storage`,
 `ics-grammar-wide`, `ics-grammar`, `ics-shared-operators` and
 `ics-grammar-followup`, `ics-rewrites`, `backend-tree-basic` and
 `backend-tree-commute`, `combined-source-tree`, `combined-parent-transfer`,
-`combined-wide-screen`, `pairing-dyadic` and `pairing-dual`. Use `--workers 1`
-for fewer processes in searches that support parallel workers; pairing and tree
+`combined-wide-screen`, `pairing-dyadic`, `pairing-dual`,
+`decoder-allocation` and `decoder-packed-counter`. Use `--workers 1`
+for fewer processes in searches that support parallel workers; decoder, pairing and tree
 searches use one process. A replay
 can use `--generations 1` as a short smoke test, which does not reproduce the full
 run. Search outputs go under ignored `scratch/`; raw console traces and beam
 frontiers are not committed.
 
-The older joint, grammar, rewrite and operator searches change the source, so they
+The older joint, grammar, rewrite, operator and combined searches reject records
+with a decoder allocation. Use `search_decoder.py` for the current source or
+replay their historical recipes. For the older sources they
 rebuild its compiler tree and explicitly discard the old tree artifact. They
 preserve the supplied arithmetic/formula settings; run `search_tree.py` on their
 output to optimize the changed tree, or use `search_combined.py` to alternate both stages automatically. A saved tree must never silently override a
@@ -120,7 +126,7 @@ OR-Tools; the recorded runs used version 9.15.6755. With that dependency availab
 
 ```sh
 python3 tools/solve_tree.py --seconds 180 --workers 4
-python3 tools/solve_tree.py --seconds 240 --max-states 309 --max-zeros 7
+python3 tools/solve_tree.py --seconds 240 --max-states 307 --max-zeros 7
 ```
 
 Only closed compositions are flattened. Control nodes stay opaque. Candidate
@@ -136,8 +142,11 @@ frontier, solver model or console log is committed.
 
 ## Combined source and tree search
 
+This earlier engine operates on the pre-decoder source. Its recorded runs supply
+the correct 310-state starting configuration.
+
 ```sh
-python3 tools/search_combined.py --workers 2 --edge-rewrites --parent-donors --exploration-slots 4
+python3 tools/experiment.py combined-source-tree
 ```
 
 The outer beam varies protected-formula syntax, clause order, parameter naming,
@@ -180,3 +189,30 @@ python3 tools/search_combined.py --initial scratch/combined.json \
 
 The restart rechecks all loaded trees against their own rebuilt source. Frontier
 files are scratch checkpoints, not curated artifacts or verification evidence.
+
+## Decoder allocation search
+
+```sh
+python3 tools/search_decoder.py --generations 40 --tree-generations 80 --tree-candidates 16
+python3 tools/search_decoder.py --initial scratch/decoder.json \
+  --resume-frontier scratch/decoder.frontier.json
+python3 tools/experiment.py decoder-allocation
+python3 tools/experiment.py decoder-packed-counter
+python3 tools/check_decoder.py
+```
+
+The initial grid covers direct destination writes, rotating tail buffers,
+eager/delayed clears, transfer order, and deferred parallel assignments. Mutations
+also vary field order and the existing source/factoring genes. A liveness planner
+rejects destructive aliasing. Source candidates receive full reduction; up to 16
+diverse finalists receive tree optimization, complete final-frontier reduction
+and independent CFG audits. Tree routines are shared with the pairing search via
+an explicit builder argument; this does not substitute dyadic arithmetic.
+
+`--packed-counter` trades a dedicated register for Cantor-packed enumeration
+state. `--borrow-stack` temporarily holds the theorem stack in the cleared top
+register to reuse the stack unpair routine. These are mutually exclusive and
+neither is used in the saved 308-state machine. The search uses one process and a
+cooperative `--memory-mb 512` RSS budget. On restart, saved trees are checked and
+scored before source selection, so an optimized tree cannot be lost merely
+because its compiler-generated tree scores worse. See [contracts and results](../docs/DECODER.md).

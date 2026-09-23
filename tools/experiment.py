@@ -14,7 +14,7 @@ def main():
     p.add_argument('--generations',type=int,help='optional shorter exploratory run')
     args=p.parse_args()
     data=json.loads((ROOT/'reference/ics-experiments.json').read_text())
-    for name in ('backend-experiments.json', 'combined-experiments.json', 'pairing-experiments.json'):
+    for name in ('backend-experiments.json', 'combined-experiments.json', 'pairing-experiments.json', 'decoder-experiments.json'):
         manifest=ROOT/'reference'/name
         if manifest.exists():data['runs']+=json.loads(manifest.read_text())['runs']
     matches=[r for r in data['runs'] if r['id']==args.id]
@@ -40,11 +40,11 @@ def main():
     if run.get('initial_tree'):
         initial_record={**initial_record, 'instruction_tree':str(ROOT/'reference'/run['initial_tree'])}
     initial.write_text(json.dumps(initial_record,indent=2)+'\n')
-    script={'order':'search_ics.py','joint':'search_joint.py','operators':'search_operators.py','grammar':'search_grammar.py','grammar-probe':'search_grammar.py','rewrites':'search_rewrites.py','tree':'search_tree.py','combined':'search_combined.py','pairing':'search_pairing.py'}[run['search']]
+    script={'order':'search_ics.py','joint':'search_joint.py','operators':'search_operators.py','grammar':'search_grammar.py','grammar-probe':'search_grammar.py','rewrites':'search_rewrites.py','tree':'search_tree.py','combined':'search_combined.py','pairing':'search_pairing.py','decoder':'search_decoder.py'}[run['search']]
     output=directory/'result.json'
     command=[sys.executable,'-B',str(ROOT/'tools'/script),'--initial',str(initial),
              '--output',str(output)]
-    if run['search'] not in ('tree','pairing'):command+=['--workers',str(workers)]
+    if run['search'] not in ('tree','pairing','decoder'):command+=['--workers',str(workers)]
     if run.get('resume_frontier'):
         command+=['--initial-frontier',str(parent_file.with_suffix('.frontier.json'))]
     if run['search']=='grammar-probe':
@@ -55,11 +55,13 @@ def main():
         for name in ('seed','width','batch'):
             command+=['--'+name,str(run[name])]
         command+=['--generations',str(args.generations or run['generations'])]
-        if run['search']=='pairing':
+        if run['search'] in ('pairing','decoder'):
             for name in ('tree_candidates','tree_batch','tree_width','tree_screen','memory_mb'):
                 command+=['--'+name.replace('_','-'),str(run[name])]
             command+=['--tree-generations',str(min(args.generations,run['tree_generations']) if args.generations else run['tree_generations'])]
             if run.get('dual'):command+=['--dual']
+            if run.get('packed_counter'):command+=['--packed-counter']
+            if run.get('borrow_stack'):command+=['--borrow-stack']
         if run['search']=='combined':
             for name in ('shortlist','screen_slack','tree_rounds','tree_batch','tree_width','tree_keep',
                          'deep_rounds','deep_count','mode','memory_mb'):

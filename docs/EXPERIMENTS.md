@@ -1,6 +1,6 @@
 # ICS and compiler experiments — 23 September 2026
 
-**Best candidate: 310 states, down from 392 (82 states / 20.9%).**
+**Best candidate: 308 states, down from 392 (84 states / 21.4%).**
 This round is experimental. There is no Lean proof and no claim that the local
 computational checks establish the theory's equivalence to ZF.
 
@@ -20,7 +20,8 @@ computational checks establish the theory's equivalence to ZF.
 | Joint source and factoring search | 316 | Search safe inlining and grammar choices together with source layout and parameter naming. |
 | Protected-formula rewrites and joint search | 315 | Preserve the logical/inference clauses; search equivalent protected formulas, source layout and factoring seeds. |
 | Dispatcher-tree reassociation and commuting increments | **310** | Share more binary instruction nodes while preserving the register computation. |
-| Combined source/tree search and checked fragment transfer | **310** | Three bounded runs found alternative 310-state constructions, but no smaller machine. |
+| Combined source/tree search and checked fragment transfer | 310 | Three bounded runs found alternative 310-state constructions, but no smaller machine. |
+| Joint decoder allocation and instruction-tree search | **308** | Decode fields in a different order, delay destination clears, and search 16 final trees. |
 
 These are measured configurations, not additive cost estimates. Different beam
 runs can choose different layouts; in particular the storage search started from
@@ -227,14 +228,15 @@ These discarded prototypes are not part of the candidate; their measured sizes
 do not establish semantic correctness or rule out better implementations of the
 same ideas. Raw prototypes and search traces are not repository artifacts.
 
-Local 3/5/7-step contractions and exact quotienting leave the candidate at 310.
-Finite-window analysis still excludes no state/read pairs in the tested windows.
+Local 3/5/7-step contractions and exact quotienting leave the current candidate at 308.
+Finite-window analysis excluded no state/read pairs for the earlier 310-state table;
+those windows have not been rerun for 308.
 These failures are limits of the experiments, not lower bounds on equivalent
 machines.
 
 ## Dispatcher/backend round
 
-The accepted result keeps the 65-state native framework unchanged and reduces
+This earlier 310-state result kept the 65-state native framework unchanged and reduced
 the decision DAG from 250 to **245 states**. The compiler can now consume an
 explicit final instruction tree, checked independently against the source.
 
@@ -310,7 +312,7 @@ outer generations, up to 24 sources, and deeper searches of six finalists per
 generation. The other screened 2,048 new sources per generation for four
 generations, with shorter tree searches. Both transferred fragments from mutation
 parents and reserved four shortlist slots outside the normal raw-size cutoff.
-Both finished at **310**. The existing candidate remains unchanged.
+Both finished at **310** and left that round’s candidate unchanged.
 
 | Recorded run | Source evaluations | Tree mutation attempts | Full tree reductions | Best |
 | --- | ---: | ---: | ---: | ---: |
@@ -335,6 +337,26 @@ with two and four workers. The default is two workers; the memory setting is a
 cooperative resident-memory budget checked between tree generations, not a hard
 operating-system limit.
 
+## Decoder and register allocation
+
+The [decoder campaign](DECODER.md) tested direct writes into destination fields,
+rotating proof tails, deferred parallel moves, eager or delayed clears, and field
+permutations together with the existing source and factoring choices. Two beams
+evaluated **8,102 source configurations** and optimized **32 finalists**, reaching
+**308 states** with ten registers and **313** with a packed nine-register design.
+
+The accepted result preserves the Cantor arithmetic kernels and inference body.
+It decodes `param1, param3, param2, axiomcode`, clearing each destination just
+before transferring its value. The instruction tree has 243 states and the
+native framework still has 65. The raw and fully reduced tables both have 308
+states. Proof numbers now encode fields in a different order; no claim is made
+that the same numeric code has the same trace as the 310-state machine.
+
+The new decoder has a symbolic live-value audit, numerical register-boundary
+checks and a complete CFG comparison of the unchanged inference body. The final
+table passes the existing rebuild, arithmetic, formula, CFG and literal-tape
+checks. See the [recorded recipes](../reference/decoder-experiments.json).
+
 ## Reproduce
 
 ```sh
@@ -355,6 +377,8 @@ python3 tools/experiment.py backend-tree-commute
 python3 tools/experiment.py combined-source-tree
 python3 tools/experiment.py combined-parent-transfer
 python3 tools/experiment.py combined-wide-screen
+python3 tools/experiment.py decoder-allocation
+python3 tools/experiment.py decoder-packed-counter
 ```
 
 The recorded experiments supply their own initial configurations, so they can be
@@ -368,10 +392,8 @@ first-pass population before continuing; a generation override shortens both sta
 
 ## Next useful experiments
 
-Getting below 300 still requires at least 11 states. The combined runs confirm
-that source size can misrank final machines, but correcting that objective did
-not beat 310 in these budgets. Extending the same local searches has less support
-than changing their available transformations: richer shared grammars, a cheaper
-instruction backend, or larger arithmetic/representation changes. The retained
-populations can seed those experiments without discarding the current tree work.
-The outcomes above are search limits, not lower bounds on equivalent machines.
+Getting below 300 requires nine more states. Joint decoder allocation recovered
+two states after tree optimization; packing the counter saved a physical register
+but added more instruction machinery than it removed. Richer shared grammars,
+cheaper dispatch or a larger representation change remain possible directions.
+These bounded results are not lower bounds on equivalent machines.
