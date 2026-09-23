@@ -1,6 +1,6 @@
 # ICS and compiler experiments — 23 September 2026
 
-**Best candidate: 315 states, down from 392 (77 states / 19.6%).**
+**Best candidate: 310 states, down from 392 (82 states / 20.9%).**
 This round is experimental. There is no Lean proof and no claim that the local
 computational checks establish the theory's equivalence to ZF.
 
@@ -18,7 +18,8 @@ computational checks establish the theory's equivalence to ZF.
 | Shared stack push | 326 | Move operands to the constructor pairing routine instead of keeping a second pairing implementation. |
 | Shared parameter copies | 320 | Match the increment order used by detachment and safety comparisons. |
 | Joint source and factoring search | 316 | Search safe inlining and grammar choices together with source layout and parameter naming. |
-| Protected-formula rewrites and joint search | **315** | Preserve the logical/inference clauses; search equivalent protected formulas, source layout and factoring seeds. |
+| Protected-formula rewrites and joint search | 315 | Preserve the logical/inference clauses; search equivalent protected formulas, source layout and factoring seeds. |
+| Dispatcher-tree reassociation and commuting increments | **310** | Share more binary instruction nodes while preserving the register computation. |
 
 These are measured configurations, not additive cost estimates. Different beam
 runs can choose different layouts; in particular the storage search started from
@@ -218,10 +219,57 @@ These discarded prototypes are not part of the candidate; their measured sizes
 do not establish semantic correctness or rule out better implementations of the
 same ideas. Raw prototypes and search traces are not repository artifacts.
 
-Local 3/5/7-step contractions and exact quotienting leave the candidate at 315.
+Local 3/5/7-step contractions and exact quotienting leave the candidate at 310.
 Finite-window analysis still excludes no state/read pairs in the tested windows.
 These failures are limits of the experiments, not lower bounds on equivalent
 machines.
+
+## Dispatcher/backend round
+
+The accepted result keeps the 65-state native framework unchanged and reduces
+the decision DAG from 250 to **245 states**. The compiler can now consume an
+explicit final instruction tree, checked independently against the source.
+
+The first tree search allowed more reassociations than the earlier closed-block
+rule. In `((a,b),c) ↔ (a,(b,c))`, the middle block need not itself be closed;
+constraints on escaping jumps determine when a rotation preserves control flow.
+This gave **312 states** after 400 generations of 256 mutation attempts, retaining
+64 candidates. The best first appeared at generation 101.
+
+The next search adjusted relative continue jumps when moving a block and allowed
+adjacent increment-only sequences to commute. It kept candidates at three nearby
+cost levels, with up to 80 retained trees. After 600 generations of 256 attempts,
+the best was **310**, first found at generation 189. These are mutation-attempt
+counts, including duplicates; they are not counts of distinct compiled machines.
+The source formulas, arithmetic lowering and ten physical registers are unchanged.
+
+The reusable search now screens by exact raw size, fully reduces a configurable
+number of leaders each generation, and fully reduces the final retained frontier.
+Every saved improvement passes the independent increment-segment CFG audit.
+A 20-generation run using this fuller scoring held at 310. The tree arena is
+compacted each generation, avoiding unbounded accumulation of old candidates.
+
+Other bounded probes did not improve that result:
+
+- Exposing register-selection chains to grammar compression and varying register
+  placement scored 6,401 configurations, with a best of 319.
+- Broader relative-jump adjustments and changes to individual uses of shared
+  nodes held at 310 in the tested runs.
+- A simple three-valued register analysis retained every decrement outcome and
+  every dispatcher read edge.
+- A global segmentation model had 847,405 edge variables and returned a 310-state
+  candidate in a 180-second run.
+- A smaller binary-grammar model had 4,173 candidate words and 48,297 productions.
+  In 180 seconds it found 310, with a model bound of 288. A further 240-second run
+  targeting at most 309 with a zero-run limit of seven returned **UNKNOWN**: no
+  feasible candidate and no impossibility result.
+
+These solver bounds concern the finite dictionary/grammar model, not equivalent
+Turing machines. OR-Tools 9.15.6755 was used with four workers and a 4 GiB solver
+memory setting. The binary model is retained in `solve_tree.py`; its candidates
+are rebuilt and independently audited before saving. Raw solver logs and model
+files are excluded. [The backend manifest](../reference/backend-experiments.json)
+records source parameters, recipes and aggregate results.
 
 ## Reproduce
 
@@ -239,17 +287,20 @@ python3 tools/experiment.py ics-grammar
 python3 tools/experiment.py ics-shared-operators
 python3 tools/experiment.py ics-grammar-followup
 python3 tools/experiment.py ics-rewrites
+python3 tools/experiment.py backend-tree-commute
 ```
 
 The recorded experiments supply their own initial configurations, so they can be
 replayed independently. Add `--workers 1` to reduce process count or
 `--generations 1` for a short search smoke test. The latter is not a full replay.
 Results go under ignored `scratch/`. See [verification scope](VERIFICATION.md)
-for exactly what the checks establish.
+for exactly what the checks establish. The backend replay regenerates its
+312-state starting tree before running the second stage; `--generations 1` also
+shortens that prerequisite.
 
 ## Next useful experiments
 
-Getting below 300 requires at least 16 more states from the current candidate.
+Getting below 300 requires at least 11 more states from the current candidate.
 The large gains in this round came from changing representations and sharing
 whole arithmetic routines. Further work should target a cheaper instruction
 backend and larger arithmetic or expression-level rewrites. The current

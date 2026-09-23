@@ -40,6 +40,8 @@ def mutate(candidate,rng):
 
 def run(args):
     initial_record=json.loads(args.initial.read_text())
+    if initial_record.get("instruction_tree"):
+        print("Source search rebuilds the saved source; run search_tree.py on its output to optimize the changed tree.",flush=True)
     formula_choices=initial_record.get("formula_choices")
     grammar=initial_record.get('grammar',{'kind':'random','inline_probability':.75,'seed':36})
     initial=(decode(initial_record),(grammar['kind'],PROBABILITIES.index(grammar['inline_probability']),grammar['seed']))
@@ -82,6 +84,8 @@ if __name__=='__main__':
     args=p.parse_args()
     if args.probe_grid:
         initial_record=json.loads(args.initial.read_text())
+        if initial_record.get("instruction_tree"):
+            print("Source search rebuilds the saved source; run search_tree.py on its output to optimize the changed tree.",flush=True)
         config=decode(initial_record)
         formula_choices=initial_record.get('formula_choices')
         tasks=[(config,(kind,PROBABILITIES.index(probability),seed))

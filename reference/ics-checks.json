@@ -1,6 +1,6 @@
 {
   "status": "experimental; computational checks only",
-  "states": 315,
+  "states": 310,
   "source": {
     "published_constructor_sequences": 5,
     "schema_renaming_cases": 90
@@ -12,12 +12,12 @@
   },
   "smoke": {
     "steps": 1000000,
-    "dispatches": 1010,
-    "register_entries": 993,
+    "dispatches": 1011,
+    "register_entries": 994,
     "minimum_observed_gap": 7,
-    "head": 86,
-    "state": "2.ret1.2",
-    "ones": 226
+    "head": 78,
+    "state": "1.sel.b",
+    "ones": 220
   },
   "formula_rewrites": {
     "POW": {
@@ -60,49 +60,65 @@
     "matched_operation_pairs": 4659,
     "distinguishes_return_and_halt": true
   },
+  "instruction_tree": {
+    "source_cfg_nodes": 6742,
+    "compiled_cfg_nodes": 6742,
+    "matched_segment_pairs": 4163,
+    "normalizes_increment_segments": true,
+    "distinguishes_return_and_halt": true
+  },
+  "tape_differential": {
+    "decrement_boundaries": 512,
+    "increments_between_boundaries": 535,
+    "compared_registers": 10,
+    "source_steps": 12810220,
+    "candidate_steps": 12805670,
+    "source_minimum_observed_gap": 7,
+    "candidate_minimum_observed_gap": 7
+  },
   "windows": [
     {
       "left": 3,
       "right": 3,
-      "abstract_configurations": 10105,
-      "allowed_state_reads": 630
+      "abstract_configurations": 10873,
+      "allowed_state_reads": 620
     },
     {
       "left": 8,
       "right": 2,
-      "abstract_configurations": 49078,
-      "allowed_state_reads": 630
+      "abstract_configurations": 55008,
+      "allowed_state_reads": 620
     },
     {
       "left": 2,
       "right": 8,
-      "abstract_configurations": 232845,
-      "allowed_state_reads": 630
+      "abstract_configurations": 241413,
+      "allowed_state_reads": 620
     },
     {
       "left": 5,
       "right": 5,
-      "abstract_configurations": 84015,
-      "allowed_state_reads": 630
+      "abstract_configurations": 94081,
+      "allowed_state_reads": 620
     },
     {
       "left": 10,
       "right": 2,
-      "abstract_configurations": 151022,
-      "allowed_state_reads": 630
+      "abstract_configurations": 165854,
+      "allowed_state_reads": 620
     },
     {
       "left": 2,
       "right": 10,
-      "abstract_configurations": 930583,
-      "allowed_state_reads": 630
+      "abstract_configurations": 964875,
+      "allowed_state_reads": 620
     },
     {
       "left": 6,
       "right": 6,
-      "abstract_configurations": 252412,
-      "allowed_state_reads": 630
+      "abstract_configurations": 286894,
+      "allowed_state_reads": 620
     }
   ],
-  "regression_tests": 29
+  "regression_tests": 39
 }

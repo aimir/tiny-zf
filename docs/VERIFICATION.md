@@ -3,7 +3,7 @@
 **Status: exact reproduction and computational checks, not a formal proof.**
 There is no Lean development or verified ZF-independence theorem in this repo.
 The conservative 392-state table follows the corrected Wade source. The current
-315-state experiment uses the ICS formulation and a different formula coding.
+310-state experiment uses the ICS formulation and a different formula coding.
 Lean verification is deliberately deferred while these experiments continue.
 
 ## Conservative 392-state baseline: `python3 tools/verify.py`
@@ -30,9 +30,9 @@ some bounded behavior. Equality of clause sets alone is not an end-to-end
 halting-equivalence proof: selector semantics, proof encoding, instruction
 lowering, and tape layout are additional obligations.
 
-## Experimental 315-state candidate: `python3 tools/verify_ics.py`
+## Experimental 310-state candidate: `python3 tools/verify_ics.py`
 
-This command checks the candidate table hash, exact recompilation, the 65 + 250
+This command checks the candidate table hash, exact recompilation, the 65 + 245
 state split and ten active registers. It compares five formula-construction
 sequences with the pinned corrected ICS source, checks 90 schema-renaming
 round trips, and runs 500 guard, 48 detachment, and 1,440 constructor cases in
@@ -60,7 +60,7 @@ or inactive detachments. Each comparison checks every register, including scratc
 cleanup and preservation of unrelated values. Together with the earlier checks,
 there are 6,268 local arithmetic/differential cases.
 
-The factoring audit compares the complete unfactored rewritten-source CFG with the
+The pre-tree factoring audit compares the complete unfactored rewritten-source CFG with the
 candidate's factored CFG. Each graph has 6,742 nodes; 4,659 reachable pairs of
 operations/exits are matched after following unconditional jumps. Register names,
 operations, and both decrement outcomes must agree. A normal return from `main`
@@ -70,12 +70,33 @@ these boundaries. This checks all CFG branches, rather than a bounded execution
 sample, but trusts the Python compiler/checker and does not prove tape-backend
 correctness or the arithmetic sharing rewrites in Lean.
 
+The final tree is a separate, hash-bound artifact. Its parser requires a finite
+acyclic binary DAG with recognized register/jump primitives. The independent
+CFG checker compares uninterrupted runs of increments by their per-register
+multiplicities, then requires the same next decrement or exit and follows both
+decrement successors. It matches **4,163 segment pairs** across the two 6,742-node
+CFGs. This permits commuting increments while preserving all branch behavior,
+including halt versus normal completion. Cycles containing only increments or
+unconditional jumps are outside this checker and are rejected. No search history
+or heuristic rewrite rule is trusted by the audit. Regression tests reject
+changed increment counts/registers, movement across a decrement, swapped branch
+outcomes and malformed tree references. They also audit every available single
+rewrite at the incumbent and confirm that all 65 native framework states are
+unchanged from the 315-state source.
+
+A literal differential check compares all ten registers at **512 decrement
+boundaries**, including the 535 increments between them. The source takes
+12,810,220 tape steps and the candidate 12,805,670 to reach those boundaries;
+both have a minimum observed gap of seven cells. This is finite evidence that
+the new dispatch paths implement the intended operations, not an unbounded
+backend proof. Use `--tree-boundaries 0` to omit this longer check.
+
 A separate literal one-million-step tape simulation visits the main dispatch
-1,010 times and enters register primitives 993 times. The minimum observed
+1,011 times and enters register primitives 994 times. The minimum observed
 zero gap before the next register-file 1 is seven cells. This is a diagnostic
 for that finite execution, not a proof of perpetual separation. `--windows`
-adds seven finite-window reachability experiments; all retain the 630 state/read
-pairs, with a largest exploration of 930,583 abstract configurations.
+adds seven finite-window reachability experiments; all retain the 620 state/read
+pairs, with a largest exploration of 964,875 abstract configurations.
 
 Relative to the conservative baseline, the source omits Extensionality and uses
 the published ICS scheme. The sharing/factoring passes keep their input schemas
@@ -92,7 +113,7 @@ A configuration is a control state, an integer head position, and a map from
 integers to bits, initially zero everywhere. Each table row reads the head bit,
 writes one bit, moves one cell left or right and selects the next state. A
 missing transition halts. The designated label `halt` has no outgoing edges.
-There are 315 operational states in the ICS candidate and 392 in the
+There are 310 operational states in the ICS candidate and 392 in the
 conservative baseline, excluding that label.
 
 The reduction tools use a complete table with a separate `HALT` target. Missing

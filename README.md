@@ -1,14 +1,16 @@
 # Smaller ZF proof-search Turing machines
 
-**Current experimental candidate: 315 states — 77 fewer than our 392-state baseline (19.6% smaller).**
+**Current experimental candidate: 310 states — 82 fewer than our 392-state baseline (20.9% smaller).**
 
 The candidate combines the corrected ICS axiom formulation with Wade's compiler,
 searches axiom order and parameter naming together, reuses one register during
 comparisons, and combines a new formula encoding with fused constructors.
 Shared stack and copy routines plus a joint source/inlining/factoring search further reduce it.
 A further search changes the syntax of the protected UNI and ICS formulas using
-classical Boolean identities and quantifier duality.
-It uses **10 active registers** and **65 framework + 250 instruction-DAG states**.
+classical Boolean identities and quantifier duality. The final dispatcher tree
+then saves five states by reassociating instruction blocks and sharing equivalent
+increment sequences.
+It uses **10 active registers** and **65 framework + 245 instruction-DAG states**.
 
 This is a reproducible experimental machine, **not a formally verified
 ZF-independence result**. Lean work is deferred. The mathematical dependency on
@@ -19,7 +21,7 @@ computational checks.
 
 | Machine | States | Artifact and scope |
 | --- | ---: | --- |
-| Current ICS candidate | **315** | [Table](candidates/ics-best.tm), [configuration and hash](candidates/ics-best.json). Changed axiomatization and formula coding; computational checks. |
+| Current ICS candidate | **310** | [Table](candidates/ics-best.tm), [configuration and hashes](candidates/ics-best.json), [instruction tree](candidates/ics-tree.json). Changed axiomatization and formula coding; computational checks. |
 | Conservative baseline | 392 | [Table](candidates/best.tm), [configuration](candidates/best.json). Same distinct axiom clauses as Wade's source, deduplicated and reordered. |
 | Pinned Wade reference | 393 | [Unmodified source/table](vendor/wade/), [provenance](reference/upstream.json). Reproduced transition for transition. |
 
@@ -31,12 +33,15 @@ The first ICS round scored **56,264 configurations**. The follow-up scored anoth
 arithmetic sharing and instruction factoring, with every retained candidate
 scored after local contraction and exact state quotienting. A third beam scored
 **20,481 configurations** combining protected-formula rewrites with source layout
-and factoring seeds, reaching 315 states.
+and factoring seeds, reaching 315 states. The subsequent dispatcher-tree search
+reached **310**; its recipes and bounded solver experiments are recorded in
+[the backend manifest](reference/backend-experiments.json).
 [Experiments](docs/EXPERIMENTS.md) explains what worked, what failed, and how to repeat the searches. Search limits are not lower bounds.
 
 ## Reproduce and check
 
-Python 3.10 or newer; standard library only. Tested with Python 3.14.
+Python 3.10 or newer; rebuilding and verification use only the standard library.
+Tested with Python 3.14. The optional global search uses OR-Tools.
 
 ```sh
 python3 tools/verify_ics.py
@@ -44,12 +49,14 @@ python3 tools/verify.py
 python3 -m unittest discover -s tests
 ```
 
-The first command rebuilds the 315-state table, checks the ported formulas and
+The first command rebuilds the 310-state table, checks the ported formulas and
 parameter renamings, runs **6,268 local arithmetic/differential cases**, compares
 the complete factored register control flow against the rewritten source, checks
-the selected formula identities independently, and simulates
-one million literal tape steps. The second checks the conservative 392/393 pair.
-The regression suite has **29 tests**. These checks do not establish end-to-end
+the selected formula identities independently, audits the final instruction tree,
+and simulates one million literal tape steps. It also compares all ten registers
+at **512 decrement boundaries** against the pre-tree source, covering about
+12.8 million tape steps per machine. The second checks the conservative 392/393 pair.
+The regression suite has **39 tests**. These checks do not establish end-to-end
 halting equivalence or the mathematical equivalence of the axiom systems.
 [Verification scope](docs/VERIFICATION.md) states the remaining obligations.
 
@@ -59,20 +66,22 @@ experiment. The tested windows exclude no state/read pairs for either incumbent.
 ## Continue experimenting
 
 ```sh
-python3 tools/search_rewrites.py --output scratch/search.json
-python3 tools/experiment.py ics-rewrites
+python3 tools/search_tree.py --stratified --edge-rewrites
+python3 tools/experiment.py backend-tree-commute
 ```
 
-The first jointly searches protected-formula syntax, source layout, schema
-parameter naming, arithmetic lowering and the instruction-factoring seed.
-The second replays the recorded 80-generation search from its original configuration and seed. All
-recorded experiment IDs and initial/final configurations are in
-[the experiment manifest](reference/ics-experiments.json).
-Use `--workers 1` for a smaller process footprint. Defaults use four workers;
-no Lean build or large solver is required.
+The first continues from the saved 310-state tree. It screens candidates by
+exact raw state count, fully reduces leading candidates, and checks every saved
+improvement against the source CFG. The second replays the two stages that led
+to 310, starting from the recorded 315-state source. Tree search uses one process
+and compacts its working arena each generation.
+
+`tools/solve_tree.py` offers an optional global constraint search over a finite
+dictionary of shared instruction sequences. Its bounds concern that model only.
+[Tools](tools/README.md) documents both searches and the source-changing searches.
 
 The emitted search `.tm` is the raw compiled table; metadata records both raw
-and reduced counts. They are both 315 for the saved candidate. A future result
+and reduced counts. They are both 310 for the saved candidate. A future result
 that relies on table reduction needs a checked reduction certificate before
 promotion. [Tools](tools/README.md) documents the implementation.
 

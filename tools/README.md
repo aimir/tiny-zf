@@ -1,12 +1,13 @@
 # Tools
 
-Python standard library only. Invoke commands from the repository root.
+Rebuilding, verification and beam search use the Python standard library.
+The optional global solver needs OR-Tools. Invoke commands from the repository root.
 
 ## Current candidate construction
 
 The source flow is **ICS formulas → equivalent protected-formula syntax → parameter naming → comparison storage →
 formula constructors/encoding → shared arithmetic → safe inlining and factoring
-→ the unchanged Wade tape backend**.
+→ an explicit final instruction tree → the unchanged Wade tape backend**.
 
 | File | Role |
 | --- | --- |
@@ -17,18 +18,23 @@ formula constructors/encoding → shared arithmetic → safe inlining and factor
 | `constructors.py` | Construct tagged formulas directly with alternative scratch assignments. |
 | `encoding.py` | Reverse inner binary payloads while keeping outer tags and formula-stack coding unchanged. |
 | `stack_ops.py` | Share selection, stack push/pop and parameter-copy arithmetic. |
+| `instruction_tree.py` | Validate/load tree artifacts, model state cost, reassociate blocks and adjust relative jumps. |
 | `grammar.py` | Closed-block analysis, inlining, alternative factoring and exact labeled-CFG comparison. |
 | `machines.py` | Locate the pinned compiler, validate the conservative baseline, read strict blank-tape tables and totalize partial transitions. |
 
 `build_joint(decode(record), sharing=record.get("shared_operations", False),
-grammar=record.get("grammar"), formula_choices=record.get("formula_choices"))` rebuilds a complete saved configuration. The unused third scratch name still exists in the inherited
-builder, but its operations are absent from the reachable 315-state machine.
+grammar=record.get("grammar"), formula_choices=record.get("formula_choices"),
+instruction_tree=read_record(record, ROOT / "candidates"))` rebuilds a complete saved configuration (`read_record` comes from
+`instruction_tree.py`; use the configuration file’s directory for search outputs). The unused third scratch name still exists in the inherited
+builder, but its operations are absent from the reachable 310-state machine.
 
 ## Checking
 
 | File | Role |
 | --- | --- |
 | `verify_ics.py` | Rebuild the ICS table; check formula transcription, schema renaming, local arithmetic and finite tape execution. |
+| `verify_tree.py` | Audit all branches of the final IR while normalizing consecutive increments; reject altered operations/exits. |
+| `tape_check.py` | Compare literal tape executions at decrement boundaries, including all active register values. |
 | `verify_sharing.py` | Check 4,280 local sharing cases and audit the complete factored CFG against source. |
 | `register_check.py` | Independent interpreter for binary structured register IR and relative jumps; used for local differential tests. |
 | `verify.py` | Reproduce the conservative 392/393 pair and check clause coverage. |
@@ -48,6 +54,8 @@ These are computational checks. See [verification scope](../docs/VERIFICATION.md
 | --- | --- |
 | `experiment.py` | Replay a curated experiment, including its initial configuration and seed. |
 | `search_ics.py` | Search clause order within the safety phases. |
+| `search_tree.py` | Continue tree optimization from the saved artifact; raw screening, full reduction and CFG checks. |
+| `solve_tree.py` | Optional OR-Tools model choosing a binary grammar globally within a finite dictionary. |
 | `search_rewrites.py` | Joint beam over protected-formula syntax, source layout and factoring seeds. |
 | `search_grammar.py` | Joint beam over source and compiler choices; `--preserve-main` keeps the main boundary. |
 | `search_joint.py` | Search order, parameter permutations, constructor lowering, comparison storage and payload order; preserve a supplied sharing/factoring configuration. |
@@ -63,16 +71,22 @@ python3 tools/experiment.py ics-operators
 Recorded experiment IDs are `ics-order`, `ics-joint`, `ics-storage`,
 `ics-encoding`, `ics-operators`, `ics-sharing`, `ics-grammar-probe`,
 `ics-grammar-wide`, `ics-grammar`, `ics-shared-operators` and
-`ics-grammar-followup` and `ics-rewrites`. Use `--workers 1` for fewer processes. A replay
+`ics-grammar-followup`, `ics-rewrites`, `backend-tree-basic` and
+`backend-tree-commute`. Use `--workers 1` for fewer processes. A replay
 can use `--generations 1` as a short smoke test, which does not reproduce the full
 run. Search outputs go under ignored `scratch/`; raw console traces and beam
 frontiers are not committed.
 
-The joint, grammar and operator search drivers preserve any supplied formula
-rewrite configuration. The original `search_ics.py` is an order-only experiment
+The joint, grammar, rewrite and operator searches change the source, so they
+rebuild its compiler tree and explicitly discard the old tree artifact. They
+preserve the supplied arithmetic/formula settings; run `search_tree.py` on their
+output to optimize the changed tree. A saved tree must never silently override a
+changed source. The dedicated tree search keeps all those source settings fixed. The original `search_ics.py` is an order-only experiment
 on the original port; its `--initial` reads only the order.
 
-Every search scores the actual final count after local reduction. Its saved
+Source searches score the full local reduction pipeline. Tree search uses an
+exact raw-count screen, fully reduces leading candidates (`--screen`, default 4)
+and every final frontier candidate, and checks every saved improvement. Its saved
 `.tm` is the raw compiler output, with both counts recorded in JSON. The current
 candidate needs no post-compilation rewrite. A future reduced artifact needs its
 own checked transformation certificate before promotion.
@@ -92,3 +106,24 @@ report probe counts using curated checkpoints, so they work without old scratch
 files. Operator, constructor, storage and encoding modules also provide small
 standalone count probes. The experimental branches have no formal equivalence
 proof, and stronger mathematical transformations require their own justification.
+
+## Global grammar search
+
+Rebuilding and verification need no solver. The optional `solve_tree.py` requires
+OR-Tools; the recorded runs used version 9.15.6755. With that dependency available:
+
+```sh
+python3 tools/solve_tree.py --seconds 180 --workers 4
+python3 tools/solve_tree.py --seconds 240 --max-states 309 --max-zeros 7
+```
+
+Only closed compositions are flattened. Control nodes stay opaque. Candidate
+words include the existing grammar, repeated substrings up to `--max-word`
+(default 16), and suffixes of required words. Each active word chooses a binary
+split; the objective counts dictionary nodes and the required zero-run scanner.
+Heights are bounded by 30 in this model. A result or bound is specific to those
+restrictions. An improvement is emitted with a tree artifact and checked CFG;
+`verify_ics.py --candidate ...` supplies the remaining candidate checks.
+
+Tree search uses one process; solver search defaults to four workers. No raw
+frontier, solver model or console log is committed.

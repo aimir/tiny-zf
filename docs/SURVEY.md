@@ -4,7 +4,7 @@ Surveyed 22 September 2026. State counts below distinguish published claims,
 locally counted tables, and exact local reproduction. None is a lower bound.
 The smallest upstream table located and reproduced here has **393 states**;
 our conservative source candidate has **392**. A subsequent experimental ICS
-port and subsequent arithmetic/factoring work reached **315**; see [the experiments](EXPERIMENTS.md). None carries an
+port and subsequent arithmetic/factoring work reached **310**; see [the experiments](EXPERIMENTS.md). None carries an
 end-to-end formal verification in this repository.
 
 ## Sources and development lines
@@ -26,13 +26,13 @@ more informative than the stale headline prose in the current upstream README.
 The source commit dates also place the 748 machine in 2017 and the 636 change
 in August 2024; some secondary histories differ.
 
-A separate [CatsAreFluffy branch](https://github.com/CatsAreFluffy/metamath-turing-machines/commit/74a0e042f5f0ba433b3151b7c6b35ab319113844)
+A separate [CatsAreFluffy branch](https://github.com/CatsAreFluffy/metamath-turing-machines/commit/74a0e042f5f0ba433b3161b7c6b35ab319113844)
 ended at a claimed **629 states** in October 2025 after several corrections.
 It drops Extensionality as well as Regularity and Choice, and combines Infinity,
 Collection and Separation into an **ICS scheme**, retaining Powerset and Union.
 Its source sketches an interpretation through a constructible universe. This is
 a distinct logical development, not an obsolete version of Wade's current
-393-state program. The experimental port to Wade's newer backend now reaches 315 states; see
+393-state program. The experimental port to Wade's newer backend now reaches 310 states; see
 [the follow-up experiments](EXPERIMENTS.md). The equiconsistency argument still
 needs scrutiny before this could replace the conservative baseline as a verified result.
 
@@ -79,7 +79,7 @@ its objective.
 - The CatsAreFluffy line contains explicit fixes in
   [September 2025](https://github.com/CatsAreFluffy/metamath-turing-machines/commit/ed63846246ce8529b387bd634878c92f1cf860e5),
   [later September](https://github.com/CatsAreFluffy/metamath-turing-machines/commit/c5735f9),
-  and [October](https://github.com/CatsAreFluffy/metamath-turing-machines/commit/74a0e042f5f0ba433b3151b7c6b35ab319113844): parameter safety, the ICS formula, and B6c.
+  and [October](https://github.com/CatsAreFluffy/metamath-turing-machines/commit/74a0e042f5f0ba433b3161b7c6b35ab319113844): parameter safety, the ICS formula, and B6c.
   These do not automatically imply the same bugs exist in Wade's different source.
 - Wade's README explicitly leaves instruction-pointer/register-file collision
   unchecked. Finite simulation can catch an early collision; it cannot prove
@@ -112,7 +112,7 @@ with the other experiments.
 ## Best next directions
 
 1. **Continue auditing and optimizing the ICS port.** The experimental port now
-   reaches 315 states; see [the follow-up](EXPERIMENTS.md). Combining a smaller logical
+   reaches 310 states; see [the follow-up](EXPERIMENTS.md). Combining a smaller logical
    representation with the newer backend might yield much more than another
    permutation search. Preserve a separate theory definition and establish its
    consistency-strength relationship; do not silently change the target theory.

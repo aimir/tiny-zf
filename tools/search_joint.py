@@ -46,6 +46,8 @@ def mutation(config, rng, storage_search=False, encoding_search=False):
 
 def run(args):
     initial_record = json.loads(args.initial.read_text())
+    if initial_record.get("instruction_tree"):
+        print("Source search rebuilds the saved source; run search_tree.py on its output to optimize the changed tree.",flush=True)
     initial = decode(initial_record)
     sharing = getattr(args, "sharing", False) or initial_record.get("shared_operations", False)
     grammar = initial_record.get("grammar")

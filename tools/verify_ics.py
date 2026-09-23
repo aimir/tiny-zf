@@ -148,12 +148,14 @@ def smoke(start,edges,steps):
             'minimum_observed_gap':minimum_gap,'head':head,'state':q,'ones':len(ones)}
 
 
-def verify(candidate=None,steps=1_000_000,windows=False):
+def verify(candidate=None,steps=1_000_000,windows=False,tree_boundaries=512):
     candidate=candidate or ROOT/'candidates/ics-best.json'
     result=json.loads(candidate.read_text())
     require(hashlib.sha256(candidate.with_suffix('.tm').read_bytes()).hexdigest()==result['table_sha256'],'candidate table hash mismatch')
     config=decode(result)
-    m=build_joint(config,sharing=result.get("shared_operations",False),grammar=result.get("grammar"),formula_choices=result.get("formula_choices"))
+    from instruction_tree import read_record
+    tree=read_record(result,candidate.parent)
+    m=build_joint(config,sharing=result.get("shared_operations",False),grammar=result.get("grammar"),formula_choices=result.get("formula_choices"),instruction_tree=tree)
     start,edges=read_table(candidate.with_suffix('.tm'))
     require(start==m.tm.start and edges==m.tm.states,'candidate does not rebuild exactly')
     require(count(edges)==result['raw_states'],'raw state count mismatch')
@@ -175,7 +177,15 @@ def verify(candidate=None,steps=1_000_000,windows=False):
         report["shared_operations"]=sharing_checks(result)
     if result.get("grammar"):
         from verify_sharing import grammar_check
-        report["grammar"]=grammar_check(result,m)
+        report["grammar"]=grammar_check(result,None if tree is not None else m)
+    if tree is not None:
+        from verify_tree import tree_check
+        report["instruction_tree"]=tree_check(result,m)
+        if tree_boundaries:
+            from tape_check import differential
+            base=build_joint(config,sharing=result.get('shared_operations',False),
+                             grammar=result.get('grammar'),formula_choices=result.get('formula_choices'))
+            report['tape_differential']=differential(base,m,checks=tree_boundaries,limit=20_000_000)
     if windows:
         rows=totalize(start,edges);allowed={q:3 for q in rows};report['windows']=[]
         for left,right in ((3,3),(8,2),(2,8),(5,5),(10,2),(2,10),(6,6)):
@@ -191,6 +201,7 @@ if __name__=='__main__':
     p.add_argument('--candidate',type=Path)
     p.add_argument('--steps',type=int,default=1_000_000)
     p.add_argument('--windows',action='store_true')
+    p.add_argument('--tree-boundaries',type=int,default=512,help='bounded tape comparisons at decrement entries; 0 disables')
     args=p.parse_args()
-    require(args.steps>=0,'steps must be nonnegative')
-    print(json.dumps(verify(args.candidate,args.steps,args.windows),indent=2))
+    require(args.steps>=0 and args.tree_boundaries>=0,'check limits must be nonnegative')
+    print(json.dumps(verify(args.candidate,args.steps,args.windows,args.tree_boundaries),indent=2))
