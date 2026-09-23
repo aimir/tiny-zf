@@ -20,6 +20,7 @@ computational checks establish the theory's equivalence to ZF.
 | Joint source and factoring search | 316 | Search safe inlining and grammar choices together with source layout and parameter naming. |
 | Protected-formula rewrites and joint search | 315 | Preserve the logical/inference clauses; search equivalent protected formulas, source layout and factoring seeds. |
 | Dispatcher-tree reassociation and commuting increments | **310** | Share more binary instruction nodes while preserving the register computation. |
+| Combined source/tree search and checked fragment transfer | **310** | Three bounded runs found alternative 310-state constructions, but no smaller machine. |
 
 These are measured configurations, not additive cost estimates. Different beam
 runs can choose different layouts; in particular the storage search started from
@@ -271,6 +272,62 @@ are rebuilt and independently audited before saving. Raw solver logs and model
 files are excluded. [The backend manifest](../reference/backend-experiments.json)
 records source parameters, recipes and aggregate results.
 
+## Combined source and instruction-tree search
+
+`search_combined.py` closes a gap in the earlier experiments: source searches
+ranked compiler output, while tree search optimized one frozen source. The new
+outer beam retains several sources, each with several saved instruction trees.
+It mutates the source, screens raw compiler sizes, optimizes the shortlisted
+trees, and fully reduces every final inner frontier before selecting sources for
+the next generation. A smaller set receives deeper searches. The source choices
+include protected-formula syntax, clause order, parameter naming, constructor
+lowering, payload direction, inlining and factoring.
+
+Closed register-code fragments can also transfer from a champion or mutation
+parent to a changed source. Their normalized CFG signatures must agree; the
+complete retained program is then independently audited against its own source.
+A regression test rejects a stale whole-program tree after a formula change.
+The raw-size screen remains heuristic, so a separate option reserves shortlist
+slots outside its cutoff. These slots give other lowering/factoring families a
+chance to improve after tree optimization.
+
+The first four-generation pass screened **769 source configurations**, attempted
+**573,696 tree mutations**, and fully reduced **5,188 tree candidates**, retaining
+up to 16 sources with four trees each. It held at **310**, but established useful
+ranking reversals: a 316-state source reached 310 and a 319-state source reached
+311, while some 315-state sources finished at 312–313. Counts include repeated
+initial configurations and tree attempts; they are not distinct-machine counts.
+
+Two further runs resumed the complete first-pass population. One used twelve
+outer generations, up to 24 sources, and deeper searches of six finalists per
+generation. The other screened 2,048 new sources per generation for four
+generations, with shorter tree searches. Both transferred fragments from mutation
+parents and reserved four shortlist slots outside the normal raw-size cutoff.
+Both finished at **310**. The existing candidate remains unchanged.
+
+| Recorded run | Source evaluations | Tree mutation attempts | Full tree reductions | Best |
+| --- | ---: | ---: | ---: | ---: |
+| Initial combined beam, 4 generations | 769 | 573,696 | 5,188 | 310 |
+| Parent transfer, 12 generations | 3,088 | 878,592 | 19,154 | 310 |
+| Wider source screening, 4 generations | 8,208 | 129,024 | 4,206 | 310 |
+| **Total** | **12,065** | **1,581,312** | **28,548** | **310** |
+
+The deeper run used four workers with a cooperative 512 MiB budget each; measured
+peak worker memory was 229 MiB. The other runs used two workers. Both final search
+artifacts passed the complete artifact verifier, including local arithmetic and
+formula checks, CFG audits, one million literal tape steps, and comparison of all
+ten registers at 512 decrement boundaries. These are computational checks, not
+formal proofs. Their small aggregate check reports are included in the manifest.
+
+The exact starting tree and source are saved with
+[the combined experiment recipes](../reference/combined-experiments.json).
+Frontiers and console logs remain in scratch storage. The search can reload and
+audit a whole frontier, including the incumbent's alternative trees. A small
+restart experiment produced identical machines and retained source/tree frontiers
+with two and four workers. The default is two workers; the memory setting is a
+cooperative resident-memory budget checked between tree generations, not a hard
+operating-system limit.
+
 ## Reproduce
 
 ```sh
@@ -288,6 +345,9 @@ python3 tools/experiment.py ics-shared-operators
 python3 tools/experiment.py ics-grammar-followup
 python3 tools/experiment.py ics-rewrites
 python3 tools/experiment.py backend-tree-commute
+python3 tools/experiment.py combined-source-tree
+python3 tools/experiment.py combined-parent-transfer
+python3 tools/experiment.py combined-wide-screen
 ```
 
 The recorded experiments supply their own initial configurations, so they can be
@@ -296,14 +356,15 @@ replayed independently. Add `--workers 1` to reduce process count or
 Results go under ignored `scratch/`. See [verification scope](VERIFICATION.md)
 for exactly what the checks establish. The backend replay regenerates its
 312-state starting tree before running the second stage; `--generations 1` also
-shortens that prerequisite.
+shortens that prerequisite. The two resumed combined runs likewise replay their
+first-pass population before continuing; a generation override shortens both stages.
 
 ## Next useful experiments
 
-Getting below 300 requires at least 11 more states from the current candidate.
-The large gains in this round came from changing representations and sharing
-whole arithmetic routines. Further work should target a cheaper instruction
-backend and larger arithmetic or expression-level rewrites. The current
-implementation already shares stack pairing and searches inlining with layout. Another long run of the same local
-permutations is less promising than expanding the compiler's choices. Keep the
-conservative baseline and the ICS dependency explicit while exploring these.
+Getting below 300 still requires at least 11 states. The combined runs confirm
+that source size can misrank final machines, but correcting that objective did
+not beat 310 in these budgets. Extending the same local searches has less support
+than changing their available transformations: richer shared grammars, a cheaper
+instruction backend, or larger arithmetic/representation changes. The retained
+populations can seed those experiments without discarding the current tree work.
+The outcomes above are search limits, not lower bounds on equivalent machines.

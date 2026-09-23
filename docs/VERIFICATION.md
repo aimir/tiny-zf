@@ -78,7 +78,11 @@ decrement successors. It matches **4,163 segment pairs** across the two 6,742-no
 CFGs. This permits commuting increments while preserving all branch behavior,
 including halt versus normal completion. Cycles containing only increments or
 unconditional jumps are outside this checker and are rejected. No search history
-or heuristic rewrite rule is trusted by the audit. Regression tests reject
+or heuristic rewrite rule is trusted by the audit. This also covers fragments
+transferred between sources by the combined search: its canonical signatures
+select proposed replacements, while the complete result is independently checked
+against the changed source. A regression case explicitly rejects retaining an
+old whole-program tree after a formula mutation. Regression tests reject
 changed increment counts/registers, movement across a decrement, swapped branch
 outcomes and malformed tree references. They also audit every available single
 rewrite at the incumbent and confirm that all 65 native framework states are

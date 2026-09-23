@@ -1,6 +1,6 @@
 # Regression tests
 
-Run `python3 -m unittest discover -s tests` from the root. The 39 tests cover:
+Run `python3 -m unittest discover -s tests` from the root. The 45 tests cover:
 
 - Strict table parsing, missing-read totalization and rejected malformed inputs.
 - Valid and invalid quotient certificates and local tape-cell preservation.
@@ -22,6 +22,11 @@ Run `python3 -m unittest discover -s tests` from the root. The 39 tests cover:
 - Every available single tree rewrite at the incumbent and a closed-word grammar
   round trip, checked independently against the original CFG.
 - Equality of all native framework transitions before and after tree optimization.
+
+- Combined-search source mutations cannot silently retain a stale whole-program tree.
+- Closed-fragment transfer preserves the changed source's complete CFG.
+- Fragment signatures preserve register names, branch order and distinct exits.
+- Final-frontier scoring retains an existing optimized tree and source-family diversity.
 
 Exact artifact reproduction and finite tape simulation are separately checked by
 `python3 tools/verify_ics.py` and `python3 tools/verify.py`. These commands do not

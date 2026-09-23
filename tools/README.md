@@ -54,6 +54,7 @@ These are computational checks. See [verification scope](../docs/VERIFICATION.md
 | --- | --- |
 | `experiment.py` | Replay a curated experiment, including its initial configuration and seed. |
 | `search_ics.py` | Search clause order within the safety phases. |
+| `search_combined.py` | Alternate source changes and tree optimization, reuse checked closed fragments, and select source survivors by final reduced size. |
 | `search_tree.py` | Continue tree optimization from the saved artifact; raw screening, full reduction and CFG checks. |
 | `solve_tree.py` | Optional OR-Tools model choosing a binary grammar globally within a finite dictionary. |
 | `search_rewrites.py` | Joint beam over protected-formula syntax, source layout and factoring seeds. |
@@ -72,15 +73,15 @@ Recorded experiment IDs are `ics-order`, `ics-joint`, `ics-storage`,
 `ics-encoding`, `ics-operators`, `ics-sharing`, `ics-grammar-probe`,
 `ics-grammar-wide`, `ics-grammar`, `ics-shared-operators` and
 `ics-grammar-followup`, `ics-rewrites`, `backend-tree-basic` and
-`backend-tree-commute`. Use `--workers 1` for fewer processes. A replay
+`backend-tree-commute`, `combined-source-tree`, `combined-parent-transfer` and `combined-wide-screen`. Use `--workers 1` for fewer processes. A replay
 can use `--generations 1` as a short smoke test, which does not reproduce the full
 run. Search outputs go under ignored `scratch/`; raw console traces and beam
 frontiers are not committed.
 
-The joint, grammar, rewrite and operator searches change the source, so they
+The older joint, grammar, rewrite and operator searches change the source, so they
 rebuild its compiler tree and explicitly discard the old tree artifact. They
 preserve the supplied arithmetic/formula settings; run `search_tree.py` on their
-output to optimize the changed tree. A saved tree must never silently override a
+output to optimize the changed tree, or use `search_combined.py` to alternate both stages automatically. A saved tree must never silently override a
 changed source. The dedicated tree search keeps all those source settings fixed. The original `search_ics.py` is an order-only experiment
 on the original port; its `--initial` reads only the order.
 
@@ -127,3 +128,50 @@ restrictions. An improvement is emitted with a tree artifact and checked CFG;
 
 Tree search uses one process; solver search defaults to four workers. No raw
 frontier, solver model or console log is committed.
+
+## Combined source and tree search
+
+```sh
+python3 tools/search_combined.py --workers 2 --edge-rewrites --parent-donors --exploration-slots 4
+```
+
+The outer beam varies protected-formula syntax, clause order, parameter naming,
+constructor lowering, payload direction, inlining probability and seed, factoring
+method and seed, and whether the main boundary is inlined. A source mutation
+always rebuilds its tree. A retained source carries several optimized trees into
+its next generation instead of restarting from the compiler output.
+
+Each generation screens new sources by exact raw size and tree fingerprint,
+keeps a mixture of good scores and distinct source families, and optimizes each
+shortlisted source's tree. Every tree in each final inner frontier receives the
+complete reduction pipeline. Source survivors are selected by those final scores;
+a smaller subset receives a deeper tree search. The raw screen remains a heuristic:
+a source eliminated before tree search could still have produced a better result.
+`--exploration-slots 4` exempts four shortlist entries from the raw-size cutoff,
+including a diversity preference for other lowering/factoring families.
+
+Closed fragments from the current champion (or the mutation parent with
+`--parent-donors`) can transfer to a new source when
+canonical register-control-flow signatures agree. Signatures collect consecutive
+increments, preserve decrement branch order and distinguish halt from return.
+They are conservative: unequal signatures do not prove inequivalence. Transfer
+only considers closed fragments with 2–70 DAG nodes and at most 1,500 CFG nodes.
+Each retained tree is independently checked against its rebuilt source, and the
+saved champion is also audited against the unfactored rewritten program.
+
+The default is two workers. Tree arenas are compacted every generation; discarded
+caches are cleared. `--memory-mb 768` is a **cooperative per-worker resident-memory
+budget**, checked between tree generations, not an operating-system hard limit.
+`--workers 1` reduces concurrency. Raw logs and `.frontier.json` checkpoints belong
+under ignored `scratch/` or outside the repository. The emitted `.tm` is the raw
+table; a reduced count alone does not qualify a candidate for promotion.
+
+Resume the whole retained population, including each source's optimized trees:
+
+```sh
+python3 tools/search_combined.py --initial scratch/combined.json \
+  --initial-frontier scratch/combined.frontier.json --parent-donors
+```
+
+The restart rechecks all loaded trees against their own rebuilt source. Frontier
+files are scratch checkpoints, not curated artifacts or verification evidence.

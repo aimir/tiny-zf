@@ -36,6 +36,11 @@ scored after local contraction and exact state quotienting. A third beam scored
 and factoring seeds, reaching 315 states. The subsequent dispatcher-tree search
 reached **310**; its recipes and bounded solver experiments are recorded in
 [the backend manifest](reference/backend-experiments.json).
+A combined source/tree search then evaluated **12,065 source configurations** and
+**1,581,312 tree mutation attempts**, with **28,548 full tree reductions**. It found
+alternative 310-state constructions but no smaller machine; the saved candidate
+remains unchanged. [Exact recipes and aggregate results](reference/combined-experiments.json)
+cover all three runs. These counts include repetitions, not distinct machines.
 [Experiments](docs/EXPERIMENTS.md) explains what worked, what failed, and how to repeat the searches. Search limits are not lower bounds.
 
 ## Reproduce and check
@@ -56,7 +61,7 @@ the selected formula identities independently, audits the final instruction tree
 and simulates one million literal tape steps. It also compares all ten registers
 at **512 decrement boundaries** against the pre-tree source, covering about
 12.8 million tape steps per machine. The second checks the conservative 392/393 pair.
-The regression suite has **39 tests**. These checks do not establish end-to-end
+The regression suite has **45 tests**. These checks do not establish end-to-end
 halting equivalence or the mathematical equivalence of the axiom systems.
 [Verification scope](docs/VERIFICATION.md) states the remaining obligations.
 
@@ -66,13 +71,19 @@ experiment. The tested windows exclude no state/read pairs for either incumbent.
 ## Continue experimenting
 
 ```sh
+python3 tools/search_combined.py --workers 2 --edge-rewrites --parent-donors --exploration-slots 4
 python3 tools/search_tree.py --stratified --edge-rewrites
 python3 tools/experiment.py backend-tree-commute
 ```
 
-The first continues from the saved 310-state tree. It screens candidates by
+The combined search alternates source changes and tree optimization, keeps
+multiple sources with their own saved trees, and ranks survivors by the fully
+reduced final machines. It can reuse closed fragments after matching their
+register control flow. It defaults to two workers with a cooperative memory budget.
+
+The separate tree search continues from the saved 310-state tree. It screens candidates by
 exact raw state count, fully reduces leading candidates, and checks every saved
-improvement against the source CFG. The second replays the two stages that led
+improvement against the source CFG. The replay command repeats the two stages that led
 to 310, starting from the recorded 315-state source. Tree search uses one process
 and compacts its working arena each generation.
 

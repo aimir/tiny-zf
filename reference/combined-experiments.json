@@ -1,0 +1,298 @@
+{
+  "date": "2026-09-23",
+  "status": "experimental; computational checks only",
+  "counting": "Source counts are parameter tuples evaluated within each run; resumed starting configurations can repeat across runs. Tree mutation attempts include duplicates. Full-reduction counts are evaluations, not distinct machines. Smoke tests and interrupted exploratory repetitions are excluded.",
+  "runs": [
+    {
+      "id": "combined-source-tree",
+      "search": "combined",
+      "initial": {
+        "raw_states": 310,
+        "formula_choices": {
+          "POW": 0,
+          "UNI": 0,
+          "ICS": 162,
+          "B6a1": 0
+        },
+        "order": [
+          10,
+          7,
+          3,
+          8,
+          2,
+          4,
+          0,
+          9,
+          5,
+          1,
+          11,
+          6,
+          16,
+          13,
+          12,
+          14,
+          15
+        ],
+        "parameter_permutations": {
+          "B1": 5,
+          "B2": 0,
+          "B3": 2,
+          "B4": 2,
+          "B6b": 2,
+          "B6c": 2,
+          "B7": 0,
+          "B8a": 1,
+          "B8b": 0,
+          "B8c": 1
+        },
+        "protected_permutation": 1,
+        "fusion": 2,
+        "two_scratch": true,
+        "reverse_payload": true,
+        "grammar": {
+          "kind": "cost",
+          "inline_probability": 0.75,
+          "seed": 15385382,
+          "inline_main": false
+        },
+        "shared_operations": true,
+        "final_states": 310,
+        "kind": "ics-instruction-tree",
+        "status": "experimental; not formally verified",
+        "wade_commit": "9c5c2e82f6ad5ceb5fb7a2d946aa3b1f1d05b1fce7340fd79029cc9d4756f429",
+        "ics_formula_commit": "74a0e042f5f0ba433b3161b7c6b35ab319113844",
+        "framework_states": 65,
+        "dag_states": 245,
+        "active_registers": 10,
+        "table_sha256": "a156659a40e7129632823c9e973afd501d1e0cc5837024919ee3c2ccc04e5846",
+        "instruction_tree": "ics-tree.json",
+        "instruction_tree_sha256": "0815b1525150b36a479821ad3dae554a3c7944152b107d79a0fd20f6262aa983"
+      },
+      "initial_tree": "combined-initial-tree.json",
+      "mode": "general",
+      "tree_width": 32,
+      "tree_batch": 96,
+      "tree_keep": 4,
+      "edge_rewrites": true,
+      "batch": 192,
+      "width": 16,
+      "shortlist": 20,
+      "tree_rounds": 24,
+      "deep_rounds": 120,
+      "deep_count": 6,
+      "screen_slack": 8,
+      "workers": 2,
+      "memory_mb": 768,
+      "parent_donors": false,
+      "exploration_slots": 0,
+      "seed": 20261010,
+      "generations": 4,
+      "initial_states": 310,
+      "final_states": 310,
+      "source_evaluations": 769,
+      "distinct_source_trees": 708,
+      "tree_searches": 154,
+      "tree_mutation_attempts": 573696,
+      "fully_reduced_trees": 5188,
+      "peak_worker_mb": 224.90625
+    },
+    {
+      "id": "combined-parent-transfer",
+      "search": "combined",
+      "initial_from_run": "combined-source-tree",
+      "resume_frontier": true,
+      "mode": "general",
+      "tree_width": 24,
+      "tree_batch": 64,
+      "tree_keep": 4,
+      "edge_rewrites": true,
+      "batch": 256,
+      "width": 24,
+      "shortlist": 32,
+      "tree_rounds": 12,
+      "deep_rounds": 80,
+      "deep_count": 6,
+      "screen_slack": 8,
+      "workers": 4,
+      "memory_mb": 512,
+      "parent_donors": true,
+      "exploration_slots": 4,
+      "seed": 20261011,
+      "generations": 12,
+      "initial_states": 310,
+      "initial_frontier_sources": 16,
+      "final_states": 310,
+      "source_evaluations": 3088,
+      "distinct_source_trees": 2776,
+      "tree_searches": 753,
+      "tree_mutation_attempts": 878592,
+      "fully_reduced_trees": 19154,
+      "peak_worker_mb": 228.8125
+    },
+    {
+      "id": "combined-wide-screen",
+      "search": "combined",
+      "initial_from_run": "combined-source-tree",
+      "resume_frontier": true,
+      "mode": "general",
+      "tree_width": 16,
+      "tree_batch": 48,
+      "tree_keep": 4,
+      "edge_rewrites": true,
+      "batch": 2048,
+      "width": 24,
+      "shortlist": 32,
+      "tree_rounds": 8,
+      "deep_rounds": 60,
+      "deep_count": 4,
+      "screen_slack": 8,
+      "workers": 2,
+      "memory_mb": 512,
+      "parent_donors": true,
+      "exploration_slots": 4,
+      "seed": 20261012,
+      "generations": 4,
+      "initial_states": 310,
+      "initial_frontier_sources": 16,
+      "final_states": 310,
+      "source_evaluations": 8208,
+      "distinct_source_trees": 7391,
+      "tree_searches": 249,
+      "tree_mutation_attempts": 129024,
+      "fully_reduced_trees": 4206,
+      "peak_worker_mb": 180.3125
+    }
+  ],
+  "totals": {
+    "source_evaluations": 12065,
+    "tree_searches": 1156,
+    "tree_mutation_attempts": 1581312,
+    "fully_reduced_trees": 28548
+  },
+  "validation": {
+    "regression_tests": 45,
+    "two_four_worker_smoke": "identical emitted tables and complete retained source/tree frontiers, excluding memory measurements",
+    "search_artifacts": [
+      {
+        "run": "combined-parent-transfer",
+        "states": 310,
+        "table_sha256": "5237df541bd8bed57ef357bb99832eb6337a997fb5f379461a3b866913d07965",
+        "formula_rewrites_checked": [
+          "POW",
+          "UNI",
+          "ICS",
+          "B6a1"
+        ],
+        "source": {
+          "published_constructor_sequences": 5,
+          "schema_renaming_cases": 90
+        },
+        "arithmetic": {
+          "guard_cases": 500,
+          "detachment_cases": 48,
+          "constructor_cases": 1440
+        },
+        "shared_operations": {
+          "push": 800,
+          "select": 2400,
+          "parameter_1": 180,
+          "parameter_2": 180,
+          "parameter_3": 180,
+          "protected_guard": 500,
+          "detachment": 40
+        },
+        "grammar": {
+          "source_cfg_nodes": 6742,
+          "compiled_cfg_nodes": 6742,
+          "matched_operation_pairs": 4659,
+          "distinguishes_return_and_halt": true
+        },
+        "instruction_tree": {
+          "source_cfg_nodes": 6742,
+          "compiled_cfg_nodes": 6742,
+          "matched_segment_pairs": 4163,
+          "normalizes_increment_segments": true,
+          "distinguishes_return_and_halt": true
+        },
+        "smoke": {
+          "steps": 1000000,
+          "dispatches": 1011,
+          "register_entries": 994,
+          "minimum_observed_gap": 7,
+          "head": 126,
+          "state": "1.sel.c",
+          "ones": 218
+        },
+        "tape_differential": {
+          "decrement_boundaries": 512,
+          "increments_between_boundaries": 535,
+          "compared_registers": 10,
+          "source_steps": 12827714,
+          "candidate_steps": 12804170,
+          "source_minimum_observed_gap": 7,
+          "candidate_minimum_observed_gap": 7
+        }
+      },
+      {
+        "run": "combined-wide-screen",
+        "states": 310,
+        "table_sha256": "d71e9715c391bfbdfe390c12d1146b78c2bb1ece5946e10b80701c7dae58cf57",
+        "formula_rewrites_checked": [
+          "POW",
+          "UNI",
+          "ICS",
+          "B6a1"
+        ],
+        "source": {
+          "published_constructor_sequences": 5,
+          "schema_renaming_cases": 90
+        },
+        "arithmetic": {
+          "guard_cases": 500,
+          "detachment_cases": 48,
+          "constructor_cases": 1440
+        },
+        "shared_operations": {
+          "push": 800,
+          "select": 2400,
+          "parameter_1": 180,
+          "parameter_2": 180,
+          "parameter_3": 180,
+          "protected_guard": 500,
+          "detachment": 40
+        },
+        "grammar": {
+          "source_cfg_nodes": 6742,
+          "compiled_cfg_nodes": 6742,
+          "matched_operation_pairs": 4659,
+          "distinguishes_return_and_halt": true
+        },
+        "instruction_tree": {
+          "source_cfg_nodes": 6742,
+          "compiled_cfg_nodes": 6742,
+          "matched_segment_pairs": 4163,
+          "normalizes_increment_segments": true,
+          "distinguishes_return_and_halt": true
+        },
+        "smoke": {
+          "steps": 1000000,
+          "dispatches": 1011,
+          "register_entries": 994,
+          "minimum_observed_gap": 8,
+          "head": 208,
+          "state": "1.sel.c",
+          "ones": 216
+        },
+        "tape_differential": {
+          "decrement_boundaries": 512,
+          "increments_between_boundaries": 535,
+          "compared_registers": 10,
+          "source_steps": 12827714,
+          "candidate_steps": 12802703,
+          "source_minimum_observed_gap": 7,
+          "candidate_minimum_observed_gap": 8
+        }
+      }
+    ]
+  }
+}
