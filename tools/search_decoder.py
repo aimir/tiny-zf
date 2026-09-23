@@ -69,6 +69,7 @@ def grid(base):
 
 def run(args):
     rng=random.Random(args.seed);base=json.loads(args.initial.read_text())
+    require(base.get('native') is None,'native layout present: use search_native.py to preserve it')
     args.output.parent.mkdir(parents=True,exist_ok=True)
     seen=set();plans=set();evaluations=invalid=0;unique=set();beam=[]
     initial_tree=read_record(base,args.initial.parent)

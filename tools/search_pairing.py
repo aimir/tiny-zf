@@ -50,7 +50,8 @@ def inspect_source(record, *, builder=build_pairing):
     raw = count(machine.tm.states)
     return {'record': record, 'raw_states': raw,
             'final_states': len(reduce(totalize(machine.tm.start, machine.tm.states))),
-            'source_hash': digest}
+            'source_hash': digest,
+            'native_active': any((name,'0') in machine.tm.states for name in ('1.movr','1.movl'))}
 
 
 def save(path, row, tree=None, *, builder=build_pairing, kind='ics-dyadic-experiment'):
@@ -70,12 +71,17 @@ def save(path, row, tree=None, *, builder=build_pairing, kind='ics-dyadic-experi
     names={q for q,b in machine.tm.states}
     framework=sum(q[0].isdigit() for q in names)
     active={q.split('.')[1] for q in names if q.startswith('3.')}
+    if getattr(machine,'native_addresses',False):
+        _,cfg=compile_fragment(machine,machine.find_seq('main().0'),terminal='return')
+        active={op[1] for op in cfg.values() if op[0] in ('inc','decnz')}
     data = {**record, 'kind': kind,
             'status': 'experimental; computational checks only; not formally verified',
             'raw_states': raw, 'final_states': final,
             'framework_states': framework, 'dag_states': raw-framework,
             'active_registers': len(active),
             'table_sha256': hashlib.sha256(path.with_suffix('.tm').read_bytes()).hexdigest()}
+    if record.get('native') is not None:
+        data['native_operations']=[kind for kind in ('movr','movl') if '1.'+kind in names]
     if tree is not None:
         data.update(instruction_tree=tree_path.name,
                     instruction_tree_sha256=hashlib.sha256(tree_path.read_bytes()).hexdigest())
@@ -154,6 +160,7 @@ def tree_search(row, donor, args, seed, *, builder=build_pairing):
 def run(args):
     args.output.parent.mkdir(parents=True, exist_ok=True)
     baseline = json.loads(args.initial.read_text())
+    if baseline.get('native') is not None:raise ValueError('native layout present: use search_native.py to preserve it')
     rng = random.Random(args.seed); seen = set(); unique = {}; evaluations = 0
     initial_tree = read_record(baseline, args.initial.parent)
     donor = fragment_bank(initial_tree) if initial_tree else {}

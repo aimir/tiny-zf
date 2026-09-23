@@ -21,7 +21,7 @@ from verify_tree import equivalent_increment_cfg
 def run(args):
     record=json.loads(args.initial.read_text())
     source=build_joint(decode(record),sharing=record.get('shared_operations',False),
-                       grammar=record.get('grammar'),formula_choices=record.get('formula_choices'),decoder=record.get('decoder'))
+                       grammar=record.get('grammar'),formula_choices=record.get('formula_choices'),decoder=record.get('decoder'),native=record.get('native'))
     original=compile_fragment(source,source.find_seq('main().0'),terminal='return')
     tree=Trees(args.mode,not args.no_commute,args.break_floor)
     source_root=tree.import_machine(source)
@@ -32,7 +32,7 @@ def run(args):
     args.output.parent.mkdir(parents=True,exist_ok=True)
 
     def compile_tree(arena,root):
-        m=build_joint(decode(record),compile_machine=False,decoder=record.get('decoder'))
+        m=build_joint(decode(record),compile_machine=False,decoder=record.get('decoder'),native=record.get('native'))
         arena.install(m,root);m.name_sequences();m.generate();m.tm.gc()
         return m
 

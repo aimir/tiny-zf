@@ -24,7 +24,7 @@ if __name__=='__main__':
     p.add_argument('--output',type=Path,default=ROOT/'scratch/ics-operators.json')
     args=p.parse_args()
     initial=json.loads(args.initial.read_text())
-    if initial.get('decoder'):raise ValueError('decoder allocation present: use search_decoder.py to preserve it')
+    if initial.get('decoder') or initial.get('native') is not None:raise ValueError('allocated source: use search_native.py for native layouts, otherwise search_decoder.py')
     config=decode(initial);best=None
     if initial.get('instruction_tree'):print('Operator search rebuilds the source; run search_tree.py on its output.',flush=True)
     sharing=initial.get('shared_operations',False);grammar=initial.get('grammar');formula_choices=initial.get('formula_choices')

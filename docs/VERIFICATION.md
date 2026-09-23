@@ -129,6 +129,22 @@ The formula recoding must also be included in any later proof. Matching the
 published constructor sequences and passing finite tests do not discharge
 these obligations. [Experiments](EXPERIMENTS.md) describes both transformations.
 
+## Native tape experiments
+
+These experiments do not change the current 308-state table. Adjacent-transfer
+artifacts expand their new primitive into the original register loop for complete
+source and tree CFG checks. Separate randomized literal-tape fixtures check both
+kernels; an atomic-IR oracle checks all register values and operation dispatch
+across 1,024 operations from blank tape. Transfer artifacts also run the ordinary
+ICS verifier. These finite checks assume the unary-layout contract and do not
+prove it for every future execution.
+
+The exposed-address experiment requires `verify_native.py`. Its checker resolves
+the selection counter into logical register operations, rejects invalid selection
+flow, compares the entire resolved CFG, rebuilds the table exactly and compares
+1,024 literal operations with the independent IR model. It currently supports
+ordinary increments/decrements. See [native contracts and recipes](NATIVE.md).
+
 ## Literal machine semantics
 
 The separate [dyadic pairing experiment](PAIRING.md) has its own builder and

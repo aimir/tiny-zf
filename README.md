@@ -50,6 +50,10 @@ neither improved the then-current 310-state candidate.
 The [decoder/allocation experiment](docs/DECODER.md) reached **308 states**, retaining
 16 source finalists for complete tree optimization. Packing the proof counter
 into the remaining proof removed a register but finished at 313 states.
+The [native-tape experiments](docs/NATIVE.md) combine adjacent transfers, physical
+register placement and decoder allocation with width-128 beams and 32 tree
+finalists per campaign. Their best transfer result is **311 states**; exposing
+register selection to tree search reaches **309**. Neither improves 308.
 [Experiments](docs/EXPERIMENTS.md) explains what worked, what failed, and how to repeat the searches. Search limits are not lower bounds.
 
 ## Reproduce and check
@@ -71,7 +75,7 @@ audits decoder register allocation, checks **1,000 decoder boundaries**, and
 simulates one million literal tape steps. It also compares all ten registers
 at **512 decrement boundaries** against the pre-tree source, covering about
 12.8 million tape steps per machine. The second checks the conservative 392/393 pair.
-The regression suite has **60 tests**, including checks for separate dyadic pairing
+The regression suite has **75 tests**, including checks for separate dyadic pairing
 experiments. These checks do not establish end-to-end
 halting equivalence or the mathematical equivalence of the axiom systems.
 [Verification scope](docs/VERIFICATION.md) states the remaining obligations.
@@ -86,6 +90,7 @@ state/read pairs; windows have not been rerun for the 308-state candidate.
 python3 tools/search_decoder.py --generations 40 --tree-generations 80 --tree-candidates 16
 python3 tools/search_tree.py --stratified --edge-rewrites
 python3 tools/experiment.py decoder-allocation
+python3 tools/search_native.py --distinct-sources
 ```
 
 The decoder search varies field order, scratch placement, transfers, clearing,

@@ -6,10 +6,12 @@ It is useful for differential testing of local arithmetic/constructor changes.
 from functools import lru_cache
 
 
-def compile_fragment(machine, fragment, *, terminal="halt"):
+def compile_fragment(machine, fragment, *, terminal="halt", expand_native=True):
     if terminal not in ("halt", "return"):
         raise ValueError("unknown fragment terminal")
     def tree(value):
+        if expand_native and isinstance(value,str) and value in getattr(machine,"native_expansions",{}):
+            return tree(machine.native_expansions[value])
         if isinstance(value, int):
             return node(value)
         if isinstance(value, (list, tuple)):
@@ -64,12 +66,19 @@ def compile_fragment(machine, fragment, *, terminal="halt"):
         elif op.startswith('_'):
             kind, level = op[1:].split('.')
             cfg[path] = ('goto', jump(path, kind, int(level)))
+        elif op.startswith('1.'):
+            kind=op.split('.')[1];normal=jump(path,'break',0)
+            cfg[path]=('tape',kind,normal,jump(path,'break',1) if kind=='decnz' else normal)
         else:
             _, register, operation = op.split('.')
             normal = jump(path, 'break', 0)
             cfg[path] = (operation, register, normal,
                          jump(path, 'break', 1) if operation == 'decnz' else normal)
-    return lookup(()), cfg
+    result=(lookup(()),cfg)
+    if getattr(machine,'native_addresses',False):
+        from native_addresses import resolve_addresses
+        result=resolve_addresses(machine,result)
+    return result
 
 
 def execute(compiled, registers=None, limit=10_000_000):

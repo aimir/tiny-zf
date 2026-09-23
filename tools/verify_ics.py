@@ -151,11 +151,12 @@ def smoke(start,edges,steps):
 def verify(candidate=None,steps=1_000_000,windows=False,tree_boundaries=512):
     candidate=candidate or ROOT/'candidates/ics-best.json'
     result=json.loads(candidate.read_text())
+    require(not result.get('native_addresses'),'use verify_native.py for exposed native addresses')
     require(hashlib.sha256(candidate.with_suffix('.tm').read_bytes()).hexdigest()==result['table_sha256'],'candidate table hash mismatch')
     config=decode(result)
     from instruction_tree import read_record
     tree=read_record(result,candidate.parent)
-    m=build_joint(config,sharing=result.get("shared_operations",False),grammar=result.get("grammar"),formula_choices=result.get("formula_choices"),instruction_tree=tree,decoder=result.get('decoder'))
+    m=build_joint(config,sharing=result.get("shared_operations",False),grammar=result.get("grammar"),formula_choices=result.get("formula_choices"),instruction_tree=tree,decoder=result.get('decoder'),native=result.get('native'))
     start,edges=read_table(candidate.with_suffix('.tm'))
     require(start==m.tm.start and edges==m.tm.states,'candidate does not rebuild exactly')
     require(count(edges)==result['raw_states'],'raw state count mismatch')
@@ -175,6 +176,13 @@ def verify(candidate=None,steps=1_000_000,windows=False,tree_boundaries=512):
     if result.get('decoder'):
         from check_decoder import check
         report['decoder']=check(result,cases=1000)
+    if result.get('native') is not None:
+        from check_native import kernel_checks,source_check,literal_check
+        order=result['native']['register_order']
+        directions=sorted({'movr' if order.index(a)>order.index(b) else 'movl' for a,b in result['native']['moves']})
+        report['native']={'kernels':{d:kernel_checks(result,direction=d) for d in directions},
+                          'expanded_source_cfg_pairs':source_check(result),
+                          'literal_ir':literal_check(m,checks=1024)}
     if result.get("shared_operations"):
         from verify_sharing import sharing_checks
         report["shared_operations"]=sharing_checks(result)
@@ -187,7 +195,7 @@ def verify(candidate=None,steps=1_000_000,windows=False,tree_boundaries=512):
         if tree_boundaries:
             from tape_check import differential
             base=build_joint(config,sharing=result.get('shared_operations',False),
-                             grammar=result.get('grammar'),formula_choices=result.get('formula_choices'),decoder=result.get('decoder'))
+                             grammar=result.get('grammar'),formula_choices=result.get('formula_choices'),decoder=result.get('decoder'),native=result.get('native'))
             report['tape_differential']=differential(base,m,checks=tree_boundaries,limit=20_000_000)
     if windows:
         rows=totalize(start,edges);allowed={q:3 for q in rows};report['windows']=[]

@@ -41,7 +41,7 @@ def tree_check(record, compiled):
     from joint import build_joint,decode
     from register_check import compile_fragment
     source=build_joint(decode(record),sharing=record.get('shared_operations',False),
-                       formula_choices=record.get('formula_choices'),compile_machine=False,decoder=record.get('decoder'))
+                       formula_choices=record.get('formula_choices'),compile_machine=False,decoder=record.get('decoder'),native=record.get('native'))
     a=compile_fragment(source,source.main(),terminal='return')
     b=compile_fragment(compiled,compiled.find_seq('main().0'),terminal='return')
     pairs=equivalent_increment_cfg(a,b)

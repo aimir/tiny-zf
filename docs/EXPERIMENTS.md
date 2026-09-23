@@ -357,6 +357,17 @@ checks and a complete CFG comparison of the unchanged inference body. The final
 table passes the existing rebuild, arithmetic, formula, CFG and literal-tape
 checks. See the [recorded recipes](../reference/decoder-experiments.json).
 
+## Native tape operations and placement
+
+The [native-tape campaign](NATIVE.md) combines adjacent destructive addition,
+physical register placement and decoder allocation with width-128 source beams
+and 32 tree finalists per campaign. A six-state left-transfer kernel and exact
+selector-layout optimization bring optimized native-transfer trees to 311 states.
+Exposing register selection to the instruction tree finishes at 309. Directly
+shortening the existing dispatcher fails its control-context checks. The 308-state
+incumbent is unchanged; exact recipes and aggregate checks are in the
+[native manifest](../reference/native-experiments.json).
+
 ## Reproduce
 
 ```sh
@@ -379,6 +390,8 @@ python3 tools/experiment.py combined-parent-transfer
 python3 tools/experiment.py combined-wide-screen
 python3 tools/experiment.py decoder-allocation
 python3 tools/experiment.py decoder-packed-counter
+python3 tools/experiment.py native-placement
+python3 tools/experiment.py native-addresses
 ```
 
 The recorded experiments supply their own initial configurations, so they can be
@@ -394,6 +407,7 @@ first-pass population before continuing; a generation override shortens both sta
 
 Getting below 300 requires nine more states. Joint decoder allocation recovered
 two states after tree optimization; packing the counter saved a physical register
-but added more instruction machinery than it removed. Richer shared grammars,
-cheaper dispatch or a larger representation change remain possible directions.
+but added more instruction machinery than it removed. Adjacent native transfers currently add more kernel/selection states than they
+remove from the tree. Larger fused arithmetic routines, a redesigned dispatcher
+or a different register representation remain possible directions.
 These bounded results are not lower bounds on equivalent machines.

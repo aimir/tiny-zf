@@ -25,7 +25,8 @@ formula constructors/encoding → shared arithmetic → safe inlining and factor
 
 `build_joint(decode(record), sharing=record.get("shared_operations", False),
 grammar=record.get("grammar"), formula_choices=record.get("formula_choices"),
-instruction_tree=read_record(record, ROOT / "candidates"), decoder=record.get("decoder"))` rebuilds a complete saved configuration (`read_record` comes from
+instruction_tree=read_record(record, ROOT / "candidates"), decoder=record.get("decoder"),
+native=record.get("native"))` rebuilds a complete saved configuration (`read_record` comes from
 `instruction_tree.py`; use the configuration file’s directory for search outputs). The unused third scratch name still exists in the inherited
 builder, but its operations are absent from the reachable 308-state machine.
 
@@ -58,6 +59,7 @@ These are computational checks. See [verification scope](../docs/VERIFICATION.md
 | `search_ics.py` | Search clause order within the safety phases. |
 | `search_combined.py` | Alternate source changes and tree optimization, reuse checked closed fragments, and select source survivors by final reduced size. |
 | `search_decoder.py` | Search allocation, field order and source choices, then fully reduce multiple tree finalists; preserves decoder settings and rechecks resumed trees. |
+| `search_native.py`, `place_native.py` | Combine native transfers, physical placement and decoder/source beams, then repack optimized trees with exact selector-cost minimization. |
 | `search_pairing.py` | Compare ordinary/reversed dyadic kernels, tag implementations and source layouts, then optimize multiple finalists' trees. |
 | `search_tree.py` | Continue tree optimization from the saved artifact; raw screening, full reduction and CFG checks. |
 | `solve_tree.py` | Optional OR-Tools model choosing a binary grammar globally within a finite dictionary. |
@@ -216,3 +218,35 @@ neither is used in the saved 308-state machine. The search uses one process and 
 cooperative `--memory-mb 512` RSS budget. On restart, saved trees are checked and
 scored before source selection, so an optimized tree cannot be lost merely
 because its compiler-generated tree scores worse. See [contracts and results](../docs/DECODER.md).
+
+## Native tape experiments
+
+`native.py` adds adjacent destructive transfers and physical register placement.
+`check_native.py` supplies randomized tape fixtures, expanded-source CFG checks
+and an independent literal-tape/atomic-IR comparison. `native_addresses.py`
+exposes ordinary register-selection chains and checks selection-counter flow.
+`verify_native.py` selects the transfer or address verifier from artifact metadata.
+
+```sh
+python3 tools/search_native.py --distinct-sources --output scratch/native.json
+python3 tools/place_native.py scratch/native.frontier.json --output scratch/placed.json
+python3 tools/verify_native.py --candidate scratch/placed.json
+python3 tools/probe_native.py left
+python3 tools/probe_native.py addresses
+python3 tools/probe_native.py dispatch
+```
+
+The source beam defaults to width 128 and 32 tree finalists. Ordinary and emitted
+native routines have separate pools; `--require-native` reserves the beam for
+emitted kernels while protecting the incumbent outside it. `--distinct-sources`
+reduces duplicates. `--configured-pools` exists solely to replay the first pilot,
+whose configuration-based classification admitted unused native bindings.
+`--resume-frontier` rebuilds sources and checks retained trees. Source searches
+that cannot preserve native layouts reject them. The dedicated tree search
+preserves native transfers; exposed-address artifacts use their separate probe.
+
+Replay IDs are `native-pilot`, `native-active`, `native-left`, `native-addresses`,
+`native-placement-pilot`, `native-placement` and `native-deep`. Placement replays
+regenerate the required source/tree frontiers; the deep replay regenerates its
+placement input. Add `--generations 1` for a short smoke run. See
+[contracts, limitations and results](../docs/NATIVE.md).

@@ -5,3 +5,4 @@
 - [Verification](VERIFICATION.md): computational checks and the deferred formal obligations.
 - [Pairing](PAIRING.md): dyadic arithmetic kernels, coding contracts, search and dedicated verification commands.
 - [Decoder allocation](DECODER.md): live-register contracts, proof-field recoding, two source/tree campaigns, and replay commands.
+- [Native tape operations](NATIVE.md): adjacent transfers, physical placement, exposed register selection, wide beams and finite tape-contract checks.

@@ -116,7 +116,7 @@ The separate allocation sweep audited all 1,024 grid plans symbolically and ran
 4,800 numerical boundary cases across 32 sampled plans and the three storage
 modes. The packed-counter winner also passed 1,000 boundary cases and its tree
 passed the full CFG audit; it was not promoted or subjected to the full literal
-candidate verifier. The regression suite has 60 tests, including corrupt-plan
+candidate verifier. The regression suite includes corrupt-plan
 rejection, proof-field coding, stale-tree rejection and preserving a saved tree
 when restarting search. [Verification scope](VERIFICATION.md) lists remaining
 formal obligations.

@@ -30,7 +30,8 @@ class Trees:
     def context(self,v):
         if isinstance(v,str):
             if v=='halt':return 0,0
-            if v.endswith('.inc'):return 1,0
+            if v in ('1.sel','1.inc','1.movr','1.movl'):return 1,0
+            if v.endswith(('.inc','.movr','.movl')):return 1,0
             if v.endswith('.decnz'):return 2,0
             kind,k=v[1:].split('.');k=int(k)
             return (k+1,0) if kind=='break' else (0,k)
@@ -113,7 +114,7 @@ class Trees:
 
     @lru_cache(None)
     def increments_only(self,v):
-        if isinstance(v,str):return v.endswith(".inc")
+        if isinstance(v,str):return v.startswith("3.") and v.endswith(".inc")
         return all(self.increments_only(x) for x in self.nodes[v])
 
     def rotations(self,v):
@@ -202,10 +203,15 @@ class Trees:
                     if not 0<=child<i:raise ValueError('forward or cyclic instruction-tree reference')
                     out.append(mapping[child])
                 elif isinstance(child,str):
-                    op=re.fullmatch(r'3\.([A-Za-z0-9_]+)\.(inc|decnz)',child)
+                    op=re.fullmatch(r'3\.([A-Za-z0-9_]+)\.(inc|decnz|movr|movl)',child)
                     jump=re.fullmatch(r'_(break|continue)\.[0-9]+',child)
-                    if not (op or jump or child=='halt'):
+                    hardware=child in ('1.sel','1.inc','1.decnz','1.movr','1.movl')
+                    if hardware and registers is not None and not getattr(registers,'native_addresses',False):
+                        raise ValueError('unconfigured native address instruction')
+                    if not (op or jump or hardware or child=='halt'):
                         raise ValueError('unknown instruction-tree primitive')
+                    if op and op[2] in ('movr','movl') and registers is not None and child not in getattr(registers,'native_primitives',()):
+                        raise ValueError('unconfigured native instruction')
                     if op and registers is not None and op[1] not in registers:
                         raise ValueError('unknown instruction-tree register')
                     out.append(child)

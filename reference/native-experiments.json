@@ -1,0 +1,1106 @@
+{
+  "date": "2026-09-23",
+  "status": "experimental; computational checks only; incumbent remains 308 states",
+  "initial": {
+    "order": [
+      10,
+      7,
+      3,
+      8,
+      2,
+      4,
+      0,
+      9,
+      5,
+      1,
+      11,
+      6,
+      16,
+      13,
+      12,
+      14,
+      15
+    ],
+    "parameter_permutations": {
+      "B1": 5,
+      "B2": 0,
+      "B3": 2,
+      "B4": 2,
+      "B6b": 2,
+      "B6c": 2,
+      "B7": 0,
+      "B8a": 1,
+      "B8b": 0,
+      "B8c": 1
+    },
+    "protected_permutation": 1,
+    "fusion": 2,
+    "two_scratch": true,
+    "reverse_payload": true,
+    "formula_choices": {
+      "POW": 0,
+      "UNI": 0,
+      "ICS": 162,
+      "B6a1": 0,
+      "B6a2": 0
+    },
+    "shared_operations": true,
+    "grammar": {
+      "kind": "cost",
+      "inline_probability": 0.75,
+      "seed": 12277335,
+      "inline_main": false,
+      "inline_seed": 15385382
+    },
+    "decoder": {
+      "order": [
+        "param1",
+        "param3",
+        "param2",
+        "axiomcode"
+      ],
+      "clear_order": [
+        "param1",
+        "param3",
+        "param2",
+        "axiomcode"
+      ],
+      "eager": false,
+      "stages": [
+        [
+          "scratch1",
+          "scratch2",
+          false
+        ],
+        [
+          "scratch1",
+          "scratch2",
+          false
+        ],
+        [
+          "scratch1",
+          "scratch2",
+          false
+        ],
+        [
+          "scratch1",
+          "scratch2",
+          false
+        ]
+      ],
+      "defer_heads": false
+    },
+    "kind": "ics-decoder-instruction-tree",
+    "status": "experimental; computational checks only; not formally verified",
+    "raw_states": 308,
+    "final_states": 308,
+    "table_sha256": "c4083dd0239b8f5c9bd231c69caff51bca8c5a3d0a0679e92f89bae158817d16",
+    "instruction_tree": "native-initial-tree.json",
+    "instruction_tree_sha256": "42d6abd5c4d97ec9cb6ef35d0de22f1c0e93a7dc9fb31fd4141dceddf6713b84",
+    "framework_states": 65,
+    "dag_states": 243,
+    "active_registers": 10,
+    "wade_commit": "9c5c2e82f6ad5ceb5fb7a2d946aa3b1f1d05b1fce7340fd79029cc9d4756f429",
+    "ics_formula_commit": "74a0e042f5f0ba433b3161b7c6b35ab319113844"
+  },
+  "initial_tree_sha256": "42d6abd5c4d97ec9cb6ef35d0de22f1c0e93a7dc9fb31fd4141dceddf6713b84",
+  "counting": "Source evaluations include full reduction and may repeat. Tree mutation attempts are proposals, not distinct machines. Tree reduction counts exclude saves and verification. Pilot and continuation use right transfers; placement reuses their trees with both kernel orientations. Older superseded kernel prototypes and small smoke/development runs are excluded.",
+  "replay": "Use tools/experiment.py with a run ID. Placement and deep runs regenerate their prerequisites. The native-active initial population is five curated source configurations plus the pinned 308-state tree, not a saved raw frontier. Logs, complete frontiers and tables for unsuccessful experiments are not committed.",
+  "regression_tests": 75,
+  "runs": [
+    {
+      "id": "native-pilot",
+      "search": "native",
+      "initial_tree": "native-initial-tree.json",
+      "seed": 20260927,
+      "grid": 512,
+      "generations": 30,
+      "batch": 256,
+      "width": 128,
+      "tree_candidates": 32,
+      "tree_generations": 100,
+      "tree_batch": 128,
+      "tree_width": 48,
+      "tree_screen": 3,
+      "memory_mb": 512,
+      "source_evaluations": 5551,
+      "invalid_plans_rejected": 1013,
+      "tree_mutation_attempts": 409600,
+      "tree_full_reduction_evaluations": 9051,
+      "peak_rss_mib": 278.5625,
+      "final_states": 308,
+      "table_sha256": "c4083dd0239b8f5c9bd231c69caff51bca8c5a3d0a0679e92f89bae158817d16",
+      "finalist_counts": [
+        308,
+        308,
+        309,
+        308,
+        309,
+        308,
+        308,
+        308,
+        309,
+        308,
+        309,
+        308,
+        309,
+        310,
+        309,
+        308,
+        312,
+        312,
+        312,
+        312,
+        311,
+        311,
+        311,
+        311,
+        311,
+        312,
+        312,
+        314,
+        313,
+        313,
+        313,
+        315
+      ],
+      "emitted_native_finalists": 5,
+      "best_emitted_native_states": 313,
+      "configured_pools": true,
+      "unused_native_finalists": 11,
+      "best_configured_native_states": 311
+    },
+    {
+      "id": "native-active",
+      "search": "native",
+      "initial_tree": "native-initial-tree.json",
+      "seed": 20260930,
+      "grid": 0,
+      "generations": 20,
+      "batch": 192,
+      "width": 128,
+      "tree_candidates": 32,
+      "tree_generations": 60,
+      "tree_batch": 128,
+      "tree_width": 40,
+      "tree_screen": 3,
+      "memory_mb": 512,
+      "source_evaluations": 2908,
+      "invalid_plans_rejected": 440,
+      "tree_mutation_attempts": 245760,
+      "tree_full_reduction_evaluations": 5791,
+      "peak_rss_mib": 274.453125,
+      "final_states": 308,
+      "table_sha256": "c4083dd0239b8f5c9bd231c69caff51bca8c5a3d0a0679e92f89bae158817d16",
+      "finalist_counts": [
+        316,
+        314,
+        314,
+        314,
+        315,
+        315,
+        313,
+        315,
+        313,
+        315,
+        313,
+        314,
+        314,
+        313,
+        315,
+        315,
+        315,
+        315,
+        316,
+        315,
+        314,
+        314,
+        313,
+        315,
+        314,
+        315,
+        314,
+        314,
+        315,
+        314,
+        314,
+        315
+      ],
+      "emitted_native_finalists": 32,
+      "best_emitted_native_states": 313,
+      "require_native": true,
+      "distinct_sources": true,
+      "initial_population": [
+        {
+          "order": [
+            10,
+            7,
+            3,
+            8,
+            2,
+            4,
+            0,
+            9,
+            5,
+            1,
+            11,
+            6,
+            16,
+            13,
+            12,
+            14,
+            15
+          ],
+          "parameter_permutations": {
+            "B1": 5,
+            "B2": 0,
+            "B3": 2,
+            "B4": 2,
+            "B6b": 2,
+            "B6c": 2,
+            "B7": 0,
+            "B8a": 1,
+            "B8b": 0,
+            "B8c": 1
+          },
+          "protected_permutation": 1,
+          "fusion": 2,
+          "two_scratch": true,
+          "reverse_payload": true,
+          "formula_choices": {
+            "POW": 0,
+            "UNI": 0,
+            "ICS": 162,
+            "B6a1": 0,
+            "B6a2": 0
+          },
+          "shared_operations": true,
+          "grammar": {
+            "kind": "cost",
+            "inline_probability": 0.75,
+            "seed": 12277335,
+            "inline_main": false,
+            "inline_seed": 15385382
+          },
+          "decoder": {
+            "order": [
+              "param1",
+              "param3",
+              "param2",
+              "axiomcode"
+            ],
+            "clear_order": [
+              "param1",
+              "param3",
+              "param2",
+              "axiomcode"
+            ],
+            "eager": false,
+            "stages": [
+              [
+                "scratch1",
+                "scratch2",
+                false
+              ],
+              [
+                "scratch1",
+                "scratch2",
+                false
+              ],
+              [
+                "scratch1",
+                "scratch2",
+                false
+              ],
+              [
+                "scratch1",
+                "scratch2",
+                false
+              ]
+            ],
+            "defer_heads": false
+          },
+          "native": {
+            "register_order": [
+              "param2",
+              "scratch1",
+              "wffstack",
+              "scratch2",
+              "topwff",
+              "param3",
+              "prooflist",
+              "axiomcode",
+              "nextproof",
+              "param1",
+              "scratch3"
+            ],
+            "moves": [
+              [
+                "scratch2",
+                "wffstack"
+              ],
+              [
+                "wffstack",
+                "scratch1"
+              ],
+              [
+                "topwff",
+                "scratch2"
+              ],
+              [
+                "scratch1",
+                "param2"
+              ]
+            ]
+          }
+        },
+        {
+          "order": [
+            10,
+            7,
+            3,
+            8,
+            2,
+            4,
+            0,
+            9,
+            5,
+            1,
+            11,
+            6,
+            16,
+            13,
+            12,
+            14,
+            15
+          ],
+          "parameter_permutations": {
+            "B1": 5,
+            "B2": 0,
+            "B3": 2,
+            "B4": 2,
+            "B6b": 2,
+            "B6c": 2,
+            "B7": 0,
+            "B8a": 1,
+            "B8b": 0,
+            "B8c": 1
+          },
+          "protected_permutation": 1,
+          "fusion": 2,
+          "two_scratch": true,
+          "reverse_payload": true,
+          "formula_choices": {
+            "POW": 0,
+            "UNI": 0,
+            "ICS": 162,
+            "B6a1": 0,
+            "B6a2": 0
+          },
+          "shared_operations": true,
+          "grammar": {
+            "kind": "cost",
+            "inline_probability": 0.75,
+            "seed": 12277335,
+            "inline_main": false,
+            "inline_seed": 15385382
+          },
+          "decoder": {
+            "order": [
+              "param1",
+              "param3",
+              "param2",
+              "axiomcode"
+            ],
+            "clear_order": [
+              "param1",
+              "param3",
+              "param2",
+              "axiomcode"
+            ],
+            "eager": false,
+            "stages": [
+              [
+                "scratch1",
+                "scratch2",
+                false
+              ],
+              [
+                "scratch1",
+                "scratch2",
+                false
+              ],
+              [
+                "scratch1",
+                "scratch2",
+                false
+              ],
+              [
+                "scratch1",
+                "scratch2",
+                false
+              ]
+            ],
+            "defer_heads": false
+          },
+          "native": {
+            "register_order": [
+              "param3",
+              "scratch1",
+              "wffstack",
+              "scratch2",
+              "topwff",
+              "param2",
+              "prooflist",
+              "axiomcode",
+              "nextproof",
+              "param1",
+              "scratch3"
+            ],
+            "moves": [
+              [
+                "scratch2",
+                "wffstack"
+              ],
+              [
+                "wffstack",
+                "scratch1"
+              ],
+              [
+                "topwff",
+                "scratch2"
+              ],
+              [
+                "scratch1",
+                "param3"
+              ]
+            ]
+          }
+        },
+        {
+          "order": [
+            10,
+            7,
+            3,
+            8,
+            2,
+            4,
+            0,
+            9,
+            5,
+            1,
+            11,
+            6,
+            16,
+            13,
+            12,
+            14,
+            15
+          ],
+          "parameter_permutations": {
+            "B1": 5,
+            "B2": 0,
+            "B3": 2,
+            "B4": 2,
+            "B6b": 2,
+            "B6c": 2,
+            "B7": 0,
+            "B8a": 1,
+            "B8b": 0,
+            "B8c": 1
+          },
+          "protected_permutation": 1,
+          "fusion": 2,
+          "two_scratch": true,
+          "reverse_payload": true,
+          "formula_choices": {
+            "POW": 0,
+            "UNI": 0,
+            "ICS": 162,
+            "B6a1": 0,
+            "B6a2": 0
+          },
+          "shared_operations": true,
+          "grammar": {
+            "kind": "cost",
+            "inline_probability": 0.75,
+            "seed": 12277335,
+            "inline_main": false,
+            "inline_seed": 15385382
+          },
+          "decoder": {
+            "order": [
+              "param1",
+              "param3",
+              "param2",
+              "axiomcode"
+            ],
+            "clear_order": [
+              "param1",
+              "param3",
+              "param2",
+              "axiomcode"
+            ],
+            "eager": false,
+            "stages": [
+              [
+                "scratch1",
+                "scratch2",
+                false
+              ],
+              [
+                "scratch1",
+                "scratch2",
+                false
+              ],
+              [
+                "scratch1",
+                "scratch2",
+                false
+              ],
+              [
+                "scratch1",
+                "scratch2",
+                false
+              ]
+            ],
+            "defer_heads": false
+          },
+          "native": {
+            "register_order": [
+              "param2",
+              "scratch1",
+              "wffstack",
+              "scratch2",
+              "topwff",
+              "param3",
+              "prooflist",
+              "axiomcode",
+              "nextproof",
+              "param1",
+              "scratch3"
+            ],
+            "moves": [
+              [
+                "scratch2",
+                "wffstack"
+              ],
+              [
+                "wffstack",
+                "scratch1"
+              ],
+              [
+                "scratch1",
+                "param2"
+              ]
+            ]
+          }
+        },
+        {
+          "order": [
+            10,
+            7,
+            3,
+            8,
+            2,
+            4,
+            0,
+            9,
+            5,
+            1,
+            11,
+            6,
+            16,
+            13,
+            12,
+            14,
+            15
+          ],
+          "parameter_permutations": {
+            "B1": 5,
+            "B2": 0,
+            "B3": 2,
+            "B4": 2,
+            "B6b": 2,
+            "B6c": 2,
+            "B7": 0,
+            "B8a": 1,
+            "B8b": 0,
+            "B8c": 1
+          },
+          "protected_permutation": 1,
+          "fusion": 2,
+          "two_scratch": true,
+          "reverse_payload": true,
+          "formula_choices": {
+            "POW": 0,
+            "UNI": 0,
+            "ICS": 162,
+            "B6a1": 0,
+            "B6a2": 0
+          },
+          "shared_operations": true,
+          "grammar": {
+            "kind": "cost",
+            "inline_probability": 0.75,
+            "seed": 12277335,
+            "inline_main": false,
+            "inline_seed": 15385382
+          },
+          "decoder": {
+            "order": [
+              "axiomcode",
+              "param2",
+              "param1",
+              "param3"
+            ],
+            "clear_order": [
+              "param1",
+              "param3",
+              "param2",
+              "axiomcode"
+            ],
+            "eager": false,
+            "stages": [
+              [
+                "scratch1",
+                "scratch2",
+                false
+              ],
+              [
+                "scratch1",
+                "scratch2",
+                false
+              ],
+              [
+                "scratch1",
+                "scratch2",
+                false
+              ],
+              [
+                "scratch1",
+                "scratch2",
+                false
+              ]
+            ],
+            "defer_heads": false
+          },
+          "native": {
+            "register_order": [
+              "param3",
+              "scratch1",
+              "wffstack",
+              "scratch2",
+              "topwff",
+              "param2",
+              "prooflist",
+              "axiomcode",
+              "nextproof",
+              "param1",
+              "scratch3"
+            ],
+            "moves": [
+              [
+                "scratch2",
+                "wffstack"
+              ],
+              [
+                "wffstack",
+                "scratch1"
+              ],
+              [
+                "topwff",
+                "scratch2"
+              ],
+              [
+                "scratch1",
+                "param3"
+              ]
+            ]
+          }
+        },
+        {
+          "order": [
+            10,
+            7,
+            3,
+            8,
+            2,
+            4,
+            0,
+            9,
+            5,
+            1,
+            11,
+            6,
+            16,
+            13,
+            12,
+            14,
+            15
+          ],
+          "parameter_permutations": {
+            "B1": 5,
+            "B2": 0,
+            "B3": 2,
+            "B4": 2,
+            "B6b": 2,
+            "B6c": 2,
+            "B7": 0,
+            "B8a": 1,
+            "B8b": 0,
+            "B8c": 1
+          },
+          "protected_permutation": 1,
+          "fusion": 2,
+          "two_scratch": true,
+          "reverse_payload": true,
+          "formula_choices": {
+            "POW": 0,
+            "UNI": 0,
+            "ICS": 162,
+            "B6a1": 0,
+            "B6a2": 0
+          },
+          "shared_operations": true,
+          "grammar": {
+            "kind": "cost",
+            "inline_probability": 0.75,
+            "seed": 12277335,
+            "inline_main": false,
+            "inline_seed": 15385382
+          },
+          "decoder": {
+            "order": [
+              "param1",
+              "param3",
+              "param2",
+              "axiomcode"
+            ],
+            "clear_order": [
+              "param1",
+              "param3",
+              "param2",
+              "axiomcode"
+            ],
+            "eager": false,
+            "stages": [
+              [
+                "scratch1",
+                "scratch2",
+                false
+              ],
+              [
+                "scratch1",
+                "scratch2",
+                false
+              ],
+              [
+                "scratch1",
+                "scratch2",
+                false
+              ],
+              [
+                "scratch1",
+                "scratch2",
+                false
+              ]
+            ],
+            "defer_heads": false
+          },
+          "native": {
+            "register_order": [
+              "nextproof",
+              "scratch1",
+              "wffstack",
+              "scratch2",
+              "topwff",
+              "param3",
+              "prooflist",
+              "axiomcode",
+              "param2",
+              "param1",
+              "scratch3"
+            ],
+            "moves": [
+              [
+                "scratch2",
+                "wffstack"
+              ],
+              [
+                "wffstack",
+                "scratch1"
+              ],
+              [
+                "topwff",
+                "scratch2"
+              ],
+              [
+                "scratch1",
+                "nextproof"
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "native-left",
+      "search": "native-probe",
+      "mode": "left",
+      "initial_tree": "native-initial-tree.json",
+      "generations": 40,
+      "source_evaluations": 72,
+      "best_source_states": 318,
+      "tree_mutation_attempts": 40960,
+      "tree_full_reduction_evaluations": 1017,
+      "peak_rss_mib": 245.5,
+      "final_states": 313,
+      "table_sha256": "a0a20ccf05b5ad0052a0e542f7b602ffb33707bb7cc7a1deb300871ab325a66e",
+      "instruction_tree_sha256": "f3e26084e9a011006304d9076bf1c2d5cd2c2a6b74eb141f341867dc77a280f8",
+      "finalist_counts": [
+        313,
+        315,
+        315,
+        315,
+        316,
+        315,
+        314,
+        314
+      ]
+    },
+    {
+      "id": "native-addresses",
+      "search": "native-probe",
+      "mode": "addresses",
+      "initial_tree": "native-initial-tree.json",
+      "generations": 150,
+      "source_evaluations": 1,
+      "best_source_states": 314,
+      "tree_mutation_attempts": 28800,
+      "tree_full_reduction_evaluations": 564,
+      "peak_rss_mib": 314.84375,
+      "final_states": 309,
+      "table_sha256": "259a632f35ba75bc271ea5e68b1dc9708108994243299d6bec5ba0be558bb00d",
+      "instruction_tree_sha256": "9888d382441f6b0a842ad8bacb76b7d3d59588aaeba41c0ff532be590bfa7afb",
+      "finalist_counts": [
+        309
+      ]
+    },
+    {
+      "id": "native-placement-pilot",
+      "search": "native-placement",
+      "frontiers_from_runs": [
+        "native-pilot"
+      ],
+      "placement_width": 4,
+      "final_states": 311,
+      "inputs": 32,
+      "placement_evaluations": 40,
+      "best_by_direction": {
+        "movl": 311,
+        "movr": 313
+      },
+      "table_sha256": "49d96a7c0e65ec81e934704016d417404ae17d23317a33713e3a305d890682fe",
+      "instruction_tree_sha256": "093ea87812b9337f6c9d0e5f76101684b44542185ba2a76d1ff419a3dd3fe39b"
+    },
+    {
+      "id": "native-placement",
+      "search": "native-placement",
+      "frontiers_from_runs": [
+        "native-pilot",
+        "native-active"
+      ],
+      "placement_width": 4,
+      "final_states": 311,
+      "inputs": 64,
+      "placement_evaluations": 296,
+      "best_by_direction": {
+        "movl": 311,
+        "movr": 313
+      },
+      "table_sha256": "49d96a7c0e65ec81e934704016d417404ae17d23317a33713e3a305d890682fe",
+      "instruction_tree_sha256": "093ea87812b9337f6c9d0e5f76101684b44542185ba2a76d1ff419a3dd3fe39b"
+    },
+    {
+      "id": "native-deep",
+      "search": "tree",
+      "initial_from_run": "native-placement-pilot",
+      "seed": 20261001,
+      "generations": 200,
+      "batch": 192,
+      "width": 96,
+      "mode": "general",
+      "break_floor": 1,
+      "screen": 4,
+      "commute": true,
+      "stratified": true,
+      "edge_rewrites": true,
+      "tree_mutation_attempts": 38400,
+      "final_states": 311,
+      "table_sha256": "49d96a7c0e65ec81e934704016d417404ae17d23317a33713e3a305d890682fe",
+      "instruction_tree_sha256": "093ea87812b9337f6c9d0e5f76101684b44542185ba2a76d1ff419a3dd3fe39b"
+    }
+  ],
+  "dispatch_probe": {
+    "reference_states": 308,
+    "reference_limit": 7,
+    "contexts": 43444,
+    "results": [
+      {
+        "limit": 6,
+        "first_failing_context": 7606,
+        "passed": false
+      },
+      {
+        "limit": 5,
+        "first_failing_context": 660,
+        "passed": false
+      },
+      {
+        "limit": 4,
+        "first_failing_context": 383,
+        "passed": false
+      },
+      {
+        "limit": 3,
+        "first_failing_context": 126,
+        "passed": false
+      },
+      {
+        "limit": 2,
+        "first_failing_context": 79,
+        "passed": false
+      },
+      {
+        "limit": 1,
+        "first_failing_context": 5,
+        "passed": false
+      }
+    ]
+  },
+  "checks": {
+    "incumbent": {
+      "states": 308,
+      "decoder": {
+        "boundary_cases": 1000,
+        "unchanged_body_cfg_pairs": 4601,
+        "symbolic_plan_operations": 16
+      },
+      "tape_differential": {
+        "decrement_boundaries": 512,
+        "increments_between_boundaries": 535,
+        "compared_registers": 10,
+        "source_steps": 12809467,
+        "candidate_steps": 12808639,
+        "source_minimum_observed_gap": 7,
+        "candidate_minimum_observed_gap": 7
+      },
+      "smoke_steps": 1000000,
+      "final_tree_cfg_pairs": 4163
+    },
+    "left_sweep": {
+      "states": 313,
+      "decoder": {
+        "boundary_cases": 1000,
+        "unchanged_body_cfg_pairs": 4601,
+        "symbolic_plan_operations": 16
+      },
+      "native": {
+        "kernels": {
+          "movl": {
+            "native_kernel_cases": 2000
+          }
+        },
+        "expanded_source_cfg_pairs": 4659,
+        "literal_ir": {
+          "operations": 1024,
+          "kinds": {
+            "decnz": 488,
+            "inc": 524,
+            "movl": 12
+          },
+          "steps": 10454541,
+          "compared_registers": 10,
+          "minimum_observed_gap": 6
+        }
+      },
+      "tape_differential": {
+        "decrement_boundaries": 512,
+        "increments_between_boundaries": 566,
+        "compared_registers": 10,
+        "source_steps": 11299539,
+        "candidate_steps": 11299577,
+        "source_minimum_observed_gap": 6,
+        "candidate_minimum_observed_gap": 6
+      },
+      "smoke_steps": 1000000,
+      "final_tree_cfg_pairs": 4163
+    },
+    "best_transfer": {
+      "states": 311,
+      "decoder": {
+        "boundary_cases": 1000,
+        "unchanged_body_cfg_pairs": 4601,
+        "symbolic_plan_operations": 16
+      },
+      "native": {
+        "kernels": {
+          "movl": {
+            "native_kernel_cases": 2000
+          }
+        },
+        "expanded_source_cfg_pairs": 4659,
+        "literal_ir": {
+          "operations": 1024,
+          "kinds": {
+            "decnz": 478,
+            "inc": 524,
+            "movl": 22
+          },
+          "steps": 5407328,
+          "compared_registers": 10,
+          "minimum_observed_gap": 7
+        }
+      },
+      "tape_differential": {
+        "decrement_boundaries": 512,
+        "increments_between_boundaries": 575,
+        "compared_registers": 10,
+        "source_steps": 6015769,
+        "candidate_steps": 6015806,
+        "source_minimum_observed_gap": 7,
+        "candidate_minimum_observed_gap": 7
+      },
+      "smoke_steps": 1000000,
+      "final_tree_cfg_pairs": 4163,
+      "applies_to": [
+        "native-placement-pilot",
+        "native-placement",
+        "native-deep"
+      ],
+      "development_kernel_cases": 10000
+    },
+    "addresses": {
+      "states": 309,
+      "matched_cfg_segment_pairs": 4163,
+      "literal_ir": {
+        "operations": 1024,
+        "kinds": {
+          "decnz": 500,
+          "inc": 524
+        },
+        "steps": 12490551,
+        "compared_registers": 10,
+        "minimum_observed_gap": 7
+      },
+      "smoke_steps": 1000000
+    }
+  },
+  "totals": {
+    "source_evaluations": 8532,
+    "source_tree_finalists": 73,
+    "tree_mutation_attempts_including_deep": 763520,
+    "campaign_tree_full_reductions_excluding_deep_and_placement": 16423
+  }
+}

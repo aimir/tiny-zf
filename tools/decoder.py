@@ -166,4 +166,4 @@ def build_decoder(record, *, compile_machine=True):
     from joint import build_joint,decode
     return build_joint(decode(record),sharing=record.get('shared_operations',False),
                        grammar=record.get('grammar'),formula_choices=record.get('formula_choices'),
-                       decoder=record.get('decoder',default_options()),compile_machine=compile_machine)
+                       decoder=record.get('decoder',default_options()),native=record.get('native'),compile_machine=compile_machine)

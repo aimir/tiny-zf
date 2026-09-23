@@ -77,7 +77,7 @@ def run(args):
     from ortools.sat.python import cp_model
     record=json.loads(args.initial.read_text())
     source=build_joint(decode(record),sharing=record.get('shared_operations',False),
-                       grammar=record.get('grammar'),formula_choices=record.get('formula_choices'),decoder=record.get('decoder'))
+                       grammar=record.get('grammar'),formula_choices=record.get('formula_choices'),decoder=record.get('decoder'),native=record.get('native'))
     original=compile_fragment(source,source.find_seq('main().0'),terminal='return')
     tree=Trees();source_root=tree.import_machine(source)
     backend=count(source.tm.states)-tree.size(source_root)
@@ -140,7 +140,7 @@ def run(args):
         if proposed.size(root)+backend>incumbent:
             proposed.clear_caches()
             return
-        m=build_joint(decode(record),compile_machine=False,decoder=record.get('decoder'))
+        m=build_joint(decode(record),compile_machine=False,decoder=record.get('decoder'),native=record.get('native'))
         proposed.install(m,root);m.name_sequences();m.generate();m.tm.gc()
         pairs=equivalent_increment_cfg(original,compile_fragment(m,m.find_seq('main().0'),terminal='return'))
         raw=count(m.tm.states);final=len(reduce(totalize(m.tm.start,m.tm.states)));proposals+=1

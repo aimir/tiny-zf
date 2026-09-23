@@ -289,7 +289,7 @@ def save(candidate, initial, path, summary):
 
 def run(args):
     initial = json.loads(args.initial.read_text())
-    if initial.get('decoder'):raise ValueError('decoder allocation present: use search_decoder.py to preserve it')
+    if initial.get('decoder') or initial.get('native') is not None:raise ValueError('allocated source: use search_native.py for native layouts, otherwise search_decoder.py')
     gene = gene_of(initial)
     if not initial.get('shared_operations') or not gene[0][4]:
         raise ValueError('combined search requires the shared two-scratch source')
