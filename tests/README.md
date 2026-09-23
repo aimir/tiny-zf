@@ -1,6 +1,6 @@
 # Regression tests
 
-Run `python3 -m unittest discover -s tests` from the root. The 45 tests cover:
+Run `python3 -m unittest discover -s tests` from the root. The 51 tests cover:
 
 - Strict table parsing, missing-read totalization and rejected malformed inputs.
 - Valid and invalid quotient certificates and local tape-cell preservation.
@@ -27,6 +27,13 @@ Run `python3 -m unittest discover -s tests` from the root. The 45 tests cover:
 - Closed-fragment transfer preserves the changed source's complete CFG.
 - Fragment signatures preserve register names, branch order and distinct exits.
 - Final-frontier scoring retains an existing optimized tree and source-family diversity.
+
+- Dyadic pair/unpair numerical contracts, both argument orientations, every
+  constructor/tag lowering, stack operations, protected guards and proof-field decoding: 28,057
+  bounded cases in the default check, including preservation of other registers.
+- Dyadic distinguished codes and numerical round trips, invalid tag/alias
+  rejection, factoring equivalence, and rejection of the old Cantor tree when
+  checking a recoded source.
 
 Exact artifact reproduction and finite tape simulation are separately checked by
 `python3 tools/verify_ics.py` and `python3 tools/verify.py`. These commands do not

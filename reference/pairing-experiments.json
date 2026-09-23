@@ -1,0 +1,397 @@
+{
+  "date": "2026-09-23",
+  "status": "experimental; computational checks only; incumbent unchanged at 310 states",
+  "counting": "Two completed campaigns only. Configurations and tree mutation attempts may repeat. Every source evaluation uses full reduction; tree counts cover uncached search inspections, excluding artifact saves and verification calls. Interrupted pilots, probes and restart smoke tests are excluded.",
+  "replay": "Use tools/experiment.py with either run ID. Replays use the existing shared 310-state initial tree as a checked fragment donor. The 512 MiB cooperative budget was added after the original runs; observed peaks were below 285 MiB. Winner trees/tables and raw frontiers stay in ignored scratch and can be regenerated.",
+  "regression_tests": 51,
+  "default_pairing_contract_cases": 28057,
+  "runs": [
+    {
+      "id": "pairing-dyadic",
+      "search": "pairing",
+      "initial": {
+        "raw_states": 310,
+        "formula_choices": {
+          "POW": 0,
+          "UNI": 0,
+          "ICS": 162,
+          "B6a1": 0
+        },
+        "order": [
+          10,
+          7,
+          3,
+          8,
+          2,
+          4,
+          0,
+          9,
+          5,
+          1,
+          11,
+          6,
+          16,
+          13,
+          12,
+          14,
+          15
+        ],
+        "parameter_permutations": {
+          "B1": 5,
+          "B2": 0,
+          "B3": 2,
+          "B4": 2,
+          "B6b": 2,
+          "B6c": 2,
+          "B7": 0,
+          "B8a": 1,
+          "B8b": 0,
+          "B8c": 1
+        },
+        "protected_permutation": 1,
+        "fusion": 2,
+        "two_scratch": true,
+        "reverse_payload": true,
+        "grammar": {
+          "kind": "cost",
+          "inline_probability": 0.75,
+          "seed": 15385382,
+          "inline_main": false
+        },
+        "shared_operations": true,
+        "final_states": 310,
+        "kind": "ics-instruction-tree",
+        "status": "experimental; not formally verified",
+        "wade_commit": "9c5c2e82f6ad5ceb5fb7a2d946aa3b1f1d05b1fce7340fd79029cc9d4756f429",
+        "ics_formula_commit": "74a0e042f5f0ba433b3161b7c6b35ab319113844",
+        "framework_states": 65,
+        "dag_states": 245,
+        "active_registers": 10,
+        "table_sha256": "a156659a40e7129632823c9e973afd501d1e0cc5837024919ee3c2ccc04e5846",
+        "instruction_tree": "ics-tree.json",
+        "instruction_tree_sha256": "0815b1525150b36a479821ad3dae554a3c7944152b107d79a0fd20f6262aa983"
+      },
+      "initial_tree": "combined-initial-tree.json",
+      "workers": 1,
+      "memory_mb": 512,
+      "dual": false,
+      "seed": 20260923,
+      "generations": 40,
+      "batch": 128,
+      "width": 64,
+      "tree_candidates": 12,
+      "tree_generations": 80,
+      "tree_batch": 128,
+      "tree_width": 32,
+      "tree_screen": 2,
+      "initial_grid_configurations": 1008,
+      "best_grid_states": 329,
+      "best_source_states": 327,
+      "source_evaluations": 4963,
+      "unique_source_trees": 4185,
+      "tree_mutation_attempts": 122880,
+      "tree_full_reduction_evaluations": 2069,
+      "peak_rss_mib": 275.78125,
+      "final_states": 321,
+      "best_configuration": {
+        "order": [
+          10,
+          7,
+          3,
+          8,
+          2,
+          4,
+          0,
+          9,
+          5,
+          1,
+          11,
+          6,
+          16,
+          13,
+          12,
+          14,
+          15
+        ],
+        "parameter_permutations": {
+          "B1": 5,
+          "B2": 0,
+          "B3": 2,
+          "B4": 2,
+          "B6b": 2,
+          "B6c": 2,
+          "B7": 0,
+          "B8a": 1,
+          "B8b": 0,
+          "B8c": 1
+        },
+        "protected_permutation": 1,
+        "fusion": 2,
+        "two_scratch": true,
+        "reverse_payload": true,
+        "formula_choices": {
+          "POW": 0,
+          "UNI": 0,
+          "ICS": 162,
+          "B6a1": 0
+        },
+        "shared_operations": true,
+        "grammar": {
+          "kind": "cost",
+          "inline_probability": 0.75,
+          "seed": 12818949,
+          "inline_main": true,
+          "inline_seed": 15385382
+        },
+        "pairing": {
+          "kernel": "dyadic",
+          "positive_inverse": false,
+          "tags": "generic",
+          "tag_order": [
+            4,
+            2,
+            3
+          ]
+        }
+      },
+      "winner_hashes": {
+        "table_sha256": "d2bfb683aad14f3d2949e836d1204f1b28e5ee0aa008ac1817ad677f2a67cf45",
+        "tree_sha256": "42645a26c12180b3810be33435d85887104f1019c1e7c1e53c0cd32cd5226eca"
+      },
+      "checks": {
+        "status": "experimental; computational checks only",
+        "arithmetic": {
+          "pair": 1536,
+          "unpair": 12288,
+          "constructors": 13440,
+          "stack": 109,
+          "guard": 162,
+          "decoder": 512,
+          "detachment": 8
+        },
+        "factored_cfg_pairs": 5693,
+        "tree_cfg_pairs": 4765,
+        "raw_states": 321,
+        "final_states": 321,
+        "smoke": {
+          "steps": 1000000,
+          "dispatches": 1012,
+          "register_entries": 992,
+          "minimum_observed_gap": 7,
+          "head": 212,
+          "state": "2.ret1.1",
+          "ones": 228
+        },
+        "tape_differential": {
+          "decrement_boundaries": 512,
+          "increments_between_boundaries": 577,
+          "compared_registers": 10,
+          "source_steps": 11583867,
+          "candidate_steps": 11582923,
+          "source_minimum_observed_gap": 7,
+          "candidate_minimum_observed_gap": 7
+        }
+      },
+      "checked_formula_choices": {
+        "POW": 0,
+        "UNI": 0,
+        "ICS": 162,
+        "B6a1": 0
+      }
+    },
+    {
+      "id": "pairing-dual",
+      "search": "pairing",
+      "initial": {
+        "raw_states": 310,
+        "formula_choices": {
+          "POW": 0,
+          "UNI": 0,
+          "ICS": 162,
+          "B6a1": 0
+        },
+        "order": [
+          10,
+          7,
+          3,
+          8,
+          2,
+          4,
+          0,
+          9,
+          5,
+          1,
+          11,
+          6,
+          16,
+          13,
+          12,
+          14,
+          15
+        ],
+        "parameter_permutations": {
+          "B1": 5,
+          "B2": 0,
+          "B3": 2,
+          "B4": 2,
+          "B6b": 2,
+          "B6c": 2,
+          "B7": 0,
+          "B8a": 1,
+          "B8b": 0,
+          "B8c": 1
+        },
+        "protected_permutation": 1,
+        "fusion": 2,
+        "two_scratch": true,
+        "reverse_payload": true,
+        "grammar": {
+          "kind": "cost",
+          "inline_probability": 0.75,
+          "seed": 15385382,
+          "inline_main": false
+        },
+        "shared_operations": true,
+        "final_states": 310,
+        "kind": "ics-instruction-tree",
+        "status": "experimental; not formally verified",
+        "wade_commit": "9c5c2e82f6ad5ceb5fb7a2d946aa3b1f1d05b1fce7340fd79029cc9d4756f429",
+        "ics_formula_commit": "74a0e042f5f0ba433b3161b7c6b35ab319113844",
+        "framework_states": 65,
+        "dag_states": 245,
+        "active_registers": 10,
+        "table_sha256": "a156659a40e7129632823c9e973afd501d1e0cc5837024919ee3c2ccc04e5846",
+        "instruction_tree": "ics-tree.json",
+        "instruction_tree_sha256": "0815b1525150b36a479821ad3dae554a3c7944152b107d79a0fd20f6262aa983"
+      },
+      "initial_tree": "combined-initial-tree.json",
+      "workers": 1,
+      "memory_mb": 512,
+      "dual": true,
+      "seed": 20260924,
+      "generations": 40,
+      "batch": 128,
+      "width": 64,
+      "tree_candidates": 12,
+      "tree_generations": 80,
+      "tree_batch": 128,
+      "tree_width": 32,
+      "tree_screen": 2,
+      "initial_grid_configurations": 1008,
+      "best_grid_states": 332,
+      "best_source_states": 329,
+      "source_evaluations": 4946,
+      "unique_source_trees": 4322,
+      "tree_mutation_attempts": 122880,
+      "tree_full_reduction_evaluations": 1996,
+      "peak_rss_mib": 284.71875,
+      "final_states": 323,
+      "best_configuration": {
+        "order": [
+          10,
+          7,
+          3,
+          8,
+          2,
+          4,
+          0,
+          9,
+          5,
+          1,
+          11,
+          6,
+          16,
+          13,
+          12,
+          14,
+          15
+        ],
+        "parameter_permutations": {
+          "B1": 5,
+          "B2": 0,
+          "B3": 2,
+          "B4": 2,
+          "B6b": 2,
+          "B6c": 2,
+          "B7": 0,
+          "B8a": 1,
+          "B8b": 0,
+          "B8c": 1
+        },
+        "protected_permutation": 1,
+        "fusion": 0,
+        "two_scratch": true,
+        "reverse_payload": true,
+        "formula_choices": {
+          "POW": 0,
+          "UNI": 0,
+          "ICS": 162,
+          "B6a2": 0
+        },
+        "shared_operations": true,
+        "grammar": {
+          "kind": "cost",
+          "inline_probability": 0.75,
+          "seed": 16274633,
+          "inline_main": false,
+          "inline_seed": 13283322
+        },
+        "pairing": {
+          "kernel": "dyadic",
+          "positive_inverse": false,
+          "tags": "repeat1",
+          "tag_order": [
+            4,
+            3,
+            2
+          ],
+          "dual": true
+        }
+      },
+      "winner_hashes": {
+        "table_sha256": "56df685bae7e06acbcd74866f3efff6ec5044fe1b65d1d8c6904321a9aa8a4f6",
+        "tree_sha256": "65cbf4ad2a2c27d56d4d524863b375faeac5aef7a9d3d6f8d4dd17ae3b724b1e"
+      },
+      "checks": {
+        "status": "experimental; computational checks only",
+        "arithmetic": {
+          "pair": 1536,
+          "unpair": 12288,
+          "constructors": 13440,
+          "stack": 109,
+          "guard": 162,
+          "decoder": 512,
+          "detachment": 9
+        },
+        "factored_cfg_pairs": 6326,
+        "tree_cfg_pairs": 5229,
+        "raw_states": 323,
+        "final_states": 323,
+        "smoke": {
+          "steps": 1000000,
+          "dispatches": 1005,
+          "register_entries": 992,
+          "minimum_observed_gap": 6,
+          "head": 118,
+          "state": "2.ret1",
+          "ones": 225
+        },
+        "tape_differential": {
+          "decrement_boundaries": 512,
+          "increments_between_boundaries": 583,
+          "compared_registers": 10,
+          "source_steps": 12869608,
+          "candidate_steps": 12867509,
+          "source_minimum_observed_gap": 7,
+          "candidate_minimum_observed_gap": 6
+        }
+      },
+      "checked_formula_choices": {
+        "POW": 0,
+        "UNI": 0,
+        "ICS": 162,
+        "B6a2": 0
+      }
+    }
+  ]
+}

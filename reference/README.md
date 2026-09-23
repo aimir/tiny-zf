@@ -33,6 +33,7 @@ machine. They do not exercise an unbounded proof search or prove tape separation
 | [backend-experiments.json](backend-experiments.json) | Dispatcher-tree search recipes and bounded backend/constraint experiments. |
 | [combined-experiments.json](combined-experiments.json) | Three combined source/tree recipes, 12,065 source evaluations, 1,581,312 tree mutation attempts, and aggregate checks; best remains 310. |
 | [combined-initial-tree.json](combined-initial-tree.json) | Exact 310-state starting tree for replay; its source and hash are in the combined manifest. |
+| [pairing-experiments.json](pairing-experiments.json) | Two dyadic-pairing recipes, 9,909 source evaluations, 245,760 tree mutation attempts, and winning configurations/check summaries; results 321 and 323. |
 | [ics-checks.json](ics-checks.json) | Curated rebuild, local differential, finite simulation and reachability results for the 310-state table. |
 | [../candidates/ics-best.json](../candidates/ics-best.json) | Current 310-state candidate configuration, table hash and state breakdown. |
 

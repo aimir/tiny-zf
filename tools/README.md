@@ -55,6 +55,7 @@ These are computational checks. See [verification scope](../docs/VERIFICATION.md
 | `experiment.py` | Replay a curated experiment, including its initial configuration and seed. |
 | `search_ics.py` | Search clause order within the safety phases. |
 | `search_combined.py` | Alternate source changes and tree optimization, reuse checked closed fragments, and select source survivors by final reduced size. |
+| `search_pairing.py` | Compare ordinary/reversed dyadic kernels, tag implementations and source layouts, then optimize multiple finalists' trees. |
 | `search_tree.py` | Continue tree optimization from the saved artifact; raw screening, full reduction and CFG checks. |
 | `solve_tree.py` | Optional OR-Tools model choosing a binary grammar globally within a finite dictionary. |
 | `search_rewrites.py` | Joint beam over protected-formula syntax, source layout and factoring seeds. |
@@ -73,7 +74,10 @@ Recorded experiment IDs are `ics-order`, `ics-joint`, `ics-storage`,
 `ics-encoding`, `ics-operators`, `ics-sharing`, `ics-grammar-probe`,
 `ics-grammar-wide`, `ics-grammar`, `ics-shared-operators` and
 `ics-grammar-followup`, `ics-rewrites`, `backend-tree-basic` and
-`backend-tree-commute`, `combined-source-tree`, `combined-parent-transfer` and `combined-wide-screen`. Use `--workers 1` for fewer processes. A replay
+`backend-tree-commute`, `combined-source-tree`, `combined-parent-transfer`,
+`combined-wide-screen`, `pairing-dyadic` and `pairing-dual`. Use `--workers 1`
+for fewer processes in searches that support parallel workers; pairing and tree
+searches use one process. A replay
 can use `--generations 1` as a short smoke test, which does not reproduce the full
 run. Search outputs go under ignored `scratch/`; raw console traces and beam
 frontiers are not committed.
@@ -96,6 +100,7 @@ own checked transformation certificate before promotion.
 
 These modules retain bounded unsuccessful approaches for further research:
 
+- `pairing.py`, `verify_pairing.py`: dyadic pairing kernels, consistent formula/stack recoding, and dedicated numerical/CFG/tape checks. See [pairing experiments](../docs/PAIRING.md) for contracts and commands. They require their own builder and verifier; the incumbent uses Cantor arithmetic.
 - `inference.py`: execute only selected inference clauses, allowing destructive parameter use.
 - `expression_order.py`: reverse subtree evaluation and consistently recode operator payloads.
 - `selected.py`: construct only the selected clause using a structured decision chain.

@@ -113,6 +113,13 @@ these obligations. [Experiments](EXPERIMENTS.md) describes both transformations.
 
 ## Literal machine semantics
 
+The separate [dyadic pairing experiment](PAIRING.md) has its own builder and
+`verify_pairing.py` checker. It checks numerical arithmetic contracts, consistent
+constructor/stack/decoder interfaces and each finalist's CFG and finite tape
+behavior against its recoded source. It does not compare that arithmetic trace
+with the incumbent's Cantor computation. The current candidate and this
+document's 310-state theorem target are unchanged.
+
 A configuration is a control state, an integer head position, and a map from
 integers to bits, initially zero everywhere. Each table row reads the head bit,
 writes one bit, moves one cell left or right and selects the next state. A

@@ -27,6 +27,13 @@ runs can choose different layouts; in particular the storage search started from
 a retained 348-state configuration whose storage rewrite initially gave 344.
 [Exact initial configurations](../reference/ics-experiments.json) remove ambiguity.
 
+The later [dyadic pairing/unpairing experiment](PAIRING.md) tested two coding
+orientations, three pair kernels, two inverse kernels, specialized tags and
+multiple source/tree finalists. Across 9,909 source evaluations and 245,760 tree
+mutation attempts, ordinary dyadic pairing reached 321 states and reversed
+dyadic pairing reached 323. Both winners passed their dedicated computational
+checks; neither replaced the 310-state Cantor machine.
+
 ### The ICS source
 
 The formulas are taken from the

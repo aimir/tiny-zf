@@ -41,6 +41,10 @@ A combined source/tree search then evaluated **12,065 source configurations** an
 alternative 310-state constructions but no smaller machine; the saved candidate
 remains unchanged. [Exact recipes and aggregate results](reference/combined-experiments.json)
 cover all three runs. These counts include repetitions, not distinct machines.
+A subsequent [pairing/unpairing experiment](docs/PAIRING.md) tested ordinary and
+reversed dyadic encodings across **9,909 source evaluations** and **245,760 tree
+mutation attempts**. Their best fully reduced results were **321 and 323 states**;
+the 310-state incumbent remains unchanged.
 [Experiments](docs/EXPERIMENTS.md) explains what worked, what failed, and how to repeat the searches. Search limits are not lower bounds.
 
 ## Reproduce and check
@@ -61,7 +65,8 @@ the selected formula identities independently, audits the final instruction tree
 and simulates one million literal tape steps. It also compares all ten registers
 at **512 decrement boundaries** against the pre-tree source, covering about
 12.8 million tape steps per machine. The second checks the conservative 392/393 pair.
-The regression suite has **45 tests**. These checks do not establish end-to-end
+The regression suite has **51 tests**, including checks for separate dyadic pairing
+experiments. These checks do not establish end-to-end
 halting equivalence or the mathematical equivalence of the axiom systems.
 [Verification scope](docs/VERIFICATION.md) states the remaining obligations.
 
