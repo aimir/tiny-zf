@@ -14,3 +14,7 @@ logs/
 *.png
 *.prof
 *.frontier.json
+.lake/
+.logs/
+*.olean
+*.ilean

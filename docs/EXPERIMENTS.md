@@ -1,8 +1,9 @@
 # ICS and compiler experiments — 23 September 2026
 
 **Best candidate: 308 states, down from 392 (84 states / 21.4%).**
-This round is experimental. There is no Lean proof and no claim that the local
-computational checks establish the theory's equivalence to ZF.
+The machine remains experimental. The [Lean development](../formal/README.md)
+proves its numeric source theorem and component contracts; the full tape-machine
+simulation and the source theory's equivalence to conventional ZF remain open.
 
 ## What produced the reduction
 

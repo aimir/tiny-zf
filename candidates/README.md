@@ -10,7 +10,9 @@
 
 Both tables use the upstream partial-transition text format and start on a blank
 two-way binary tape. No post-compilation table reduction is needed for their
-advertised counts. Neither is formally verified. The 392-state baseline is
+advertised counts. Neither has an end-to-end formal tape-machine proof. The
+[Lean development](../formal/README.md) proves the current numeric source theorem
+and component contracts, and imports the literal 308-state table. The 392-state baseline is
 retained because it avoids the ICS theory/encoding changes, making it a useful
 comparison rather than a competing headline result.
 

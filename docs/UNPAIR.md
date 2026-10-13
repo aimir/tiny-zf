@@ -135,7 +135,8 @@ arithmetic, smoke and decrement-boundary checks also run on saved finalists.
 
 Regression tests reject a damaged tape kernel, incorrect arithmetic, a miswired
 fusion site, invalid layout and invalid fusion masks. These checks do not prove
-unbounded tape separation or end-to-end halting equivalence. Lean remains deferred.
+unbounded tape separation or end-to-end halting equivalence. These fused/native
+kernels are outside the current [partial Lean development](../formal/README.md).
 See [verification scope](VERIFICATION.md).
 
 ## Reproduce

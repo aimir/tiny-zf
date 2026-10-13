@@ -1,0 +1,91 @@
+{
+  "status": "partial Lean formalization; source theorem proved; tape-machine theorem unproved",
+  "headline": "TinyZF.source_enumerator_correct",
+  "statement": "Source.FindsTarget \u2194 Source.Provable 1",
+  "end_to_end_machine_verification": false,
+  "zf_equiconsistency_verification": false,
+  "machine_sha256": "c4083dd0239b8f5c9bd231c69caff51bca8c5a3d0a0679e92f89bae158817d16",
+  "theorem_axioms": {
+    "TinyZF.source_enumerator_correct": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "TinyZF.Source.compile": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "TinyZF.Source.iteration_sound": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "TinyZF.every_program_runs": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "TinyZF.Cantor.tri_formula": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "TinyZF.Cantor.unpair_pair": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "TinyZF.Cantor.pair_unpair": [
+      "Quot.sound",
+      "propext"
+    ],
+    "TinyZF.Decoder.boundary_correct": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "TinyZF.Source.decode_code": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "TinyZF.Source.code_injective": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "TinyZF.Source.derivation_valid": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "TinyZF.Source.protected_rewrites_correct": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "TinyZF.Machine308.state_count": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  "source_sha256": {
+    "Audit.lean": "a39eee745b86a8d4faf82ced6bbc01c700c46af5e81558bd548a30791ad0b8da",
+    "TinyZF.lean": "52a5e4e05ba2d98e4b15ada581f2f06fe5358487179980d7db3a24f9930d1d17",
+    "TinyZF/Cantor.lean": "1d8fed5d765db2b774384c88b9c3e82b9a9bdba84829313e54a7ecef2bc949dc",
+    "TinyZF/Decoder.lean": "83ed4693ff9998ae0f2260b81728741ece9ea51ffe0048bb4193dc629d5d9cd1",
+    "TinyZF/Enumeration.lean": "5d29a4aaddd4bf2fa10827f23ee0b5d90c9bb0dc715765dec61f3af2498d1863",
+    "TinyZF/Formulas.lean": "73e83fabddf030e50076e1892f0ffdbad9fedefdedf57dfc5e20b7fe6d86498a",
+    "TinyZF/Interpretation.lean": "6209ffc3ee1e36635179d983aafaf19a2b63bc6d701b4acf9a87a076fddf1d0d",
+    "TinyZF/Machine.lean": "5ea7feef1b0a9533155891db264ed3d0bf9aa618339187b189d4e0182826ec01",
+    "TinyZF/Machine308.lean": "4cee89c8998a4784bdeda9cd6a902c1d5551126c0b5f006d4c287c85734046c4",
+    "TinyZF/ProtectedOriginal.lean": "4d21b8aae11cdce47c072f69d6b965bc13e2399c69a88a2835e488a17c5998a7",
+    "TinyZF/Schemas.lean": "acbd6480f424b40c52624cdc386b8c3b9917a4512cf8ce5af4df563553ea2e45",
+    "TinyZF/Source.lean": "6fcd13e653dd69d6f06b1044e7c44c5711c8101898ca79954e10db71565698ec",
+    "lean-toolchain": "2bdc48adfa58d0017e538a0ad117c5d73d35deec879978f909406a80c8037273",
+    "lakefile.toml": "dabc543bf8f5188c84310cfd4833e216e3989b5eef050550093af33c563d374b",
+    "lake-manifest.json": "5ec3c6b3d4ed374ac95a8f4674e8a75bcc5a20899e447963d7b49884a03f1467"
+  }
+}

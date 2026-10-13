@@ -1,10 +1,19 @@
 # Verification scope and intended contract
 
-**Status: exact reproduction and computational checks, not a formal proof.**
-There is no Lean development or verified ZF-independence theorem in this repo.
-The conservative 392-state table follows the corrected Wade source. The current
-308-state experiment uses the ICS formulation and a different formula coding.
-Lean verification is deliberately deferred while these experiments continue.
+**Status: partial Lean formalization, exact reproduction and computational checks.**
+The [Lean development](../formal/README.md) proves the unbounded numeric source
+enumerator's soundness and completeness, Cantor and formula coding, semantic
+soundness and protected rewrites, and the current decoder allocation contract.
+It imports the exact 308-state table, but does **not** prove its source-to-tape
+simulation or a ZF-independence theorem. The conservative 392-state table follows
+the corrected Wade source; the 308-state experiment uses ICS and a different
+formula coding.
+
+The default Lean headline is `Source.FindsTarget ↔ Source.Provable 1`. Its numeric
+calculus is explicitly defined independently of execution. The remaining stronger
+goal is `Machine308.Halts ↔ Source.Provable 1`; a further theory interpretation is
+needed to connect this with conventional ZF. See the [entry file](../formal/TinyZF.lean)
+and [build instructions](../formal/README.md#run-verification).
 
 ## Conservative 392-state baseline: `python3 tools/verify.py`
 
@@ -50,9 +59,11 @@ permits classical Boolean equivalence and congruence under unchanged quantifier
 scopes. It does not permit arbitrary changes to atoms, binders, or quantifier
 order. Regression tests check all 268 individual rewrite choices and reject
 changed connectives, membership/equality atoms, and binders. The twelve logical
-axiom/inference clauses remain unchanged. A future formal proof must translate
-these identities into derivations in that fixed calculus; a BDD check alone is
-not a kernel-checked proof of halting equivalence.
+axiom/inference clauses remain unchanged. Lean now proves semantic equivalence
+of all five selected protected schemas in every first-order structure and
+valuation. Translating these identities into derivations in the fixed calculus
+remains an obligation; neither semantic equivalence nor the BDD check alone
+establishes tape-machine halting equivalence.
 
 The sharing pass adds 4,280 differential cases: 800 stack pushes, 2,400
 selections, 540 parameter copies, 500 complete protected guards, and 40 selected
@@ -64,7 +75,9 @@ The decoder audit checks the generated allocation with distinct symbolic tokens:
 clears discard only old field values, moves target zero registers, each unpair
 consumes the next proof tail into two zero registers, and all four fields and
 scratch values satisfy the boundary contract. This assumes the existing arithmetic
-primitive contracts; it is a Python resource check, not a Lean proof. A separate
+primitive contracts; that Python resource check is accompanied by the unbounded
+Lean theorem `Decoder.boundary_correct` for the same 16-operation arithmetic
+plan. Neither proves the tape implementations of those arithmetic contracts. A separate
 integer model checks 1,000 decoder/enumerator boundaries, including arbitrary old
 field values, theorem-stack contents and the empty-proof refill case. The remaining
 inference body and halt test match the original body in a complete CFG comparison
@@ -73,8 +86,10 @@ inference body and halt test match the original body in a complete CFG compariso
 The winning field order is `param1, param3, param2, axiomcode`. This changes the
 numeric proof encoding. Nested Cantor pairing and a field permutation give a
 bijection on instruction tuples; the positive-tail convention still makes every
-finite tail traversal terminate. Connecting this coding argument to soundness
-and completeness of the whole proof enumerator remains a formal obligation.
+finite tail traversal terminate. Lean now proves the two coding inverses, exhaustive
+enumeration and the soundness/completeness equivalence for the numeric source
+interpreter. Connecting that interpreter to the optimized register/tape program
+and to conventional ZF remains a formal obligation.
 The literal-tape differential below compares the new tree with its **own decoder
 source**, not with the old machine on the same proof numbers.
 
@@ -181,30 +196,35 @@ undefined targets, duplicate rows and nonbinary/non-L/R instructions. The
 unmodified upstream parser is retained for reproduction, not relied on as a
 strict external-file validator.
 
-## Proposed end-to-end theorem, not yet approved or proved
+## Remaining end-to-end goal, defined but not proved
 
-For the literal checked-in candidate table `M`, a precisely defined source
-proof predicate `SourceProof`, and the distinguished contradiction target `bad`:
+[TinyZF.lean](../formal/TinyZF.lean) records the exact proposition:
 
-```text
-HaltsOnBlankTape(M) ↔ ∃ p : Nat, SourceProof(p, bad)
+```lean
+def MachineCorrect : Prop := Machine308.Halts ↔ Source.Provable 1
 ```
+
+This is a definition, not a theorem or an assumed axiom. `Machine308` contains
+the literal candidate table; `Source.Provable` is the explicit numeric calculus
+using the current guarded and rewritten schemas. Its target decodes to `v₀ ∈ v₀`.
 
 An additional theorem should connect existence of such a proof to existence of
 a contradiction proof in a fixed conventional ZF presentation. This separates
 implementation correctness from the mathematical relationship between theories.
 It also makes it possible to audit an alternative ICS formulation without
-silently replacing the meaning of the first theorem. These are mathematical
-specifications, not Lean statements already accepted by a kernel.
+silently replacing the meaning of the first theorem. The source-enumerator
+theorem is proved; the tape-machine equivalence and conventional-ZF connection
+are not.
 
 The proof obligations are:
 
-- **Logic and coding:** define well-formed formulas, inference rules, axioms,
-  pairing, proof enumeration and the distinguished target; justify treatment of
-  numeric codes that are not well-formed formulas.
-- **Enumeration:** show soundness and completeness of the stack enumeration,
-  including field-order recoding, default clauses, inactive premise-loading clauses
-  and out-of-range axiom selectors.
+- **Logic and coding:** the explicit numeric rules, formula syntax, pairing,
+  total decoding and distinguished target are defined, with decoding and
+  semantic soundness proved. Their interpretation into a conventional ICS/ZF
+  derivation system is still needed.
+- **Enumeration:** the numeric interpreter's soundness and completeness, actual
+  field order, default clause and selector saturation are proved. Matching the
+  compiled clause-selection and inactive premise-loading code remains open.
 - **Deduplication / reordering:** translate finite derivations in both directions
   by renumbering clause selectors and their encodings. Repeated copies of a
   schema are unnecessary, but the renumbering argument must be formalized.
@@ -212,8 +232,9 @@ The proof obligations are:
   verify DAG factoring/lowering, register primitives and bootstrap.
 - **Tape invariant:** prove instruction-pointer/register-file separation and
   exclude unintended halts such as the missing `1.inc`/`1` entry.
-- **Literal artifact:** tie the finite table and its state count to the compiled
-  object. Any later reduction needs a checked simulation certificate.
+- **Literal artifact:** the Lean table and state count are tied to the saved
+  candidate by the import audit. Connecting that table to the source semantics
+  is still open. Any later reduction needs a checked simulation certificate.
 
 Proving nonhalting outright is neither a regression test nor the intended
 unconditional deliverable. Independence conclusions need their explicit

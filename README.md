@@ -2,6 +2,11 @@
 
 **Current experimental candidate: 308 states — 84 fewer than our 392-state baseline (21.4% smaller).**
 
+**Lean now proves correctness of the unbounded numeric source enumerator and
+several component contracts. The full 308-state tape-machine theorem and the
+connection to conventional ZF remain unproved.** Start with the
+[headline Lean theorem](formal/TinyZF.lean) and [formal verification guide](formal/README.md).
+
 The candidate combines the corrected ICS axiom formulation with Wade's compiler,
 searches axiom order and parameter naming together, reuses one register during
 comparisons, and combines a new formula encoding with fused constructors.
@@ -15,9 +20,9 @@ search of the final instruction tree.
 It uses **10 active registers** and **65 framework + 243 instruction-DAG states**.
 
 This is a reproducible experimental machine, **not a formally verified
-ZF-independence result**. Lean work is deferred. The mathematical dependency on
-the ICS theory's claimed equiconsistency with ZF is stated separately from the
-computational checks.
+ZF-independence result**. The [Lean development](formal/README.md) separates the
+proved source theorem from the remaining source-to-tape simulation and the ICS
+theory's claimed equiconsistency with ZF.
 
 ## Results and artifacts
 
@@ -26,6 +31,18 @@ computational checks.
 | Current ICS candidate | **308** | [Table](candidates/ics-best.tm), [configuration and hashes](candidates/ics-best.json), [instruction tree](candidates/ics-tree.json). Changed axiomatization and formula coding; computational checks. |
 | Conservative baseline | 392 | [Table](candidates/best.tm), [configuration](candidates/best.json). Same distinct axiom clauses as Wade's source, deduplicated and reordered. |
 | Pinned Wade reference | 393 | [Unmodified source/table](vendor/wade/), [provenance](reference/upstream.json). Reproduced transition for transition. |
+
+| Lean result | Scope |
+| --- | --- |
+| Source enumerator correctness | Finds target code 1 iff the explicit numeric source calculus derives 1; arbitrary execution lengths and parameter values. |
+| Formula coding and interpretation | Cantor inverses, injective formula encoding, total decoding of malformed inputs, and semantic soundness in source models. |
+| Selected formula rewrites | All five protected choices preserve first-order truth in every domain and valuation. |
+| Decoder allocation | The exact 16-operation arithmetic plan places all four fields correctly and preserves the counter and theorem stack. |
+| Literal machine | All 308 states and transitions are imported and checked against the saved table; the tape simulation theorem is still open. |
+
+The headline is `TinyZF.source_enumerator_correct`. It is not the stronger
+`TinyZF.MachineCorrect` goal. [The proof guide](formal/README.md) makes the
+distinction explicit; no missing compiler or theory bridge is assumed as an axiom.
 
 The upstream README prose still says 410, while its latest pinned table has 393.
 The originally linked 2025 commit has 432 states and predates a correctness fix.
@@ -65,7 +82,22 @@ ordinary instructions also bottomed out at 308.
 
 ## Reproduce and check
 
-Python 3.10 or newer; rebuilding and verification use only the standard library.
+For the Lean development, install elan, then run:
+
+```sh
+cd formal
+lake exe cache get Mathlib/Tactic.lean
+lake build
+python3 tools/check.py
+```
+
+The acceptance check verifies the exact imports, the headline theorem type,
+principal axiom dependencies and recorded source hashes. Its success message
+explicitly excludes the unproved full tape-machine and ZF-independence claims.
+Lean and mathlib are pinned. [Build details](formal/README.md#run-verification).
+
+For the computational checks below, use Python 3.10 or newer from the repository
+root; rebuilding and these verifiers use only the standard library.
 Tested with Python 3.14. The optional global search uses OR-Tools.
 
 ```sh
@@ -82,7 +114,7 @@ audits decoder register allocation, checks **1,000 decoder boundaries**, and
 simulates one million literal tape steps. It also compares all ten registers
 at **512 decrement boundaries** against the pre-tree source, covering about
 12.8 million tape steps per machine. The second checks the conservative 392/393 pair.
-The regression suite has **87 tests**, including checks for separate dyadic pairing
+The regression suite has **93 tests**, including checks for separate dyadic pairing
 experiments. These checks do not establish end-to-end
 halting equivalence or the mathematical equivalence of the axiom systems.
 [Verification scope](docs/VERIFICATION.md) states the remaining obligations.
@@ -136,10 +168,12 @@ belong in Git. Raw logs, archives, caches and search frontiers are excluded.
 
 ## Release and citation
 
-The [v0.1.0-experimental release](https://github.com/aimir/tiny-zf/releases/tag/v0.1.0-experimental)
-collects the 308-state candidate, conservative baseline, pinned upstream sources
-and reproduction tools. [CI](https://github.com/aimir/tiny-zf/actions/workflows/verify.yml)
-runs the computational verifiers and regression tests; it does not certify
-ZF independence. [CITATION.cff](CITATION.cff) provides release metadata. Please
+The [v0.2.0-experimental release](https://github.com/aimir/tiny-zf/releases/tag/v0.2.0-experimental)
+collects the 308-state candidate, partial Lean formalization, conservative baseline,
+pinned upstream sources and reproduction tools.
+[CI](https://github.com/aimir/tiny-zf/actions/workflows/verify.yml) checks the Lean
+development, exact imports, axiom dependencies, computational verifiers and
+regression tests; it does not certify ZF independence.
+[CITATION.cff](CITATION.cff) provides release metadata. Please
 also credit the upstream work recorded in the provenance manifests and source
 survey.

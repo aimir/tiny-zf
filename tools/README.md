@@ -49,7 +49,9 @@ python3 tools/verify.py
 python3 -m unittest discover -s tests
 ```
 
-These are computational checks. See [verification scope](../docs/VERIFICATION.md).
+These are computational checks. The separate [Lean acceptance checker](../formal/tools/README.md)
+checks the source theorem, component proofs and exact imports. See
+[verification scope](../docs/VERIFICATION.md) for the remaining tape-machine obligations.
 
 ## Search and replay
 

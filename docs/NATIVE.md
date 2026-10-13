@@ -135,7 +135,8 @@ the native tape contract; that separate obligation has finite tape checks:
   reduction, the complete resolved CFG and 1,024 literal atomic operations.
 
 These checks do not prove unbounded tape separation or an end-to-end equivalence
-theorem. Lean verification remains deferred. See [verification scope](VERIFICATION.md).
+theorem. These native kernels are outside the current
+[partial Lean development](../formal/README.md). See [verification scope](VERIFICATION.md).
 
 ```sh
 python3 tools/experiment.py native-pilot

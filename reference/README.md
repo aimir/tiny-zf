@@ -40,6 +40,8 @@ machine. They do not exercise an unbounded proof search or prove tape separation
 | [unpair-experiments.json](unpair-experiments.json) | Fused unpair/tail restoration, native Cantor-step and whole-tree replay settings, final counts and selected verification results. |
 | [ics-checks.json](ics-checks.json) | Curated rebuild, local differential, finite simulation and reachability results for the 308-state table (without a new window experiment). |
 | [../candidates/ics-best.json](../candidates/ics-best.json) | Current 308-state candidate configuration, table hash and state breakdown. |
+| [coq-verification.json](coq-verification.json) | Pinned Coq reference and inspected proof layers; reference only, not rebuilt or imported as Lean axioms. |
+| [../formal/verification.json](../formal/verification.json) | Checked Lean source hashes, headline, axiom dependencies and explicit incomplete end-to-end status. |
 
 These add to the initial survey experiments above. Full generation traces and
 beam frontiers are intentionally absent. Use `python3 tools/experiment.py ID` to

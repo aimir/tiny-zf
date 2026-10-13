@@ -1,0 +1,23 @@
+{
+  "repository": "https://github.com/jeff87654/busy-beaver",
+  "commit": "4590f221f53151f2b7ca4e7895f1080197ec05c3",
+  "inspected_path": "ZF/verify",
+  "reference_theorem": "halts tm c0 <-> prov (Wel v0 v0)",
+  "reference_machine_states": 393,
+  "reference_theory": "Tarski-style calculus plus EXT, REP, POW, UNI, INF; not the 308-state ICS source",
+  "rebuilt_here": false,
+  "coq_files_vendored": false,
+  "lean_trust_dependency": false,
+  "use": "Reference proof architecture: arithmetic coding, stack soundness, derivation compilation, exhaustive enumeration, and separate machine simulation. Lean proofs are checked independently.",
+  "files_sha256": {
+    "ZF/verify/393/Main.v": "af2259be89a8f290e1336aec0523cdfe532ca67bee52ef3ff37cae80b24500c9",
+    "ZF/verify/393/Logic.v": "17180a06ca827e3938fa3f4204955cbebcda5674776b6c8733f0072a6c904470",
+    "ZF/verify/393/L1.v": "16821c542de5b984a113d4aed7d5047ae6c3f0db1a26ba9c3fc62756daf90dab",
+    "ZF/verify/393/Enum.v": "79b2b53815572a0c7ca2b86ddf4604ee155c2bb44ce8c8670bed414601aa58a4",
+    "ZF/verify/393/L1_Arith.v": "990c6239a96c45e129db9018c5986762f3566113b6877a3b3f291ede5d59ef7f",
+    "ZF/verify/393/Sim.v": "433fcddf10f5e8257add27da31493a53a38b00bc7f03736f4182e112d44cb2a6",
+    "ZF/verify/393/RMEquiv.v": "6f0a7d9f6226d5fa382b6936063cb248bd43fcb14ece0a621ee14f449c22452b",
+    "ZF/verify/393/Prog.v": "697234a9411b4418865f7389bc8a9e109585f057bd75427e258f7c3f1112cec1",
+    "ZF/verify/check.py": "46e7cae6e3684496c8c1561840626e9caab14035059ba255806c8aea7d59862c"
+  }
+}
