@@ -86,7 +86,7 @@ For the Lean development, install elan, then run:
 
 ```sh
 cd formal
-lake exe cache get Mathlib/Tactic.lean
+lake exe cache get Mathlib.Tactic
 lake build
 python3 tools/check.py
 ```

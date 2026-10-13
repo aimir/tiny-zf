@@ -62,7 +62,7 @@ are also stated beside the theorems.
 With Python 3 and elan installed, from this folder:
 
 ```sh
-lake exe cache get Mathlib/Tactic.lean
+lake exe cache get Mathlib.Tactic
 lake build
 python3 tools/check.py
 ```

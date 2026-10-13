@@ -37,6 +37,6 @@ jobs:
           build: 'false'
           use-mathlib-cache: 'false'
           use-github-cache: 'false'
-      - run: lake exe cache get Mathlib/Tactic.lean
+      - run: lake exe cache get Mathlib.Tactic
         working-directory: formal
       - run: python3 formal/tools/check.py
