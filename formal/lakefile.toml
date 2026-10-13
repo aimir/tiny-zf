@@ -1,7 +1,7 @@
 name = "tiny_zf"
-version = "0.1.0"
+version = "0.2.0"
 defaultTargets = ["TinyZF"]
-weakLeanArgs = ["--memory=8192", "--threads=2"]
+weakLeanArgs = ["--memory=8192", "--threads=1"]
 
 [[require]]
 name = "mathlib"

@@ -941,6 +941,937 @@ def table : Vector (Option (Transition 308)) 616 := ⟨#[
 /-- The literal machine, with no extra working states. -/
 def machine : Machine 308 := fun q b => table.get ⟨2 * q.val + (if b then 1 else 0), by cases b <;> simp <;> omega⟩
 
+/-- A balanced lookup used only to accelerate certificate evaluation.
+ The semantic machine remains the literal table above. -/
+def fastLookup : Machine 308 := fun q b =>
+  if q.val < 154 then
+    if q.val < 77 then
+      if q.val < 38 then
+        if q.val < 19 then
+          if q.val < 9 then
+            if q.val < 4 then
+              if q.val < 2 then
+                if q.val < 1 then
+                  if b then some ⟨false, false, some 2⟩ else some ⟨true, true, some 1⟩
+                else
+                  if b then some ⟨false, true, some 1⟩ else some ⟨false, true, some 2⟩
+              else
+                if q.val < 3 then
+                  if b then some ⟨false, true, some 4⟩ else some ⟨true, false, some 3⟩
+                else
+                  if b then some ⟨false, false, some 64⟩ else some ⟨false, false, some 4⟩
+            else
+              if q.val < 6 then
+                if q.val < 5 then
+                  if b then some ⟨false, false, some 1⟩ else some ⟨true, false, some 0⟩
+                else
+                  if b then some ⟨true, false, some 10⟩ else some ⟨true, true, some 6⟩
+              else
+                if q.val < 7 then
+                  if b then some ⟨false, true, some 7⟩ else some ⟨false, true, some 6⟩
+                else
+                  if q.val < 8 then
+                    if b then some ⟨true, true, some 7⟩ else some ⟨true, true, some 8⟩
+                  else
+                    if b then some ⟨false, true, some 7⟩ else some ⟨false, true, some 9⟩
+          else
+            if q.val < 14 then
+              if q.val < 11 then
+                if q.val < 10 then
+                  if b then some ⟨true, true, some 9⟩ else some ⟨false, false, some 5⟩
+                else
+                  if b then some ⟨true, true, some 11⟩ else some ⟨false, false, some 26⟩
+              else
+                if q.val < 12 then
+                  if b then some ⟨false, true, some 11⟩ else some ⟨true, true, some 12⟩
+                else
+                  if q.val < 13 then
+                    if b then some ⟨true, true, some 9⟩ else some ⟨false, false, some 17⟩
+                  else
+                    if b then none else some ⟨true, true, some 14⟩
+            else
+              if q.val < 16 then
+                if q.val < 15 then
+                  if b then some ⟨true, true, some 15⟩ else some ⟨false, true, some 14⟩
+                else
+                  if b then some ⟨true, true, some 15⟩ else some ⟨false, true, some 16⟩
+              else
+                if q.val < 17 then
+                  if b then some ⟨true, true, some 15⟩ else some ⟨true, false, some 23⟩
+                else
+                  if q.val < 18 then
+                    if b then some ⟨false, false, some 23⟩ else some ⟨true, true, some 18⟩
+                  else
+                    if b then some ⟨true, true, some 19⟩ else some ⟨false, true, some 18⟩
+        else
+          if q.val < 28 then
+            if q.val < 23 then
+              if q.val < 21 then
+                if q.val < 20 then
+                  if b then some ⟨true, true, some 19⟩ else some ⟨false, true, some 20⟩
+                else
+                  if b then some ⟨true, true, some 19⟩ else some ⟨false, false, some 21⟩
+              else
+                if q.val < 22 then
+                  if b then some ⟨false, false, some 23⟩ else some ⟨true, false, some 22⟩
+                else
+                  if b then some ⟨true, false, some 22⟩ else some ⟨false, true, some 21⟩
+            else
+              if q.val < 25 then
+                if q.val < 24 then
+                  if b then some ⟨true, false, some 23⟩ else some ⟨false, false, some 24⟩
+                else
+                  if b then some ⟨true, false, some 23⟩ else some ⟨false, false, some 25⟩
+              else
+                if q.val < 26 then
+                  if b then some ⟨false, false, some 57⟩ else some ⟨false, false, some 25⟩
+                else
+                  if q.val < 27 then
+                    if b then some ⟨true, false, some 26⟩ else some ⟨false, false, some 27⟩
+                  else
+                    if b then some ⟨true, false, some 26⟩ else some ⟨false, false, some 28⟩
+          else
+            if q.val < 33 then
+              if q.val < 30 then
+                if q.val < 29 then
+                  if b then some ⟨false, false, some 58⟩ else some ⟨false, false, some 28⟩
+                else
+                  if b then some ⟨true, true, some 47⟩ else some ⟨false, true, some 17⟩
+              else
+                if q.val < 31 then
+                  if b then some ⟨true, true, some 48⟩ else some ⟨false, true, some 17⟩
+                else
+                  if q.val < 32 then
+                    if b then some ⟨true, true, some 39⟩ else some ⟨false, true, some 17⟩
+                  else
+                    if b then some ⟨true, true, some 40⟩ else some ⟨false, true, some 17⟩
+            else
+              if q.val < 35 then
+                if q.val < 34 then
+                  if b then some ⟨true, true, some 29⟩ else some ⟨false, true, some 17⟩
+                else
+                  if b then some ⟨true, true, some 30⟩ else some ⟨false, true, some 17⟩
+              else
+                if q.val < 36 then
+                  if b then some ⟨true, true, some 33⟩ else some ⟨false, true, some 17⟩
+                else
+                  if q.val < 37 then
+                    if b then some ⟨true, true, some 34⟩ else some ⟨false, true, some 17⟩
+                  else
+                    if b then some ⟨true, true, some 35⟩ else some ⟨false, true, some 17⟩
+      else
+        if q.val < 57 then
+          if q.val < 47 then
+            if q.val < 42 then
+              if q.val < 40 then
+                if q.val < 39 then
+                  if b then some ⟨true, true, some 36⟩ else some ⟨false, true, some 17⟩
+                else
+                  if b then some ⟨true, true, some 5⟩ else some ⟨false, true, some 17⟩
+              else
+                if q.val < 41 then
+                  if b then some ⟨true, true, some 13⟩ else some ⟨false, true, some 17⟩
+                else
+                  if b then some ⟨true, true, some 37⟩ else some ⟨false, true, some 17⟩
+            else
+              if q.val < 44 then
+                if q.val < 43 then
+                  if b then some ⟨true, true, some 38⟩ else some ⟨false, true, some 17⟩
+                else
+                  if b then some ⟨true, true, some 41⟩ else some ⟨false, true, some 17⟩
+              else
+                if q.val < 45 then
+                  if b then some ⟨true, true, some 42⟩ else some ⟨false, true, some 17⟩
+                else
+                  if q.val < 46 then
+                    if b then some ⟨true, true, some 31⟩ else some ⟨false, true, some 17⟩
+                  else
+                    if b then some ⟨true, true, some 32⟩ else some ⟨false, true, some 17⟩
+          else
+            if q.val < 52 then
+              if q.val < 49 then
+                if q.val < 48 then
+                  if b then some ⟨true, true, some 45⟩ else some ⟨false, true, some 17⟩
+                else
+                  if b then some ⟨true, true, some 46⟩ else some ⟨false, true, some 17⟩
+              else
+                if q.val < 50 then
+                  if b then some ⟨true, false, some 60⟩ else some ⟨false, false, some 50⟩
+                else
+                  if q.val < 51 then
+                    if b then some ⟨true, false, some 60⟩ else some ⟨false, false, some 51⟩
+                  else
+                    if b then some ⟨true, false, some 60⟩ else some ⟨false, false, some 52⟩
+            else
+              if q.val < 54 then
+                if q.val < 53 then
+                  if b then some ⟨true, false, some 60⟩ else some ⟨false, false, some 53⟩
+                else
+                  if b then some ⟨true, false, some 60⟩ else some ⟨false, false, some 54⟩
+              else
+                if q.val < 55 then
+                  if b then some ⟨true, false, some 60⟩ else some ⟨false, false, some 55⟩
+                else
+                  if q.val < 56 then
+                    if b then some ⟨true, false, some 60⟩ else some ⟨false, true, some 56⟩
+                  else
+                    if b then some ⟨true, true, some 65⟩ else some ⟨false, true, some 56⟩
+        else
+          if q.val < 67 then
+            if q.val < 62 then
+              if q.val < 59 then
+                if q.val < 58 then
+                  if b then some ⟨false, false, some 57⟩ else some ⟨true, false, some 60⟩
+                else
+                  if b then some ⟨false, false, some 58⟩ else some ⟨false, false, some 57⟩
+              else
+                if q.val < 60 then
+                  if b then some ⟨false, false, some 59⟩ else some ⟨false, false, some 58⟩
+                else
+                  if q.val < 61 then
+                    if b then some ⟨true, false, some 60⟩ else some ⟨false, false, some 49⟩
+                  else
+                    if b then some ⟨false, false, some 60⟩ else some ⟨false, false, some 61⟩
+            else
+              if q.val < 64 then
+                if q.val < 63 then
+                  if b then some ⟨false, false, some 61⟩ else some ⟨false, false, some 62⟩
+                else
+                  if b then some ⟨false, false, some 62⟩ else some ⟨false, false, some 63⟩
+              else
+                if q.val < 65 then
+                  if b then some ⟨false, false, some 63⟩ else some ⟨false, false, some 64⟩
+                else
+                  if q.val < 66 then
+                    if b then some ⟨true, true, some 74⟩ else some ⟨false, true, some 66⟩
+                  else
+                    if b then some ⟨true, true, some 68⟩ else some ⟨false, true, some 67⟩
+          else
+            if q.val < 72 then
+              if q.val < 69 then
+                if q.val < 68 then
+                  if b then some ⟨false, false, some 58⟩ else some ⟨false, true, some 39⟩
+                else
+                  if b then some ⟨true, true, some 32⟩ else some ⟨false, true, some 69⟩
+              else
+                if q.val < 70 then
+                  if b then some ⟨true, true, some 72⟩ else some ⟨false, true, some 70⟩
+                else
+                  if q.val < 71 then
+                    if b then some ⟨true, true, some 71⟩ else some ⟨false, true, some 31⟩
+                  else
+                    if b then some ⟨true, true, some 184⟩ else some ⟨false, true, some 40⟩
+            else
+              if q.val < 74 then
+                if q.val < 73 then
+                  if b then some ⟨true, true, some 73⟩ else some ⟨false, true, some 41⟩
+                else
+                  if b then some ⟨false, false, some 61⟩ else some ⟨false, true, some 32⟩
+              else
+                if q.val < 75 then
+                  if b then some ⟨true, true, some 85⟩ else some ⟨false, true, some 191⟩
+                else
+                  if q.val < 76 then
+                    if b then some ⟨true, true, some 76⟩ else some ⟨false, true, some 233⟩
+                  else
+                    if b then some ⟨true, true, some 77⟩ else some ⟨false, true, some 237⟩
+    else
+      if q.val < 115 then
+        if q.val < 96 then
+          if q.val < 86 then
+            if q.val < 81 then
+              if q.val < 79 then
+                if q.val < 78 then
+                  if b then some ⟨true, true, some 78⟩ else some ⟨false, true, some 254⟩
+                else
+                  if b then some ⟨true, true, some 79⟩ else some ⟨false, true, some 260⟩
+              else
+                if q.val < 80 then
+                  if b then some ⟨true, true, some 80⟩ else some ⟨false, true, some 261⟩
+                else
+                  if b then some ⟨true, true, some 81⟩ else some ⟨false, true, some 263⟩
+            else
+              if q.val < 83 then
+                if q.val < 82 then
+                  if b then some ⟨true, true, some 82⟩ else some ⟨false, true, some 265⟩
+                else
+                  if b then some ⟨true, true, some 83⟩ else some ⟨false, true, some 243⟩
+              else
+                if q.val < 84 then
+                  if b then some ⟨true, true, some 84⟩ else some ⟨false, true, some 263⟩
+                else
+                  if q.val < 85 then
+                    if b then some ⟨true, true, some 87⟩ else some ⟨false, true, some 233⟩
+                  else
+                    if b then some ⟨true, true, some 98⟩ else some ⟨false, true, some 86⟩
+          else
+            if q.val < 91 then
+              if q.val < 88 then
+                if q.val < 87 then
+                  if b then some ⟨false, false, some 60⟩ else some ⟨false, true, some 33⟩
+                else
+                  if b then some ⟨true, true, some 88⟩ else some ⟨false, true, some 267⟩
+              else
+                if q.val < 89 then
+                  if b then some ⟨true, true, some 89⟩ else some ⟨false, true, some 269⟩
+                else
+                  if q.val < 90 then
+                    if b then some ⟨true, true, some 90⟩ else some ⟨false, true, some 243⟩
+                  else
+                    if b then some ⟨true, true, some 91⟩ else some ⟨false, true, some 271⟩
+            else
+              if q.val < 93 then
+                if q.val < 92 then
+                  if b then some ⟨true, true, some 92⟩ else some ⟨false, true, some 253⟩
+                else
+                  if b then some ⟨true, true, some 93⟩ else some ⟨false, true, some 225⟩
+              else
+                if q.val < 94 then
+                  if b then some ⟨true, true, some 94⟩ else some ⟨false, true, some 265⟩
+                else
+                  if q.val < 95 then
+                    if b then some ⟨true, true, some 95⟩ else some ⟨false, true, some 280⟩
+                  else
+                    if b then some ⟨true, true, some 97⟩ else some ⟨false, true, some 96⟩
+        else
+          if q.val < 105 then
+            if q.val < 100 then
+              if q.val < 98 then
+                if q.val < 97 then
+                  if b then some ⟨true, true, some 203⟩ else some ⟨false, true, some 272⟩
+                else
+                  if b then some ⟨true, true, some 99⟩ else some ⟨false, true, some 271⟩
+              else
+                if q.val < 99 then
+                  if b then some ⟨true, true, some 113⟩ else some ⟨false, true, some 195⟩
+                else
+                  if b then some ⟨true, true, some 103⟩ else some ⟨false, true, some 100⟩
+            else
+              if q.val < 102 then
+                if q.val < 101 then
+                  if b then some ⟨true, true, some 102⟩ else some ⟨false, true, some 101⟩
+                else
+                  if b then some ⟨true, true, some 186⟩ else some ⟨false, true, some 45⟩
+              else
+                if q.val < 103 then
+                  if b then some ⟨true, true, some 221⟩ else some ⟨false, true, some 282⟩
+                else
+                  if q.val < 104 then
+                    if b then some ⟨true, true, some 105⟩ else some ⟨false, true, some 104⟩
+                  else
+                    if b then some ⟨true, true, some 233⟩ else some ⟨false, true, some 292⟩
+          else
+            if q.val < 110 then
+              if q.val < 107 then
+                if q.val < 106 then
+                  if b then some ⟨true, true, some 106⟩ else some ⟨false, true, some 266⟩
+                else
+                  if b then some ⟨true, true, some 107⟩ else some ⟨false, true, some 232⟩
+              else
+                if q.val < 108 then
+                  if b then some ⟨true, true, some 108⟩ else some ⟨false, true, some 253⟩
+                else
+                  if q.val < 109 then
+                    if b then some ⟨true, true, some 109⟩ else some ⟨false, true, some 237⟩
+                  else
+                    if b then some ⟨true, true, some 110⟩ else some ⟨false, true, some 293⟩
+            else
+              if q.val < 112 then
+                if q.val < 111 then
+                  if b then some ⟨true, true, some 111⟩ else some ⟨false, true, some 260⟩
+                else
+                  if b then some ⟨true, true, some 112⟩ else some ⟨false, true, some 240⟩
+              else
+                if q.val < 113 then
+                  if b then some ⟨true, true, some 114⟩ else some ⟨false, true, some 258⟩
+                else
+                  if q.val < 114 then
+                    if b then some ⟨true, true, some 124⟩ else some ⟨false, true, some 191⟩
+                  else
+                    if b then some ⟨true, true, some 115⟩ else some ⟨false, true, some 280⟩
+      else
+        if q.val < 134 then
+          if q.val < 124 then
+            if q.val < 119 then
+              if q.val < 117 then
+                if q.val < 116 then
+                  if b then some ⟨true, true, some 116⟩ else some ⟨false, true, some 294⟩
+                else
+                  if b then some ⟨true, true, some 117⟩ else some ⟨false, true, some 292⟩
+              else
+                if q.val < 118 then
+                  if b then some ⟨true, true, some 118⟩ else some ⟨false, true, some 256⟩
+                else
+                  if b then some ⟨true, true, some 119⟩ else some ⟨false, true, some 254⟩
+            else
+              if q.val < 121 then
+                if q.val < 120 then
+                  if b then some ⟨true, true, some 120⟩ else some ⟨false, true, some 294⟩
+                else
+                  if b then some ⟨true, true, some 121⟩ else some ⟨false, true, some 295⟩
+              else
+                if q.val < 122 then
+                  if b then some ⟨true, true, some 122⟩ else some ⟨false, true, some 234⟩
+                else
+                  if q.val < 123 then
+                    if b then some ⟨true, true, some 123⟩ else some ⟨false, true, some 258⟩
+                  else
+                    if b then some ⟨true, true, some 125⟩ else some ⟨false, true, some 296⟩
+          else
+            if q.val < 129 then
+              if q.val < 126 then
+                if q.val < 125 then
+                  if b then some ⟨true, true, some 144⟩ else some ⟨false, true, some 199⟩
+                else
+                  if b then some ⟨true, true, some 126⟩ else some ⟨false, true, some 215⟩
+              else
+                if q.val < 127 then
+                  if b then some ⟨true, true, some 131⟩ else some ⟨false, true, some 127⟩
+                else
+                  if q.val < 128 then
+                    if b then some ⟨true, true, some 129⟩ else some ⟨false, true, some 128⟩
+                  else
+                    if b then some ⟨true, true, some 205⟩ else some ⟨false, true, some 33⟩
+            else
+              if q.val < 131 then
+                if q.val < 130 then
+                  if b then some ⟨true, true, some 34⟩ else some ⟨false, true, some 130⟩
+                else
+                  if b then some ⟨true, true, some 282⟩ else some ⟨false, true, some 195⟩
+              else
+                if q.val < 132 then
+                  if b then some ⟨true, true, some 136⟩ else some ⟨false, true, some 132⟩
+                else
+                  if q.val < 133 then
+                    if b then some ⟨true, true, some 134⟩ else some ⟨false, true, some 133⟩
+                  else
+                    if b then some ⟨true, true, some 205⟩ else some ⟨false, true, some 37⟩
+        else
+          if q.val < 144 then
+            if q.val < 139 then
+              if q.val < 136 then
+                if q.val < 135 then
+                  if b then some ⟨true, true, some 135⟩ else some ⟨false, true, some 197⟩
+                else
+                  if b then some ⟨true, true, some 38⟩ else some ⟨false, true, some 282⟩
+              else
+                if q.val < 137 then
+                  if b then some ⟨true, true, some 137⟩ else some ⟨false, true, some 228⟩
+                else
+                  if q.val < 138 then
+                    if b then some ⟨true, true, some 138⟩ else some ⟨false, true, some 207⟩
+                  else
+                    if b then some ⟨true, true, some 140⟩ else some ⟨false, true, some 139⟩
+            else
+              if q.val < 141 then
+                if q.val < 140 then
+                  if b then some ⟨true, true, some 225⟩ else some ⟨false, true, some 297⟩
+                else
+                  if b then some ⟨true, true, some 141⟩ else some ⟨false, true, some 297⟩
+              else
+                if q.val < 142 then
+                  if b then some ⟨true, true, some 142⟩ else some ⟨false, true, some 296⟩
+                else
+                  if q.val < 143 then
+                    if b then some ⟨true, true, some 143⟩ else some ⟨false, true, some 298⟩
+                  else
+                    if b then some ⟨true, true, some 145⟩ else some ⟨false, true, some 300⟩
+          else
+            if q.val < 149 then
+              if q.val < 146 then
+                if q.val < 145 then
+                  if b then some ⟨true, true, some 155⟩ else some ⟨false, true, some 191⟩
+                else
+                  if b then some ⟨true, true, some 146⟩ else some ⟨false, true, some 302⟩
+              else
+                if q.val < 147 then
+                  if b then some ⟨true, true, some 147⟩ else some ⟨false, true, some 303⟩
+                else
+                  if q.val < 148 then
+                    if b then some ⟨true, true, some 148⟩ else some ⟨false, true, some 234⟩
+                  else
+                    if b then some ⟨true, true, some 149⟩ else some ⟨false, true, some 266⟩
+            else
+              if q.val < 151 then
+                if q.val < 150 then
+                  if b then some ⟨true, true, some 150⟩ else some ⟨false, true, some 239⟩
+                else
+                  if b then some ⟨true, true, some 151⟩ else some ⟨false, true, some 300⟩
+              else
+                if q.val < 152 then
+                  if b then some ⟨true, true, some 152⟩ else some ⟨false, true, some 293⟩
+                else
+                  if q.val < 153 then
+                    if b then some ⟨true, true, some 153⟩ else some ⟨false, true, some 303⟩
+                  else
+                    if b then some ⟨true, true, some 154⟩ else some ⟨false, true, some 241⟩
+  else
+    if q.val < 231 then
+      if q.val < 192 then
+        if q.val < 173 then
+          if q.val < 163 then
+            if q.val < 158 then
+              if q.val < 156 then
+                if q.val < 155 then
+                  if b then some ⟨true, true, some 156⟩ else some ⟨false, true, some 305⟩
+                else
+                  if b then some ⟨true, true, some 168⟩ else some ⟨false, true, some 203⟩
+              else
+                if q.val < 157 then
+                  if b then some ⟨true, true, some 158⟩ else some ⟨false, true, some 157⟩
+                else
+                  if b then some ⟨true, true, some 239⟩ else some ⟨false, true, some 269⟩
+            else
+              if q.val < 160 then
+                if q.val < 159 then
+                  if b then some ⟨true, true, some 159⟩ else some ⟨false, true, some 305⟩
+                else
+                  if b then some ⟨true, true, some 160⟩ else some ⟨false, true, some 241⟩
+              else
+                if q.val < 161 then
+                  if b then some ⟨true, true, some 161⟩ else some ⟨false, true, some 243⟩
+                else
+                  if q.val < 162 then
+                    if b then some ⟨true, true, some 163⟩ else some ⟨false, true, some 162⟩
+                  else
+                    if b then some ⟨true, true, some 306⟩ else some ⟨false, true, some 306⟩
+          else
+            if q.val < 168 then
+              if q.val < 165 then
+                if q.val < 164 then
+                  if b then some ⟨true, true, some 164⟩ else some ⟨false, true, some 295⟩
+                else
+                  if b then some ⟨true, true, some 165⟩ else some ⟨false, true, some 298⟩
+              else
+                if q.val < 166 then
+                  if b then some ⟨true, true, some 166⟩ else some ⟨false, true, some 307⟩
+                else
+                  if q.val < 167 then
+                    if b then some ⟨true, true, some 167⟩ else some ⟨false, true, some 297⟩
+                  else
+                    if b then some ⟨true, true, some 169⟩ else some ⟨false, true, some 307⟩
+            else
+              if q.val < 170 then
+                if q.val < 169 then
+                  if b then some ⟨true, true, some 178⟩ else some ⟨false, true, some 191⟩
+                else
+                  if b then some ⟨true, true, some 170⟩ else some ⟨false, true, some 292⟩
+              else
+                if q.val < 171 then
+                  if b then some ⟨true, true, some 172⟩ else some ⟨false, true, some 171⟩
+                else
+                  if q.val < 172 then
+                    if b then some ⟨true, true, some 291⟩ else some ⟨false, true, some 225⟩
+                  else
+                    if b then some ⟨true, true, some 173⟩ else some ⟨false, true, some 296⟩
+        else
+          if q.val < 182 then
+            if q.val < 177 then
+              if q.val < 175 then
+                if q.val < 174 then
+                  if b then some ⟨true, true, some 174⟩ else some ⟨false, true, some 45⟩
+                else
+                  if b then some ⟨true, true, none⟩ else some ⟨false, true, some 175⟩
+              else
+                if q.val < 176 then
+                  if b then some ⟨true, true, some 176⟩ else some ⟨false, true, some 45⟩
+                else
+                  if b then some ⟨false, false, some 58⟩ else some ⟨false, true, some 177⟩
+            else
+              if q.val < 179 then
+                if q.val < 178 then
+                  if b then some ⟨true, true, some 46⟩ else some ⟨false, true, some 46⟩
+                else
+                  if b then some ⟨true, true, some 75⟩ else some ⟨false, true, some 179⟩
+              else
+                if q.val < 180 then
+                  if b then some ⟨true, true, some 181⟩ else some ⟨false, true, some 180⟩
+                else
+                  if q.val < 181 then
+                    if b then some ⟨false, false, some 60⟩ else some ⟨false, true, some 29⟩
+                  else
+                    if b then some ⟨true, true, some 215⟩ else some ⟨false, true, some 182⟩
+          else
+            if q.val < 187 then
+              if q.val < 184 then
+                if q.val < 183 then
+                  if b then some ⟨true, true, some 183⟩ else some ⟨false, true, some 41⟩
+                else
+                  if b then some ⟨false, false, some 61⟩ else some ⟨false, true, some 30⟩
+              else
+                if q.val < 185 then
+                  if b then some ⟨false, false, some 62⟩ else some ⟨false, true, some 42⟩
+                else
+                  if q.val < 186 then
+                    if b then some ⟨false, false, some 62⟩ else some ⟨false, true, some 43⟩
+                  else
+                    if b then some ⟨false, false, some 61⟩ else some ⟨false, true, some 44⟩
+            else
+              if q.val < 189 then
+                if q.val < 188 then
+                  if b then some ⟨true, true, some 186⟩ else some ⟨false, true, some 41⟩
+                else
+                  if b then some ⟨false, false, some 63⟩ else some ⟨false, true, some 187⟩
+              else
+                if q.val < 190 then
+                  if b then some ⟨true, true, some 188⟩ else some ⟨false, true, some 185⟩
+                else
+                  if q.val < 191 then
+                    if b then some ⟨true, true, some 189⟩ else some ⟨false, true, some 42⟩
+                  else
+                    if b then some ⟨true, true, some 193⟩ else some ⟨false, true, some 192⟩
+      else
+        if q.val < 211 then
+          if q.val < 201 then
+            if q.val < 196 then
+              if q.val < 194 then
+                if q.val < 193 then
+                  if b then some ⟨true, true, some 190⟩ else some ⟨false, true, some 39⟩
+                else
+                  if b then some ⟨true, true, some 194⟩ else some ⟨false, true, some 43⟩
+              else
+                if q.val < 195 then
+                  if b then some ⟨false, false, some 61⟩ else some ⟨false, true, some 40⟩
+                else
+                  if b then some ⟨true, true, some 196⟩ else some ⟨false, true, some 41⟩
+            else
+              if q.val < 198 then
+                if q.val < 197 then
+                  if b then some ⟨false, false, some 61⟩ else some ⟨false, true, some 34⟩
+                else
+                  if b then some ⟨true, true, some 198⟩ else some ⟨false, true, some 41⟩
+              else
+                if q.val < 199 then
+                  if b then some ⟨false, false, some 61⟩ else some ⟨false, true, some 38⟩
+                else
+                  if q.val < 200 then
+                    if b then some ⟨true, true, some 197⟩ else some ⟨false, true, some 200⟩
+                  else
+                    if b then some ⟨false, false, some 60⟩ else some ⟨false, true, some 37⟩
+          else
+            if q.val < 206 then
+              if q.val < 203 then
+                if q.val < 202 then
+                  if b then some ⟨true, true, some 202⟩ else some ⟨false, true, some 41⟩
+                else
+                  if b then some ⟨false, false, some 61⟩ else some ⟨false, true, some 36⟩
+              else
+                if q.val < 204 then
+                  if b then some ⟨true, true, some 201⟩ else some ⟨false, true, some 204⟩
+                else
+                  if q.val < 205 then
+                    if b then some ⟨false, false, some 60⟩ else some ⟨false, true, some 35⟩
+                  else
+                    if b then some ⟨true, true, some 184⟩ else some ⟨false, true, some 44⟩
+            else
+              if q.val < 208 then
+                if q.val < 207 then
+                  if b then some ⟨false, false, some 61⟩ else some ⟨false, true, some 46⟩
+                else
+                  if b then some ⟨true, true, some 206⟩ else some ⟨false, true, some 41⟩
+              else
+                if q.val < 209 then
+                  if b then some ⟨true, true, some 210⟩ else some ⟨false, true, some 209⟩
+                else
+                  if q.val < 210 then
+                    if b then some ⟨true, true, some 205⟩ else some ⟨false, true, some 45⟩
+                  else
+                    if b then some ⟨true, true, some 211⟩ else some ⟨false, true, some 41⟩
+        else
+          if q.val < 221 then
+            if q.val < 216 then
+              if q.val < 213 then
+                if q.val < 212 then
+                  if b then some ⟨true, true, some 212⟩ else some ⟨false, true, some 44⟩
+                else
+                  if b then some ⟨false, false, some 63⟩ else some ⟨false, true, some 207⟩
+              else
+                if q.val < 214 then
+                  if b then some ⟨true, true, some 214⟩ else some ⟨false, true, some 43⟩
+                else
+                  if q.val < 215 then
+                    if b then some ⟨false, false, some 61⟩ else some ⟨false, true, some 48⟩
+                  else
+                    if b then some ⟨true, true, some 218⟩ else some ⟨false, true, some 216⟩
+            else
+              if q.val < 218 then
+                if q.val < 217 then
+                  if b then some ⟨true, true, some 217⟩ else some ⟨false, true, some 47⟩
+                else
+                  if b then some ⟨false, false, some 61⟩ else some ⟨false, true, some 42⟩
+              else
+                if q.val < 219 then
+                  if b then some ⟨true, true, some 213⟩ else some ⟨false, true, some 208⟩
+                else
+                  if q.val < 220 then
+                    if b then some ⟨true, true, some 184⟩ else some ⟨false, true, some 46⟩
+                  else
+                    if b then some ⟨true, true, some 219⟩ else some ⟨false, true, some 33⟩
+          else
+            if q.val < 226 then
+              if q.val < 223 then
+                if q.val < 222 then
+                  if b then some ⟨true, true, some 195⟩ else some ⟨false, true, some 220⟩
+                else
+                  if b then some ⟨true, true, some 221⟩ else some ⟨false, true, some 215⟩
+              else
+                if q.val < 224 then
+                  if b then some ⟨true, true, some 219⟩ else some ⟨false, true, some 35⟩
+                else
+                  if q.val < 225 then
+                    if b then some ⟨true, true, some 201⟩ else some ⟨false, true, some 223⟩
+                  else
+                    if b then some ⟨true, true, some 224⟩ else some ⟨false, true, some 215⟩
+            else
+              if q.val < 228 then
+                if q.val < 227 then
+                  if b then some ⟨true, true, some 225⟩ else some ⟨false, true, some 222⟩
+                else
+                  if b then some ⟨true, true, some 190⟩ else some ⟨false, true, some 47⟩
+              else
+                if q.val < 229 then
+                  if b then some ⟨true, true, some 213⟩ else some ⟨false, true, some 227⟩
+                else
+                  if q.val < 230 then
+                    if b then some ⟨true, true, some 230⟩ else some ⟨false, true, some 208⟩
+                  else
+                    if b then some ⟨true, true, some 206⟩ else some ⟨false, true, some 43⟩
+    else
+      if q.val < 269 then
+        if q.val < 250 then
+          if q.val < 240 then
+            if q.val < 235 then
+              if q.val < 233 then
+                if q.val < 232 then
+                  if b then some ⟨true, true, some 229⟩ else some ⟨false, true, some 228⟩
+                else
+                  if b then some ⟨true, true, some 229⟩ else some ⟨false, true, some 231⟩
+              else
+                if q.val < 234 then
+                  if b then some ⟨true, true, some 232⟩ else some ⟨false, true, some 226⟩
+                else
+                  if b then some ⟨true, true, some 235⟩ else some ⟨false, true, some 215⟩
+            else
+              if q.val < 237 then
+                if q.val < 236 then
+                  if b then some ⟨true, true, some 197⟩ else some ⟨false, true, some 236⟩
+                else
+                  if b then some ⟨true, true, some 219⟩ else some ⟨false, true, some 37⟩
+              else
+                if q.val < 238 then
+                  if b then some ⟨true, true, some 234⟩ else some ⟨false, true, some 222⟩
+                else
+                  if q.val < 239 then
+                    if b then some ⟨true, true, some 229⟩ else some ⟨false, true, some 42⟩
+                  else
+                    if b then some ⟨true, true, some 238⟩ else some ⟨false, true, some 231⟩
+          else
+            if q.val < 245 then
+              if q.val < 242 then
+                if q.val < 241 then
+                  if b then some ⟨true, true, some 234⟩ else some ⟨false, true, some 225⟩
+                else
+                  if b then some ⟨true, true, some 239⟩ else some ⟨false, true, some 240⟩
+              else
+                if q.val < 243 then
+                  if b then some ⟨true, true, some 238⟩ else some ⟨false, true, some 42⟩
+                else
+                  if q.val < 244 then
+                    if b then some ⟨true, true, some 242⟩ else some ⟨false, true, some 231⟩
+                  else
+                    if b then some ⟨false, false, some 58⟩ else some ⟨false, true, some 29⟩
+            else
+              if q.val < 247 then
+                if q.val < 246 then
+                  if b then some ⟨false, false, some 60⟩ else some ⟨false, true, some 45⟩
+                else
+                  if b then some ⟨true, true, some 207⟩ else some ⟨false, true, some 245⟩
+              else
+                if q.val < 248 then
+                  if b then some ⟨true, true, some 246⟩ else some ⟨false, true, some 244⟩
+                else
+                  if q.val < 249 then
+                    if b then some ⟨true, true, some 247⟩ else some ⟨false, true, some 228⟩
+                  else
+                    if b then some ⟨false, false, some 60⟩ else some ⟨false, true, some 41⟩
+        else
+          if q.val < 259 then
+            if q.val < 254 then
+              if q.val < 252 then
+                if q.val < 251 then
+                  if b then some ⟨true, true, some 249⟩ else some ⟨false, true, some 248⟩
+                else
+                  if b then some ⟨true, true, some 250⟩ else some ⟨false, true, some 243⟩
+              else
+                if q.val < 253 then
+                  if b then some ⟨true, true, some 251⟩ else some ⟨false, true, some 243⟩
+                else
+                  if b then some ⟨true, true, some 225⟩ else some ⟨false, true, some 252⟩
+            else
+              if q.val < 256 then
+                if q.val < 255 then
+                  if b then some ⟨true, true, some 255⟩ else some ⟨false, true, some 239⟩
+                else
+                  if b then some ⟨true, true, some 253⟩ else some ⟨false, true, some 241⟩
+              else
+                if q.val < 257 then
+                  if b then some ⟨true, true, some 222⟩ else some ⟨false, true, some 225⟩
+                else
+                  if q.val < 258 then
+                    if b then some ⟨true, true, some 242⟩ else some ⟨false, true, some 42⟩
+                  else
+                    if b then some ⟨true, true, some 259⟩ else some ⟨false, true, some 231⟩
+          else
+            if q.val < 264 then
+              if q.val < 261 then
+                if q.val < 260 then
+                  if b then some ⟨true, true, some 257⟩ else some ⟨false, true, some 42⟩
+                else
+                  if b then some ⟨true, true, some 258⟩ else some ⟨false, true, some 256⟩
+              else
+                if q.val < 262 then
+                  if b then some ⟨true, true, some 262⟩ else some ⟨false, true, some 257⟩
+                else
+                  if q.val < 263 then
+                    if b then some ⟨true, true, some 257⟩ else some ⟨false, true, some 258⟩
+                  else
+                    if b then some ⟨true, true, some 264⟩ else some ⟨false, true, some 222⟩
+            else
+              if q.val < 266 then
+                if q.val < 265 then
+                  if b then some ⟨true, true, some 222⟩ else some ⟨false, true, some 251⟩
+                else
+                  if b then some ⟨true, true, some 222⟩ else some ⟨false, true, some 257⟩
+              else
+                if q.val < 267 then
+                  if b then some ⟨true, true, some 225⟩ else some ⟨false, true, some 234⟩
+                else
+                  if q.val < 268 then
+                    if b then some ⟨true, true, some 266⟩ else some ⟨false, true, some 268⟩
+                  else
+                    if b then some ⟨true, true, some 250⟩ else some ⟨false, true, some 261⟩
+      else
+        if q.val < 288 then
+          if q.val < 278 then
+            if q.val < 273 then
+              if q.val < 271 then
+                if q.val < 270 then
+                  if b then some ⟨true, true, some 256⟩ else some ⟨false, true, some 243⟩
+                else
+                  if b then some ⟨true, true, some 222⟩ else some ⟨false, true, some 234⟩
+              else
+                if q.val < 272 then
+                  if b then some ⟨true, true, some 243⟩ else some ⟨false, true, some 270⟩
+                else
+                  if b then some ⟨false, false, some 58⟩ else some ⟨false, true, some 273⟩
+            else
+              if q.val < 275 then
+                if q.val < 274 then
+                  if b then some ⟨true, true, some 274⟩ else some ⟨false, true, some 29⟩
+                else
+                  if b then some ⟨true, true, some 278⟩ else some ⟨false, true, some 275⟩
+              else
+                if q.val < 276 then
+                  if b then some ⟨true, true, some 276⟩ else some ⟨false, true, some 29⟩
+                else
+                  if q.val < 277 then
+                    if b then some ⟨false, false, some 58⟩ else some ⟨false, true, some 277⟩
+                  else
+                    if b then some ⟨true, true, some 30⟩ else some ⟨false, true, some 30⟩
+          else
+            if q.val < 283 then
+              if q.val < 280 then
+                if q.val < 279 then
+                  if b then some ⟨true, true, some 279⟩ else some ⟨false, true, some 30⟩
+                else
+                  if b then some ⟨false, false, some 58⟩ else some ⟨false, true, some 228⟩
+              else
+                if q.val < 281 then
+                  if b then some ⟨true, true, some 281⟩ else some ⟨false, true, some 252⟩
+                else
+                  if q.val < 282 then
+                    if b then some ⟨true, true, some 199⟩ else some ⟨false, true, some 272⟩
+                  else
+                    if b then some ⟨true, true, some 289⟩ else some ⟨false, true, some 283⟩
+            else
+              if q.val < 285 then
+                if q.val < 284 then
+                  if b then some ⟨true, true, some 284⟩ else some ⟨false, true, some 224⟩
+                else
+                  if b then some ⟨true, true, some 285⟩ else some ⟨false, true, some 43⟩
+              else
+                if q.val < 286 then
+                  if b then some ⟨true, true, some 287⟩ else some ⟨false, true, some 286⟩
+                else
+                  if q.val < 287 then
+                    if b then some ⟨false, false, some 61⟩ else some ⟨false, true, some 45⟩
+                  else
+                    if b then some ⟨false, false, some 59⟩ else some ⟨false, true, some 288⟩
+        else
+          if q.val < 298 then
+            if q.val < 293 then
+              if q.val < 290 then
+                if q.val < 289 then
+                  if b then some ⟨false, false, some 60⟩ else some ⟨false, true, some 43⟩
+                else
+                  if b then some ⟨true, true, some 290⟩ else some ⟨false, true, some 45⟩
+              else
+                if q.val < 291 then
+                  if b then some ⟨false, false, some 58⟩ else some ⟨false, true, some 245⟩
+                else
+                  if q.val < 292 then
+                    if b then some ⟨true, true, some 232⟩ else some ⟨false, true, some 237⟩
+                  else
+                    if b then some ⟨true, true, some 291⟩ else some ⟨false, true, some 250⟩
+            else
+              if q.val < 295 then
+                if q.val < 294 then
+                  if b then some ⟨true, true, some 258⟩ else some ⟨false, true, some 243⟩
+                else
+                  if b then some ⟨true, true, some 258⟩ else some ⟨false, true, some 237⟩
+              else
+                if q.val < 296 then
+                  if b then some ⟨true, true, some 226⟩ else some ⟨false, true, some 258⟩
+                else
+                  if q.val < 297 then
+                    if b then some ⟨true, true, some 251⟩ else some ⟨false, true, some 258⟩
+                  else
+                    if b then some ⟨true, true, some 239⟩ else some ⟨false, true, some 237⟩
+          else
+            if q.val < 303 then
+              if q.val < 300 then
+                if q.val < 299 then
+                  if b then some ⟨true, true, some 299⟩ else some ⟨false, true, some 266⟩
+                else
+                  if b then some ⟨true, true, some 241⟩ else some ⟨false, true, some 234⟩
+              else
+                if q.val < 301 then
+                  if b then some ⟨true, true, some 239⟩ else some ⟨false, true, some 270⟩
+                else
+                  if q.val < 302 then
+                    if b then some ⟨true, true, some 293⟩ else some ⟨false, true, some 257⟩
+                  else
+                    if b then some ⟨true, true, some 257⟩ else some ⟨false, true, some 301⟩
+            else
+              if q.val < 305 then
+                if q.val < 304 then
+                  if b then some ⟨true, true, some 304⟩ else some ⟨false, true, some 241⟩
+                else
+                  if b then some ⟨true, true, some 267⟩ else some ⟨false, true, some 293⟩
+              else
+                if q.val < 306 then
+                  if b then some ⟨true, true, some 261⟩ else some ⟨false, true, some 237⟩
+                else
+                  if q.val < 307 then
+                    if b then some ⟨true, true, some 257⟩ else some ⟨false, true, some 243⟩
+                  else
+                    if b then some ⟨true, true, some 302⟩ else some ⟨false, true, some 301⟩
+
+/-- Kernel-check every transition to justify the faster lookup. -/
+theorem fastLookup_eq_machine : fastLookup = machine := by
+  funext q b
+  fin_cases q <;> cases b <;> decide +kernel
+
 /-- Blank tape, head at zero, original initial label `0.boot.A`. -/
 def initial : Configuration 308 := ⟨some 0, 0, fun _ => false⟩
 

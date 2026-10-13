@@ -118,8 +118,9 @@ modes. The packed-counter winner also passed 1,000 boundary cases and its tree
 passed the full CFG audit; it was not promoted or subjected to the full literal
 candidate verifier. The regression suite includes corrupt-plan
 rejection, proof-field coding, stale-tree rejection and preserving a saved tree
-when restarting search. [Verification scope](VERIFICATION.md) lists remaining
-formal obligations.
+when restarting search. The [Lean implementation proof](../formal/README.md) now verifies the incumbent’s
+decoder and complete literal-tape execution; [verification scope](VERIFICATION.md)
+distinguishes that result from the remaining theory interpretation.
 
 To continue from the current candidate:
 

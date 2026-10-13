@@ -124,9 +124,10 @@ with the other experiments.
    parameters after their last use and sharing scratch registers. This may expose
    savings that tape-window analysis misses. Couple it to a proof of sufficient
    instruction-pointer space.
-4. **Prove the backend/source contract before aggressive rewrites.** A checkable
-   simulation relation from literal transitions to a structured register program
-   would make subsequent state reductions much safer to assess.
+4. **Preserve the proved backend/source contract during further rewrites.**
+   The [Lean headline](../formal/TinyZF.lean) now connects the literal 308-state
+   machine to its independent source calculus. New candidates must supply their
+   own checked certificates and preserve that fixed statement.
 
 ## The independence claim
 

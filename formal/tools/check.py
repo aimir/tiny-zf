@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Check the partial Lean formalization, its scope, and exact candidate imports."""
+"""Check the complete tape-to-source Lean theorem, its scope, and exact candidate imports."""
 from pathlib import Path
 import argparse
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -43,7 +44,8 @@ def check_imports(root=ROOT):
 
 
 def run(command):
-    result = subprocess.run(command, cwd=FORMAL, text=True, capture_output=True)
+    result = subprocess.run(command, cwd=FORMAL, text=True, capture_output=True,
+        env={**os.environ, 'LEAN_NUM_THREADS': '1'})
     output = result.stdout + result.stderr
     print(output if len(output) < 6000 else output[-6000:], end='', flush=True)
     if result.returncode:
@@ -74,14 +76,14 @@ def main():
     args = parser.parse_args()
     check_imports()
     run(['lake', 'build'])
-    axioms = audit_axioms(run(['lake', 'env', 'lean', '--memory=8192', '--threads=2', 'Audit.lean']))
-    files = sorted(FORMAL.glob('*.lean')) + sorted((FORMAL / 'TinyZF').glob('*.lean'))
+    axioms = audit_axioms(run(['lake', 'env', 'lean', '--memory=8192', '--threads=1', 'Audit.lean']))
+    files = sorted(FORMAL.glob('*.lean')) + sorted((FORMAL / 'TinyZF').rglob('*.lean'))
     files += [FORMAL / x for x in ('lean-toolchain', 'lakefile.toml', 'lake-manifest.json')]
     report = {
-        'status': 'partial Lean formalization; source theorem proved; tape-machine theorem unproved',
-        'headline': 'TinyZF.source_enumerator_correct',
-        'statement': 'Source.FindsTarget ↔ Source.Provable 1',
-        'end_to_end_machine_verification': False,
+        'status': 'complete Lean verification of the literal tape machine against the numeric source calculus',
+        'headline': 'TinyZF.machine_correct',
+        'statement': 'Machine308.Halts ↔ Source.Provable 1',
+        'end_to_end_machine_verification': True,
         'zf_equiconsistency_verification': False,
         'machine_sha256': MACHINE_HASH,
         'theorem_axioms': axioms,
@@ -92,7 +94,7 @@ def main():
         path.write_text(json.dumps(report, indent=2) + '\n')
     elif json.loads(path.read_text()) != report:
         raise ValueError('Stale verification record; recheck and refresh with --record')
-    print('ACCEPTED: source theorem and listed components; NOT the full tape-machine or ZF-independence theorem.')
+    print('ACCEPTED: complete literal tape-machine/source-calculus equivalence; conventional-ZF interpretation and independence remain outside the claim.')
 
 
 if __name__ == '__main__':

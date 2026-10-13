@@ -1,19 +1,24 @@
 # Verification scope and intended contract
 
-**Status: partial Lean formalization, exact reproduction and computational checks.**
-The [Lean development](../formal/README.md) proves the unbounded numeric source
-enumerator's soundness and completeness, Cantor and formula coding, semantic
-soundness and protected rewrites, and the current decoder allocation contract.
-It imports the exact 308-state table, but does **not** prove its source-to-tape
-simulation or a ZF-independence theorem. The conservative 392-state table follows
-the corrected Wade source; the 308-state experiment uses ICS and a different
-formula coding.
+**Status: the literal 308-state machine is formally verified against its numeric
+source calculus in Lean.** The exact headline is:
 
-The default Lean headline is `Source.FindsTarget ↔ Source.Provable 1`. Its numeric
-calculus is explicitly defined independently of execution. The remaining stronger
-goal is `Machine308.Halts ↔ Source.Provable 1`; a further theory interpretation is
-needed to connect this with conventional ZF. See the [entry file](../formal/TinyZF.lean)
-and [build instructions](../formal/README.md#run-verification).
+```lean
+theorem machine_correct : Machine308.Halts ↔ Source.Provable 1
+```
+
+The source calculus is defined independently of machine execution. The proof
+covers the bootstrap, register and tape invariants, all optimized instruction
+paths, graph equivalence, primitive arithmetic, decoder allocation, clause
+execution, and exhaustive source enumeration. See the [entry theorem](../formal/TinyZF.lean)
+and [verification guide](../formal/README.md). Its audited dependencies contain
+only `propext`, `Classical.choice`, and `Quot.sound`.
+
+The ICS/conventional-ZF interpretation and any ZF-independence conclusion remain
+unproved. The conservative 392-state baseline and experimental native/dyadic
+machines are outside this headline. The computational checks below remain
+useful independent reproduction and regression checks; they are distinct from
+the Lean proof.
 
 ## Conservative 392-state baseline: `python3 tools/verify.py`
 
@@ -77,7 +82,7 @@ consumes the next proof tail into two zero registers, and all four fields and
 scratch values satisfy the boundary contract. This assumes the existing arithmetic
 primitive contracts; that Python resource check is accompanied by the unbounded
 Lean theorem `Decoder.boundary_correct` for the same 16-operation arithmetic
-plan. Neither proves the tape implementations of those arithmetic contracts. A separate
+plan. The separate Lean implementation proof now verifies those arithmetic contracts using primitive loops and literal tape transitions. A separate
 integer model checks 1,000 decoder/enumerator boundaries, including arbitrary old
 field values, theorem-stack contents and the empty-proof refill case. The remaining
 inference body and halt test match the original body in a complete CFG comparison
@@ -88,8 +93,8 @@ numeric proof encoding. Nested Cantor pairing and a field permutation give a
 bijection on instruction tuples; the positive-tail convention still makes every
 finite tail traversal terminate. Lean now proves the two coding inverses, exhaustive
 enumeration and the soundness/completeness equivalence for the numeric source
-interpreter. Connecting that interpreter to the optimized register/tape program
-and to conventional ZF remains a formal obligation.
+interpreter. The Lean headline now connects that interpreter to the optimized register/tape
+program. Its connection to conventional ZF remains a mathematical obligation.
 The literal-tape differential below compares the new tree with its **own decoder
 source**, not with the old machine on the same proof numbers.
 
@@ -140,7 +145,7 @@ the published ICS scheme. The sharing/factoring passes keep their input schemas
 and formula encoding unchanged; the separate formula pass supplies the identities
 described above. The claimed equiconsistency of ICS with ZF remains an explicit
 dependency.
-The formula recoding must also be included in any later proof. Matching the
+The Lean implementation theorem includes the actual reversed-payload coding. Matching the
 published constructor sequences and passing finite tests do not discharge
 these obligations. [Experiments](EXPERIMENTS.md) describes both transformations.
 
@@ -196,46 +201,27 @@ undefined targets, duplicate rows and nonbinary/non-L/R instructions. The
 unmodified upstream parser is retained for reproduction, not relied on as a
 strict external-file validator.
 
-## Remaining end-to-end goal, defined but not proved
+## Proved implementation contract and remaining theory bridge
 
-[TinyZF.lean](../formal/TinyZF.lean) records the exact proposition:
+[TinyZF.lean](../formal/TinyZF.lean) proves the fixed target
+`Machine308.Halts ↔ Source.Provable 1`. Its statement uses the literal candidate
+and the independently defined numeric calculus with the actual guarded and
+rewritten schemas. All implementation layers are discharged, including inactive
+premise loading, selector saturation, arbitrary register values, and unbounded
+execution. No compiler-correctness assumption is present.
 
-```lean
-def MachineCorrect : Prop := Machine308.Halts ↔ Source.Provable 1
-```
+An additional theorem would connect a derivation of numeric code one with a
+contradiction proof in a fixed conventional ZF presentation. That requires
+interpreting the exact source schemas and inference rules, including the ICS
+scheme and selected rewrites. It is deliberately separate from implementation
+correctness. A ZF-independence conclusion also requires explicit metatheoretic
+assumptions, as described in [the survey](SURVEY.md).
 
-This is a definition, not a theorem or an assumed axiom. `Machine308` contains
-the literal candidate table; `Source.Provable` is the explicit numeric calculus
-using the current guarded and rewritten schemas. Its target decodes to `v₀ ∈ v₀`.
+The finite Python graph checks above retain a distinguished `return` node,
+whereas the Lean whole-program graph redirects normal iteration returns to the
+entry. Thus the Lean certificates have 6,741 instructions and 4,162 common
+blocks, while the finite fragment reports count 6,742 nodes and 4,163 pairs.
+Those are different interfaces to the same iteration, not missing Lean cases.
 
-An additional theorem should connect existence of such a proof to existence of
-a contradiction proof in a fixed conventional ZF presentation. This separates
-implementation correctness from the mathematical relationship between theories.
-It also makes it possible to audit an alternative ICS formulation without
-silently replacing the meaning of the first theorem. The source-enumerator
-theorem is proved; the tape-machine equivalence and conventional-ZF connection
-are not.
-
-The proof obligations are:
-
-- **Logic and coding:** the explicit numeric rules, formula syntax, pairing,
-  total decoding and distinguished target are defined, with decoding and
-  semantic soundness proved. Their interpretation into a conventional ICS/ZF
-  derivation system is still needed.
-- **Enumeration:** the numeric interpreter's soundness and completeness, actual
-  field order, default clause and selector saturation are proved. Matching the
-  compiled clause-selection and inactive premise-loading code remains open.
-- **Deduplication / reordering:** translate finite derivations in both directions
-  by renumbering clause selectors and their encodings. Repeated copies of a
-  schema are unnecessary, but the renumbering argument must be formalized.
-- **Compiler:** specify the structured instruction and relative jump semantics,
-  verify DAG factoring/lowering, register primitives and bootstrap.
-- **Tape invariant:** prove instruction-pointer/register-file separation and
-  exclude unintended halts such as the missing `1.inc`/`1` entry.
-- **Literal artifact:** the Lean table and state count are tied to the saved
-  candidate by the import audit. Connecting that table to the source semantics
-  is still open. Any later reduction needs a checked simulation certificate.
-
-Proving nonhalting outright is neither a regression test nor the intended
-unconditional deliverable. Independence conclusions need their explicit
-metatheoretic assumptions, as described in [the survey](SURVEY.md).
+Any future machine change requires its own checked artifact and correspondence;
+the current theorem is specifically bound to the saved 308-state table.

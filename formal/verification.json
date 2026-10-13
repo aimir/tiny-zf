@@ -1,11 +1,43 @@
 {
-  "status": "partial Lean formalization; source theorem proved; tape-machine theorem unproved",
-  "headline": "TinyZF.source_enumerator_correct",
-  "statement": "Source.FindsTarget \u2194 Source.Provable 1",
-  "end_to_end_machine_verification": false,
+  "status": "complete Lean verification of the literal tape machine against the numeric source calculus",
+  "headline": "TinyZF.machine_correct",
+  "statement": "Machine308.Halts \u2194 Source.Provable 1",
+  "end_to_end_machine_verification": true,
   "zf_equiconsistency_verification": false,
   "machine_sha256": "c4083dd0239b8f5c9bd231c69caff51bca8c5a3d0a0679e92f89bae158817d16",
   "theorem_axioms": {
+    "TinyZF.machine_correct": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "TinyZF.Tape.Bootstrap.boundary": [
+      "Quot.sound",
+      "propext"
+    ],
+    "TinyZF.Tape.Candidate.initialized_iff": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "TinyZF.Interpreter.Comparison.candidate_iff_source": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "TinyZF.Interpreter.Placement.models": [
+      "propext"
+    ],
+    "TinyZF.Interpreter.Execution.iteration_run": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "TinyZF.Interpreter.Correctness.graph_iff_source": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
     "TinyZF.source_enumerator_correct": [
       "Classical.choice",
       "Quot.sound",
@@ -72,20 +104,43 @@
     ]
   },
   "source_sha256": {
-    "Audit.lean": "a39eee745b86a8d4faf82ced6bbc01c700c46af5e81558bd548a30791ad0b8da",
-    "TinyZF.lean": "52a5e4e05ba2d98e4b15ada581f2f06fe5358487179980d7db3a24f9930d1d17",
+    "Audit.lean": "c057a3ff59136fca7e0058348de5020da4271ff09ee0a73bcb7b173f63a723bc",
+    "TinyZF.lean": "aad8dcc986e6d899911f260589912aec3112844d19a826c7f5782ce84bf948dd",
     "TinyZF/Cantor.lean": "1d8fed5d765db2b774384c88b9c3e82b9a9bdba84829313e54a7ecef2bc949dc",
     "TinyZF/Decoder.lean": "83ed4693ff9998ae0f2260b81728741ece9ea51ffe0048bb4193dc629d5d9cd1",
     "TinyZF/Enumeration.lean": "5d29a4aaddd4bf2fa10827f23ee0b5d90c9bb0dc715765dec61f3af2498d1863",
     "TinyZF/Formulas.lean": "73e83fabddf030e50076e1892f0ffdbad9fedefdedf57dfc5e20b7fe6d86498a",
     "TinyZF/Interpretation.lean": "6209ffc3ee1e36635179d983aafaf19a2b63bc6d701b4acf9a87a076fddf1d0d",
+    "TinyZF/Interpreter/Arithmetic.lean": "b7d8125f17de635a4d400eb8a6e0152a7d82882df51ed6cdeba0333cad2bbc37",
+    "TinyZF/Interpreter/Clauses.lean": "67d2fae70d0facf8d5c71d8eae5e5a82321469ef33e7073a745d0bdf23e47c62",
+    "TinyZF/Interpreter/Comparison.lean": "531fc36365ba688af7dfe481daa055927efc76bf47fdc172f71880dc37e23e80",
+    "TinyZF/Interpreter/Correctness.lean": "699c6171d6e581230705702127c07cb29ea0abfbb46c084b9f5374935ad9b68e",
+    "TinyZF/Interpreter/Decoder.lean": "8b610dce50cc2e411b0cea7906ac5564cde02111c6fd87ae85c515e5ec95eed4",
+    "TinyZF/Interpreter/Execution.lean": "6810fc4a3f8c00c8917c91b7c6a41caecef0036465175b6d1670acc546540dd7",
+    "TinyZF/Interpreter/Expressions.lean": "f1c8b3c8d457944a7722da664805af93d22eb14f48c84fa2d660a8ba0dbdfbf8",
+    "TinyZF/Interpreter/Graph.lean": "b4b66076cbcc0e7945b1536823929eab450b62479bcffee34f873dd333c3e23e",
+    "TinyZF/Interpreter/Placement.lean": "3cee919de4aaefe0e0c22030fa891fc0dacb7bb9d64ef7d34521e87abfe619ba",
+    "TinyZF/Interpreter/SchemaCode.lean": "ca5fb9673388048a659892fe9d42a4c30f94efe9734e194e048dbfc39c8a6742",
+    "TinyZF/Interpreter/Segments.lean": "84a4e5884508288369177a647622425325a75f0ceda79ae400f12dea5bcf870d",
+    "TinyZF/Interpreter/SourceGraph.lean": "8f6616dbfa0450f7c7924617f00fdd12a2312328dd351af5925d80edc8bd8d2b",
+    "TinyZF/Interpreter/Stack.lean": "91a24b33ed40a3e84eb00a476b96e0030a7e6b19f5b442283c7e4d38cb65d0d1",
+    "TinyZF/Interpreter/Structured.lean": "71267b4ca681f4664a8a559c1eed80aec6b006d27d8f5a29eb9002f02914be71",
     "TinyZF/Machine.lean": "5ea7feef1b0a9533155891db264ed3d0bf9aa618339187b189d4e0182826ec01",
-    "TinyZF/Machine308.lean": "4cee89c8998a4784bdeda9cd6a902c1d5551126c0b5f006d4c287c85734046c4",
+    "TinyZF/Machine308.lean": "965dbacbd5494bdc06585f7e0763e29512993c5bf38fa8b4889100a6518eaa79",
     "TinyZF/ProtectedOriginal.lean": "4d21b8aae11cdce47c072f69d6b965bc13e2399c69a88a2835e488a17c5998a7",
     "TinyZF/Schemas.lean": "acbd6480f424b40c52624cdc386b8c3b9917a4512cf8ce5af4df563553ea2e45",
     "TinyZF/Source.lean": "6fcd13e653dd69d6f06b1044e7c44c5711c8101898ca79954e10db71565698ec",
+    "TinyZF/Tape/Bootstrap.lean": "f5cc0c5ee7565b932a08c4f692e5692c4094e90b692beaf48e6af4bf6d38c427",
+    "TinyZF/Tape/Candidate.lean": "d1cc1ad80dbb0f752c5cfdc2fc2dca75e4aa17087ccdd449c6521ea6801d591a",
+    "TinyZF/Tape/Control.lean": "b6bf5775d30390769359bed568c90d8447f00a0226f3c2224aa9f755426259be",
+    "TinyZF/Tape/Core.lean": "fdd664cbb68ed4a18e507548d25c3572d8f0c8ec7ba1901dfe9ca9e4f745029d",
+    "TinyZF/Tape/Cycles.lean": "943e61ec87cc9642ef0642ddfe74b94e0c548496470b033c9c4d261b02a1b8d6",
+    "TinyZF/Tape/Paths.lean": "3c2acbb134dc1c9c5737140c60a0213d444056856a96db257bf8a979f42736ac",
+    "TinyZF/Tape/Program.lean": "ce678efb89f37328e0c8d548a9497909a1b832bca07a4245d2ae97b52f8dd342",
+    "TinyZF/Tape/Registers.lean": "bc56922b5fd93afb110fcd316796c9542cfe1531e03a41a231ab94d349170334",
+    "TinyZF/Tape/Simulation.lean": "15cac27b73c9056dd4a5f835b641ec2bba60e08b78ed29bc3b25e525b940a142",
     "lean-toolchain": "2bdc48adfa58d0017e538a0ad117c5d73d35deec879978f909406a80c8037273",
-    "lakefile.toml": "dabc543bf8f5188c84310cfd4833e216e3989b5eef050550093af33c563d374b",
+    "lakefile.toml": "65b027be501e420996706d17a8a4b80938613c6110cd6f1e00d05a1b75ceace6",
     "lake-manifest.json": "5ec3c6b3d4ed374ac95a8f4674e8a75bcc5a20899e447963d7b49884a03f1467"
   }
 }

@@ -1,9 +1,9 @@
 # ICS and compiler experiments — 23 September 2026
 
 **Best candidate: 308 states, down from 392 (84 states / 21.4%).**
-The machine remains experimental. The [Lean development](../formal/README.md)
-proves its numeric source theorem and component contracts; the full tape-machine
-simulation and the source theory's equivalence to conventional ZF remain open.
+The [Lean development](../formal/README.md) proves the literal machine’s
+unbounded halting equivalence with its independently specified numeric source
+calculus. The source theory’s equivalence to conventional ZF remains open.
 
 ## What produced the reduction
 

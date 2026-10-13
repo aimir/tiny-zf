@@ -136,7 +136,7 @@ the native tape contract; that separate obligation has finite tape checks:
 
 These checks do not prove unbounded tape separation or an end-to-end equivalence
 theorem. These native kernels are outside the current
-[partial Lean development](../formal/README.md). See [verification scope](VERIFICATION.md).
+[Lean verification of the 308-state incumbent](../formal/README.md). See [verification scope](VERIFICATION.md).
 
 ```sh
 python3 tools/experiment.py native-pilot

@@ -8,10 +8,10 @@ authors:
 repository-code: "https://github.com/aimir/tiny-zf"
 url: "https://github.com/aimir/tiny-zf/releases/tag/v0.2.0-experimental"
 version: "0.2.0-experimental"
-date-released: 2026-10-12
+date-released: 2026-10-13
 abstract: >-
   Reproducible experiments producing a 308-state proof-search Turing machine
-  using a corrected ICS formulation and Wade's compiler. Lean proves correctness
-  of the unbounded numeric source enumerator and component contracts. The
-  source-to-tape simulation and the source theory's connection to conventional
-  ZF remain unproved; this is not a verified ZF-independence result.
+  using a corrected ICS formulation and Wade's compiler. Lean proves exact
+  blank-tape halting equivalence with the independently defined numeric source
+  calculus. The source theory’s connection to conventional ZF remains unproved;
+  this is not a verified ZF-independence result.

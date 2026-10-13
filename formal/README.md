@@ -1,61 +1,66 @@
-# Partial Lean formalization of the 308-state construction
+# Lean verification of the 308-state machine
 
-**The unbounded numeric source enumerator is proved correct. The literal
-308-state machine has been imported, but its source-to-tape simulation and the
-ICS-to-ZF connection remain unproved.**
-
-Start with [TinyZF.lean](TinyZF.lean). The default build checks:
+**The literal binary machine is formally verified against the independently
+specified numeric source calculus.** The default build proves this exact theorem
+in [TinyZF.lean](TinyZF.lean):
 
 ```lean
-theorem source_enumerator_correct :
-    Source.FindsTarget ↔ Source.Provable 1
+theorem machine_correct : Machine308.Halts ↔ Source.Provable 1
 ```
 
-`Source.Provable` is an independently stated numeric derivation system: its
-constructors are the default equality code 0, the 15 actual guarded axiom
-schemas, detachment and generalization. It is not defined as machine execution.
-The schema definitions expose the current permutations, safety guards, Boolean
-rewrites and reversed Cantor payloads. Numeric parameters need not already be
-well-formed formulas. A total decoder and semantic soundness theorem handle them.
+`Machine308.Halts` uses the checked-in table, a two-way infinite all-zero tape,
+head position zero, and initial label `0.boot.A`. The machine has 308 working
+states; halting is separate. An absent transition also halts. The proof handles
+that literal semantics and establishes the invariants needed to exclude
+unintended halts during interpreter execution.
 
-`Source.FindsTarget` means that the source interpreter reaches code 1 after a
-positive number of iterations from zero initial registers. Code 1 decodes to
-`v₀ ∈ v₀`. Soundness preserves provability of the entire zero-padded theorem
-stack. Completeness compiles any derivation into instructions that work above
-an arbitrary caller stack, then proves that the counter/tail enumerator
-eventually executes that list. Neither direction uses finite test bounds.
+`Source.Provable` is an independently stated derivation system: default code 0,
+the 15 exact guarded schema instances, detachment, and generalization. It is not
+defined as machine execution. The schema definitions expose parameter
+permutations, safety guards, Boolean rewrites, and reversed Cantor payloads.
+Numeric inputs may be malformed formulas; their behavior is covered too. Code 1
+decodes to `v₀ ∈ v₀`.
 
-The separate definition
-
-```lean
-def MachineCorrect : Prop := Machine308.Halts ↔ Source.Provable 1
-```
-
-records the remaining tape-machine goal. **There is no theorem proving it yet.**
-`Machine308.Halts` uses the exact checked-in table, a two-way infinite all-zero
-tape, head position zero and initial label `0.boot.A`. There are 308 working
-states; halting is separate. Undefined transitions are retained, including the
-missing `1.inc`/`1` case. Establishing that this case is unreachable is part of
-the remaining tape invariant, not assumed by the semantics.
+This theorem proves implementation correctness. The interpretation of this
+numeric calculus in a conventional ICS/ZF derivation system, its claimed
+relationship to ZF, and the metatheoretic independence conclusion remain outside
+the proved statement. None is supplied as a hypothesis or an axiom.
 
 ## Proof flow
 
-| File | Checked result and role |
-| --- | --- |
-| [Cantor](TinyZF/Cantor.lean) | Exact diagonal pairing, integer triangular-number formula, both inverse identities and bounds. |
-| [Enumeration](TinyZF/Enumeration.lean) | The actual `param1,param3,param2,axiomcode` field order is invertible; every finite instruction list is eventually executed. |
-| [Schemas](TinyZF/Schemas.lean) | Imported numeric constructors, all current schema instances and selector order. Definitions, not a compiler proof. |
-| [Source](TinyZF/Source.lean) | Stack soundness, compilation of derivations and the unbounded iff theorem. |
-| [Formulas](TinyZF/Formulas.lean) | Well-formed syntax, injective encoding, total decoding of all numbers and first-order semantics. |
-| [Interpretation](TinyZF/Interpretation.lean) | Source derivations hold in every source model; all selected protected rewrites preserve truth. |
-| [Decoder](TinyZF/Decoder.lean) | The exact allocation plan satisfies its boundary contract for all natural register values, assuming its arithmetic operation semantics. |
-| [Machine](TinyZF/Machine.lean), [Machine308](TinyZF/Machine308.lean) | Infinite-tape semantics and exact literal transition import with `Fin 308`. |
+1. [Cantor](TinyZF/Cantor.lean), [Enumeration](TinyZF/Enumeration.lean), and
+   [Source](TinyZF/Source.lean) prove arithmetic coding, exhaustive enumeration,
+   stack soundness, and compilation of arbitrary source derivations. The source
+   enumerator finds code 1 exactly when `Source.Provable 1` holds.
+2. [Interpreter](TinyZF/Interpreter/README.md) proves copying, pairing,
+   unpairing, formula construction, both inference clauses, protection,
+   decoding, and the complete source iteration using only primitive register
+   increments/decrements. Checked placements tie that structured code to every
+   actual instruction, loop return, and branch in the unoptimized graph.
+3. The same directory’s `Comparison` checks 4,162 paired increment/decrement
+   blocks relating the unoptimized and optimized graphs. Increment order may
+   differ, but every count, register, branch target, and halt is checked. The
+   unbounded equivalence follows from a proved progressing simulation.
+4. [Tape](TinyZF/Tape/README.md) proves the literal machine’s register
+   operations, dispatch, instruction paths, and invariant preservation. Its
+   certificate checks all 6,741 instructions. A checked 117-step primitive
+   prefix and global instruction-size bound prove sufficient pointer space for
+   every later step. Bootstrap checks all 39,769 literal initialization steps.
+5. `machine_correct` composes those unbounded equivalences. A positive finite
+   implementation of each source step prevents a tape halt from being missed
+   between sampled interpreter boundaries.
 
-The rewrite theorem proves semantic equivalence in every domain and assignment.
-It does not yet translate Boolean identities into derivations of the fixed
-Hilbert calculus. The decoder theorem is about arithmetic contracts; it does not
-prove that the physical tape implements unpairing or transfer. These distinctions
-are also stated beside the theorems.
+[Formulas](TinyZF/Formulas.lean) and [Interpretation](TinyZF/Interpretation.lean)
+provide the first-order meaning, injective formula coding, total decoding, and
+semantic correctness of the chosen protected rewrites. These supporting results
+do not assert an equivalence with conventional ZF.
+
+Every theorem has a local explanation. Generated data and their private
+certificate batches remain in the corresponding logical module. Batch lemmas
+exist to bound elaboration memory; they check all rows and add no assumptions.
+The Python compiler, optimizer, matcher, and certificate generators are
+untrusted producers. Lean checks their output against the literal definitions.
+No alternative or obsolete machine proofs are retained.
 
 ## Run verification
 
@@ -63,50 +68,44 @@ With Python 3 and elan installed, from this folder:
 
 ```sh
 lake exe cache get Mathlib.Tactic
-lake build
+LEAN_NUM_THREADS=1 lake build
 python3 tools/check.py
 ```
 
 The pins are Lean `v4.32.2` and mathlib
-`905b95818eb32af7874a58b427f50c1711a5e96c`. The first cache fetch needs network
-access. No Coq installation, solver or proof-source regeneration is required.
+`905b95818eb32af7874a58b427f50c1711a5e96c`. The initial cache download needs
+network access. All generated Lean sources are committed, so ordinary checking
+requires neither regeneration, Coq, nor a solver. Each Lean process is configured
+for one worker thread and an 8 GiB allocation ceiling. The large finite
+certificates take several minutes to check from scratch.
 
-The checker rebuilds the default target, checks the exact theorem type, prints
-and checks principal axiom dependencies, compares the literal table and generated
-schema imports, checks the current allocation plan, and checks the compact
-[verification manifest](verification.json). Allowed foundational axioms are only
-`propext`, `Classical.choice`, and `Quot.sound`. It rejects `sorryAx`, added
-project axioms and native-computation axioms in the audited dependencies.
-No proof logs, binaries or caches are committed.
+The acceptance checker builds the default headline, verifies its exact type,
+audits principal theorem dependencies, compares every generated import with the
+current artifact, checks the decoder plan, and validates the compact
+[verification manifest](verification.json). The manifest hashes all Lean sources
+recursively. Allowed foundational axioms are only `propext`, `Classical.choice`,
+and `Quot.sound`; the audit rejects `sorryAx`, project axioms, and native-computation
+axioms. Finite certificate evaluation uses kernel reduction.
 
-After intentionally editing proof sources, run `python3 tools/check.py --record`
-to refresh the manifest only after all checks pass. For a direct axiom report:
+After intentionally changing proof sources, run `python3 tools/check.py --record`
+to refresh the manifest only after success. For a direct dependency report:
 
 ```sh
-lake env lean Audit.lean
+lake env lean --memory=8192 --threads=1 Audit.lean
 ```
 
-## Coq reference and remaining obligations
+The [tools guide](tools/README.md) explains regeneration. No logs, binary build
+artifacts, or caches belong in Git.
 
-The architecture draws on [Jeff's Coq verification](https://github.com/jeff87654/busy-beaver/tree/4590f221f53151f2b7ca4e7895f1080197ec05c3/ZF/verify),
-pinned in [the reference manifest](../reference/coq-verification.json). Its
-393-state theorem connects Wade's machine to a Tarski-style calculus with
-Extensionality, Replacement, Powerset, Union and Infinity. The other checked
-machine directories in that reference likewise do not cover this repository's
-308-state ICS candidate. The Coq development is a reference for the proof layers;
-its theorems are not imported as Lean axioms, and it has not been rebuilt here.
-No Coq source files are vendored.
+## Reference and remaining mathematical scope
 
-To finish the stronger result, the remaining work is:
+The register/tape decomposition draws on
+[Jeffrey Ketchersid’s Coq verification](https://github.com/jeff87654/busy-beaver/tree/4590f221f53151f2b7ca4e7895f1080197ec05c3/ZF/verify),
+pinned in [the reference manifest](../reference/coq-verification.json). That
+reference verifies other machines and a different source calculus; it is not
+an imported theorem or build dependency. No Coq source files are vendored.
 
-1. Relate the actual optimized register program to this source interpreter,
-   including arithmetic sharing, clause selection and the final instruction DAG.
-2. Verify the tape backend, bootstrap, register-file separation and all halting
-   cases for unbounded execution; compose that with the source theorem to prove
-   `MachineCorrect`.
-3. Connect the explicit numeric source calculus to a conventional presentation
-   of the intended ICS theory and formalize the mathematical bridge to ZF.
-4. State the metatheoretic assumptions needed for any independence conclusion.
-
-Successful builds currently establish the source theorem and listed components,
-not those four remaining obligations.
+The remaining mathematical work is to relate the exact numeric source calculus
+to conventional ICS/ZF derivability and then state and prove an independence
+result under explicit metatheoretic assumptions. The binary tape-to-source
+implementation is fully covered by the headline theorem.

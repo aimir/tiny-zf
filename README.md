@@ -2,9 +2,9 @@
 
 **Current experimental candidate: 308 states — 84 fewer than our 392-state baseline (21.4% smaller).**
 
-**Lean now proves correctness of the unbounded numeric source enumerator and
-several component contracts. The full 308-state tape-machine theorem and the
-connection to conventional ZF remain unproved.** Start with the
+**Lean formally verifies the literal 308-state machine: it halts on blank tape
+if and only if the independently defined numeric source calculus proves code 1.
+The source calculus’s connection to conventional ZF remains unproved.** Start with the
 [headline Lean theorem](formal/TinyZF.lean) and [formal verification guide](formal/README.md).
 
 The candidate combines the corrected ICS axiom formulation with Wade's compiler,
@@ -21,28 +21,30 @@ It uses **10 active registers** and **65 framework + 243 instruction-DAG states*
 
 This is a reproducible experimental machine, **not a formally verified
 ZF-independence result**. The [Lean development](formal/README.md) separates the
-proved source theorem from the remaining source-to-tape simulation and the ICS
-theory's claimed equiconsistency with ZF.
+proved binary-tape-to-source equivalence from the ICS theory’s claimed
+equiconsistency with ZF.
 
 ## Results and artifacts
 
 | Machine | States | Artifact and scope |
 | --- | ---: | --- |
-| Current ICS candidate | **308** | [Table](candidates/ics-best.tm), [configuration and hashes](candidates/ics-best.json), [instruction tree](candidates/ics-tree.json). Changed axiomatization and formula coding; computational checks. |
+| Current ICS candidate | **308** | [Table](candidates/ics-best.tm), [configuration and hashes](candidates/ics-best.json), [instruction tree](candidates/ics-tree.json). Lean-verified tape-to-source equivalence; changed axiomatization and formula coding. |
 | Conservative baseline | 392 | [Table](candidates/best.tm), [configuration](candidates/best.json). Same distinct axiom clauses as Wade's source, deduplicated and reordered. |
 | Pinned Wade reference | 393 | [Unmodified source/table](vendor/wade/), [provenance](reference/upstream.json). Reproduced transition for transition. |
 
 | Lean result | Scope |
 | --- | --- |
+| Binary tape to source calculus | Exact blank-tape halting iff `Source.Provable 1`; bootstrap, unbounded register/tape invariants, graph optimization, arithmetic, decoding, and clause execution are proved. |
 | Source enumerator correctness | Finds target code 1 iff the explicit numeric source calculus derives 1; arbitrary execution lengths and parameter values. |
 | Formula coding and interpretation | Cantor inverses, injective formula encoding, total decoding of malformed inputs, and semantic soundness in source models. |
 | Selected formula rewrites | All five protected choices preserve first-order truth in every domain and valuation. |
 | Decoder allocation | The exact 16-operation arithmetic plan places all four fields correctly and preserves the counter and theorem stack. |
-| Literal machine | All 308 states and transitions are imported and checked against the saved table; the tape simulation theorem is still open. |
+| Literal machine | The exact 308-state table is imported, identity-checked, and used by the end-to-end proof. |
 
-The headline is `TinyZF.source_enumerator_correct`. It is not the stronger
-`TinyZF.MachineCorrect` goal. [The proof guide](formal/README.md) makes the
-distinction explicit; no missing compiler or theory bridge is assumed as an axiom.
+The headline is `TinyZF.machine_correct : Machine308.Halts ↔ Source.Provable 1`.
+[The proof guide](formal/README.md) describes its complete implementation chain.
+Compiler correctness is proved for this literal artifact; no compiler or theory
+bridge is assumed as an axiom.
 
 The upstream README prose still says 410, while its latest pinned table has 393.
 The originally linked 2025 commit has 432 states and predates a correctness fix.
@@ -92,8 +94,8 @@ python3 tools/check.py
 ```
 
 The acceptance check verifies the exact imports, the headline theorem type,
-principal axiom dependencies and recorded source hashes. Its success message
-explicitly excludes the unproved full tape-machine and ZF-independence claims.
+principal axiom dependencies and all recorded proof-source hashes. It accepts
+the full tape-machine theorem while explicitly excluding a ZF-independence claim.
 Lean and mathlib are pinned. [Build details](formal/README.md#run-verification).
 
 For the computational checks below, use Python 3.10 or newer from the repository
@@ -169,7 +171,7 @@ belong in Git. Raw logs, archives, caches and search frontiers are excluded.
 ## Release and citation
 
 The [v0.2.0-experimental release](https://github.com/aimir/tiny-zf/releases/tag/v0.2.0-experimental)
-collects the 308-state candidate, partial Lean formalization, conservative baseline,
+collects the 308-state candidate, its Lean implementation proof, conservative baseline,
 pinned upstream sources and reproduction tools.
 [CI](https://github.com/aimir/tiny-zf/actions/workflows/verify.yml) checks the Lean
 development, exact imports, axiom dependencies, computational verifiers and
