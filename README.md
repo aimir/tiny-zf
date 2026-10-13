@@ -133,3 +133,13 @@ The corrected ICS formula source carries its [MIT license](vendor/cats/LICENSE).
 Local reduction algorithms are adapted from our Riemann workspace at `c05cef7`.
 Only source, small text tables, curated configurations/results and documentation
 belong in Git. Raw logs, archives, caches and search frontiers are excluded.
+
+## Release and citation
+
+The [v0.1.0-experimental release](https://github.com/aimir/tiny-zf/releases/tag/v0.1.0-experimental)
+collects the 308-state candidate, conservative baseline, pinned upstream sources
+and reproduction tools. [CI](https://github.com/aimir/tiny-zf/actions/workflows/verify.yml)
+runs the computational verifiers and regression tests; it does not certify
+ZF independence. [CITATION.cff](CITATION.cff) provides release metadata. Please
+also credit the upstream work recorded in the provenance manifests and source
+survey.
