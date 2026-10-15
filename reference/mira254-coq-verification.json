@@ -1,0 +1,17 @@
+{
+  "upstream_commit": "297ab8df7e5de329605c3875b4934643b371a5e3",
+  "machine_sha256": "d655ce2cf8cccebd21caa21a49f0f9f010960a44b95c17aae6cc425c518954eb",
+  "working_states": 254,
+  "prover": "The Coq Proof Assistant, version 8.20.1\ncompiled with OCaml 4.14.1",
+  "clean_source_rebuild": true,
+  "theorems": [
+    "zf254_halts_iff_ZF",
+    "zf254_halts_iff_ZFC",
+    "zf254_halts_iff_SIR"
+  ],
+  "closed_under_global_context": 3,
+  "check_pass": true,
+  "checked_date": "2026-10-15",
+  "elapsed_seconds": 665,
+  "scope": "Mira-Cult's upstream machine; not a new reduction or a Lean theorem"
+}

@@ -3,7 +3,9 @@
 **Current experimental candidate: 308 states — 84 fewer than our 392-state baseline (21.4% smaller).**
 
 **External benchmark: Mira-Cult's 254-state machine, with an end-to-end ZFC
-inconsistency proof in Jeffrey Ketchersid's Coq development.** Our
+inconsistency proof in Jeffrey Ketchersid's Coq development.** We have
+[rebuilt that complete proof from source](formal/coq/README.md), with all three
+headline theorems closed under the global context. Our
 [comparison and combined experiments](docs/MIRA254.md) reproduce the architectural
 savings and improve one register-program tree, but establish no machine below 254.
 

@@ -70,3 +70,6 @@ instruction-tree tests use all settings from the current candidate.
 Exact artifact reproduction and finite tape simulation are separately checked by
 `python3 tools/verify_ics.py` and `python3 tools/verify.py`. These commands do not
 establish end-to-end formal equivalence with ZF.
+
+`test_mira_coq.py` checks that the external Coq acceptance wrapper rejects
+failed, incomplete, axiom-bearing, or malformed success reports.

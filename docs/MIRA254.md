@@ -22,10 +22,12 @@ The table's SHA-256 is
 `d655ce2cf8cccebd21caa21a49f0f9f010960a44b95c17aae6cc425c518954eb`.
 
 We reproduced all 8,391 instruction cases in the upstream Python symbolic
-executor: 8,387 ordinary returns, three counter overflows and one halt. This
-does not mean we rebuilt its Coq proof. The Python model uses register-operation
-contracts; the published Coq development proves those contracts and the complete
-machine theorem. The comparison tool distinguishes these scopes.
+executor: 8,387 ordinary returns, three counter overflows and one halt. The
+Python check uses register-operation contracts. We also completed a separate
+clean build of the entire upstream Coq development: all three headline theorems
+report `Closed under the global context`. See the [Coq verification guide](../formal/coq/README.md)
+and [compact build record](../reference/mira254-coq-verification.json). The Coq
+proof establishes those register contracts and the complete machine theorem.
 
 ## Where the reduction comes from
 

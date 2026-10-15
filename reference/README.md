@@ -51,3 +51,7 @@ machine. They do not exercise an unbounded proof search or prove tape separation
 These add to the initial survey experiments above. Full generation traces and
 beam frontiers are intentionally absent. Use `python3 tools/experiment.py ID` to
 replay a run; see [the experiment report](../docs/EXPERIMENTS.md).
+
+`mira254-coq-verification.json` records the successful clean Coq 8.20.1 build
+of the pinned external 254-state machine's full ZF/ZFC equivalence.
+See [the reproduction guide](../formal/coq/README.md).

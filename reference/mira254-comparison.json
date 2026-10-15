@@ -143,5 +143,6 @@
   },
   "regression_tests": 99,
   "new_sub254_machine_established": false,
-  "upstream_coq_rebuilt_locally": false
+  "upstream_coq_rebuilt_locally": true,
+  "upstream_coq_verification": "mira254-coq-verification.json"
 }
