@@ -103,6 +103,11 @@ artifacts, or caches belong in Git.
 
 ## Reference and remaining mathematical scope
 
+The separate [Coq acceptance workflow](coq/README.md) checks the Mira-based
+254-state construction through conventional ZF and ZFC inconsistency. Its
+literal table and source calculus differ from this directory's 308-state Lean
+headline. The Coq result does not fill the ICS-to-ZF gap for the Lean machine.
+
 The register/tape decomposition draws on
 [Jeffrey Ketchersid’s Coq verification](https://github.com/jeff87654/busy-beaver/tree/4590f221f53151f2b7ca4e7895f1080197ec05c3/ZF/verify),
 pinned in [the reference manifest](../reference/coq-verification.json). That

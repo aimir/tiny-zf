@@ -3,7 +3,8 @@
 Compared 15 October 2026 against
 [busy-beaver commit 297ab8d](https://github.com/jeff87654/busy-beaver/tree/297ab8df7e5de329605c3875b4934643b371a5e3/ZF/m254).
 **No machine smaller than 254 states was established in this experiment.**
-The retained improvement is a register-program tree, not a new record TM.
+The retained program-tree changes now include a native 254-state variant with
+a complete Coq proof. This matches the reference size, rather than improving it.
 
 ## Attribution and verification
 
@@ -91,8 +92,9 @@ checks 3,863 related increment segments and their decrement/exit continuations.
 
 The [retained tree](../reference/mira254-tree202.json) and
 [measured results](../reference/mira254-comparison.json) are small text artifacts.
-They have no new Lean or Coq proof. They do not replace `ics-best.tm`, the Lean
-headline, or the external 254-state record.
+That older saved layout has no new Lean or Coq proof. It is distinct from the
+202-node tree of the native variant below. Neither replaces `ics-best.tm` or
+changes the scope of the 308-state Lean headline.
 
 ### Rejected 253-state transplant
 
@@ -112,6 +114,34 @@ instruction site 894 decrements `topwff`, with all twenty physical registers
 initially zero. After 588 tape steps the modified interpreter returns with the
 wrong program counter. This disproves the instruction contract; it does not by
 itself settle the modified table's halting behavior from blank tape.
+
+### Repaired native variant and its proof
+
+The failed transplant also redirects a backtracking path through states 218
+and 154. Its use of state 178 depends on the old layout. A separate copy of
+state 154 preserves that path: its zero edge uses state 206, whose zero edge
+supplies the behavior formerly obtained from 178. Ordinary dispatch can then
+use the rotated tree. Removing 208 and adding this context-specific state
+leaves **254 states**.
+
+The [native compiler](../tools/mira_native.py) reproduces this repair. It writes
+the table and its exact matching tree together, with hashes. The public
+[table](../candidates/mira254-rotation.tm) is the densely renumbered table
+checked by Coq; its [tree](../candidates/mira254-rotation.tree.json) has 202
+shared nodes. All 8,391 symbolic cases pass. Blank-tape execution reaches the
+full prescribed initial tape after 264,982 steps.
+
+The [candidate proof driver](../formal/coq/candidate.py) regenerates the decoder
+and a 3,009-entry bisimulation certificate against the unchanged 219-node source.
+Coq checks both directions of that certificate and the entire tape-to-ZF/ZFC
+proof. All three headline theorems are closed; the
+[record](../reference/mira254-rotation-coq.json) identifies the exact table and
+tree. See [how to rebuild](../formal/coq/README.md#verify-a-changed-machine).
+
+The proof check also caught an actual integration error during development:
+the older saved 202-node tree was initially paired with this new table. That
+combination fails 136 symbolic cases and Coq's instruction-site theorem. The
+successful record is for the exact matching tree linked above.
 
 ## Reproduce
 
@@ -146,10 +176,9 @@ The failed five-tag and native-operation experiments did not establish that this
 architecture was exhausted. This was a limitation of the search space, not
 evidence that 308 was near an optimum.
 
-The next useful implementation is a compiler for their single-marker backend
-that records where each contextual fold is valid. Reassociation would then
-recheck or undo affected folds and score the actual final table. Multiple
-source/tree candidates should survive until that score is available. The retained
-202-node tree is a concrete test case: the backend must compile it below 254
-with all instruction/boot checks passing, or account for the extra states needed
-to restore correctness. A smaller register tree alone is not enough.
+The native compiler and candidate proof driver now support that next step.
+Reassociation must recheck or undo contextual sharing and score the actual
+final table. Multiple checked layouts are retained for further merging.
+The repaired variant accounts for the extra state needed by one such rewrite;
+a smaller register tree alone is not enough. Further search continues toward
+a machine below 254, with full formal acceptance required for each result.

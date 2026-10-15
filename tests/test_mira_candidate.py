@@ -1,0 +1,98 @@
+"""Acceptance boundaries for replacing the formally checked binary tape machine."""
+import importlib.util
+from pathlib import Path
+import tempfile
+from types import SimpleNamespace
+import unittest
+from unittest.mock import patch
+
+
+spec = importlib.util.spec_from_file_location(
+    "mira_candidate", Path(__file__).resolve().parents[1] / "formal/coq/candidate.py")
+candidate = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(candidate)
+
+
+def boot_writer(stray=False):
+    """A transparent fixture writing the specified tape then moving to dispatch."""
+    bits = [1] + [0] * 62 + [1]
+    for value in [0] * 6 + [2] + [0] * 138:
+        bits.extend([0] + [1] * (value + 1))
+    if stray:
+        bits.extend([0, 0, 1])
+    rows = {}
+    for i, bit in enumerate(bits):
+        state = "0" if i == 0 else f"write{i}"
+        target = f"write{i + 1}" if i + 1 < len(bits) else f"back{i - 1}"
+        for read in (0, 1):
+            rows[state, read] = bit, "R" if i + 1 < len(bits) else "L", target
+    for i in range(len(bits) - 2, 1, -1):
+        for read in (0, 1):
+            rows[f"back{i}", read] = read, "L", "96" if i == 2 else f"back{i - 1}"
+    for read in (0, 1):
+        rows["96", read] = read, "R", "96"
+    return rows, len(bits) * 2 - 3
+
+
+class CandidateAcceptance(unittest.TestCase):
+    def test_strict_table_parser(self):
+        valid = "#! start 0\n0 0 1 R 96\n0 1 0 L 254\n96 0 0 L 0\n96 1 1 R 96\n"
+        self.assertEqual(len(candidate.parse_table(valid)), 4)
+        self.assertEqual(candidate.parse_table(valid + "#! fill 0\n"), candidate.parse_table(valid))
+        for broken in (valid + "0 0 0 R 0\n", valid.replace("96 1 1 R 96\n", ""),
+                       valid.replace("0 L 254", "0 L unknown"),
+                       valid.replace("0 L 254", "0 L halt"),
+                       valid.replace("#! start 0", "#! start 96"),
+                       valid + "#! fill 1\n", valid + "#! tape 1001\n",
+                       valid + "#! fill 0\n#! fill 0\n"):
+            with self.subTest(broken=broken), self.assertRaises(ValueError):
+                candidate.parse_table(broken)
+
+    def test_canonical_mapping_preserves_machine_and_kernel(self):
+        states = [str(q) for q in candidate.ANCHORS] + [f"program{i}" for i in range(110)]
+        rows = {(q, b): (b, "R" if b else "L", states[(i + b + 1) % len(states)])
+                for i, q in enumerate(states) for b in (0, 1)}
+        rows["0", 1] = 1, "R", "254"
+        table, mapping = candidate.canonicalize(rows)
+        self.assertEqual(set(q for q, _ in table), set(range(len(states))))
+        self.assertEqual(mapping["254"], len(states))
+        for q in candidate.ANCHORS:
+            self.assertEqual(mapping[str(q)], q)
+        for (q, b), (w, d, target) in rows.items():
+            self.assertEqual(table[mapping[q], b], (w, d, mapping[target]))
+
+    def test_bootstrap_checks_entire_tape_and_fuel(self):
+        rows, steps = boot_writer()
+        self.assertEqual(candidate.bootstrap(rows, steps), steps)
+        with self.assertRaises(ValueError):
+            candidate.bootstrap(rows, steps - 1)
+        broken, broken_steps = boot_writer(stray=True)
+        with self.assertRaises(ValueError):
+            candidate.bootstrap(broken, broken_steps)
+
+    def test_dirty_dependency_closure_always_rebuilds_headline(self):
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name).resolve()
+            source_dir = root / "coq"
+            source_dir.mkdir()
+            base, changed, child, top = [source_dir / f"{s}.v" for s in ("Base", "Table", "Sim", "End")]
+            for source in (base, changed, child, top):
+                source.write_text("(* fixture *)\n")
+                source.with_suffix(".vo").touch()
+            edges = {base: [], changed: [], child: [base, changed], top: [child]}
+            checker = SimpleNamespace(
+                HERE=root, ZF=root, TOP=top, UNDEC=root / "unused", ROOTS={}, WARN=[], LIBFLAGS=[],
+                closure=lambda roots, top: [base, changed, child, top],
+                deps=lambda roots, source: edges[source], strip_comments=lambda text: "")
+            success = SimpleNamespace(returncode=0, stdout="Closed under the global context\n" * 3, stderr="")
+            with patch.object(candidate.subprocess, "run", return_value=success) as compiler:
+                alias = source_dir / ".." / "coq" / "Table.v"
+                self.assertEqual(candidate.compile_closure(checker, "coqc", {alias}, True), 3)
+                self.assertEqual([Path(c.args[0][-1]).name for c in compiler.call_args_list],
+                                 ["Table.v", "Sim.v", "End.v"])
+            with patch.object(candidate.subprocess, "run", return_value=success), self.assertRaises(ValueError):
+                candidate.compile_closure(checker, "coqc", set(), True)
+
+
+if __name__ == "__main__":
+    unittest.main()

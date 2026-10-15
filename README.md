@@ -1,13 +1,19 @@
 # Smaller ZF proof-search Turing machines
 
-**Current experimental candidate: 308 states — 84 fewer than our 392-state baseline (21.4% smaller).**
+**Formally checked Mira-based variant: 254 states, with a complete Coq proof
+that it halts on blank tape exactly when ZF or ZFC is inconsistent.**
+The [literal table](candidates/mira254-rotation.tm),
+[matching program tree](candidates/mira254-rotation.tree.json), and
+[verification instructions](formal/coq/README.md#verify-a-changed-machine) are included.
+This matches Mira-Cult's state count; it is not a smaller record.
 
 **External benchmark: Mira-Cult's 254-state machine, with an end-to-end ZFC
 inconsistency proof in Jeffrey Ketchersid's Coq development.** We have
 [rebuilt that complete proof from source](formal/coq/README.md), with all three
 headline theorems closed under the global context. Our
 [comparison and combined experiments](docs/MIRA254.md) reproduce the architectural
-savings and improve one register-program tree, but establish no machine below 254.
+savings and compile a smaller register-program tree into an independently
+checked 254-state variant. No machine below 254 has been established here.
 
 **Lean formally verifies the literal 308-state machine: it halts on blank tape
 if and only if the independently defined numeric source calculus proves code 1.
@@ -35,6 +41,7 @@ equiconsistency with ZF.
 
 | Machine | States | Artifact and scope |
 | --- | ---: | --- |
+| Mira-based tree variant | **254** | [Table](candidates/mira254-rotation.tm), [tree](candidates/mira254-rotation.tree.json), [Coq record](reference/mira254-rotation-coq.json). Complete blank-tape halting equivalence to ZF/ZFC inconsistency; equals the external record. |
 | Mira-Cult / external benchmark | **254** | [Upstream table and Coq proof](https://github.com/jeff87654/busy-beaver/tree/297ab8df7e5de329605c3875b4934643b371a5e3/ZF/m254); [local comparison](docs/MIRA254.md). Not the machine of this repository's Lean headline. |
 | Current ICS candidate | **308** | [Table](candidates/ics-best.tm), [configuration and hashes](candidates/ics-best.json), [instruction tree](candidates/ics-tree.json). Lean-verified tape-to-source equivalence; changed axiomatization and formula coding. |
 | Conservative baseline | 392 | [Table](candidates/best.tm), [configuration](candidates/best.json). Same distinct axiom clauses as Wade's source, deduplicated and reordered. |
@@ -124,7 +131,7 @@ audits decoder register allocation, checks **1,000 decoder boundaries**, and
 simulates one million literal tape steps. It also compares all ten registers
 at **512 decrement boundaries** against the pre-tree source, covering about
 12.8 million tape steps per machine. The second checks the conservative 392/393 pair.
-The regression suite has **99 tests**, including checks for the external-program importer and separate dyadic pairing
+The regression suite includes checks for the external-program importer, Coq acceptance and separate dyadic pairing
 experiments. These checks do not establish end-to-end
 halting equivalence or the mathematical equivalence of the axiom systems.
 [Verification scope](docs/VERIFICATION.md) states the remaining obligations.

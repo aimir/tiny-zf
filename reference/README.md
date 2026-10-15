@@ -55,3 +55,10 @@ replay a run; see [the experiment report](../docs/EXPERIMENTS.md).
 `mira254-coq-verification.json` records the successful clean Coq 8.20.1 build
 of the pinned external 254-state machine's full ZF/ZFC equivalence.
 See [the reproduction guide](../formal/coq/README.md).
+
+`mira254-rotation-coq.json` records the complete Coq verification of the
+[254-state native variant](../candidates/mira254-rotation.tm). Its canonical
+machine and instruction-tree hashes identify the committed artifacts. The
+initial named-table hash identifies the compiler output before renumbering.
+The build reused freshly checked upstream dependencies and recompiled all
+affected modules. [Rebuild instructions](../formal/coq/README.md).

@@ -73,3 +73,8 @@ establish end-to-end formal equivalence with ZF.
 
 `test_mira_coq.py` checks that the external Coq acceptance wrapper rejects
 failed, incomplete, axiom-bearing, or malformed success reports.
+
+`test_mira_candidate.py` checks strict table parsing, preservation under
+canonical state renumbering, exact bootstrap tapes including distant garbage,
+and propagation of changed proof modules through to the final theorem audit.
+These regression tests complement the actual Coq build; they do not replace it.

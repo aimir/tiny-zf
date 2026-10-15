@@ -48,3 +48,58 @@ the pinned upstream repository supplies the proofs and their dependencies.
 The comparison and ongoing optimization work are documented in
 [MIRA254.md](../../docs/MIRA254.md). A changed table still needs its own proof:
 this successful reference build does not certify a candidate mutation.
+
+## Verify a changed machine
+
+The [254-state tree variant](../../candidates/mira254-rotation.tm) has also
+passed the complete proof with its own literal transition table and
+[exact decoder tree](../../candidates/mira254-rotation.tree.json). Its
+[verification record](../../reference/mira254-rotation-coq.json) reports all
+three endpoints closed. It changes the decoder layout while preserving the
+same source interpreter and set theory. Its size equals the upstream record.
+
+After obtaining the pinned checkout above, run from this repository:
+
+```sh
+python3 formal/coq/candidate.py --upstream /tmp/zf-reference --coqc coqc \
+  --table candidates/mira254-rotation.tm \
+  --tree candidates/mira254-rotation.tree.json \
+  --output scratch/rotation-proof
+```
+
+The output directory must be new. By default this copies the pinned sources
+and rebuilds their entire dependency closure, excluding existing compiled
+objects. The checked table is written to `scratch/rotation-proof/candidate.tm`;
+its bytes must match the committed table. The original upstream files stay
+unchanged. To reproduce the named compiler output as well:
+
+```sh
+python3 tools/mira_native.py --upstream /tmp/zf-reference \
+  --backend contextual --rotate --output scratch/rotation.tm
+python3 formal/coq/candidate.py --upstream /tmp/zf-reference --coqc coqc \
+  --table scratch/rotation.tm --tree scratch/rotation.tree.json \
+  --output scratch/generated-rotation-proof
+```
+
+The driver checks the complete blank-tape bootstrap, including every trailing
+register, and renumbers states while preserving the identities referenced by
+proof lemmas. It generates the decoder definition and a two-way bisimulation
+certificate against the unchanged source program. Coq checks the register
+excursions, every instruction site, whole-run simulation, the source certificate,
+and the complete connection to ZF/ZFC. Neither Python's symbolic executor nor
+the generator is an assumed compiler-correctness theorem.
+
+The recorded run reused objects from a freshly rebuilt upstream proof and
+recompiled all 15 affected modules, including the three final assumption
+audits. `--reuse-upstream-build` enables that faster mode; the default performs
+a full source rebuild. The record contains both the generated named-table hash
+and `canonical_machine_sha256`, which identifies the committed literal table.
+The `zf254_*` theorem names are inherited from the pinned proof; their machine
+definition is replaced by the candidate's exact table.
+
+Always pair a machine with its matching tree. The older
+`reference/mira254-tree202.json` is a different 202-node layout: pairing it with
+this table fails Coq's instruction check. A failed build writes no verification
+record. The independent backend in `mira_native.py` also supplies an explicit
+compiler and six search transformations; its symbolic results alone are not
+formal acceptance.

@@ -283,3 +283,12 @@ search reserves native-Cantor slots for emitted kernels, not configuration flags
 Existing source searches reject fused records when they cannot preserve them.
 The ordinary tree search and verifier retain fusion options. See
 [contracts, verification scope and recipes](../docs/UNPAIR.md).
+
+## Mira native backend
+
+`mira_native.py` emits a native single-marker decoder, or reproduces the
+contextually repaired 254-state rotation with `--backend contextual --rotate`.
+It writes a matching tree and hashes alongside the table, and screens every
+symbolic instruction case. Full acceptance uses
+[`formal/coq/candidate.py`](../formal/coq/candidate.py), which rebuilds the
+Coq machine-to-ZF/ZFC theorem. See [the complete workflow](../formal/coq/README.md).
