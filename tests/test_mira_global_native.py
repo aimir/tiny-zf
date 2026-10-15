@@ -119,6 +119,29 @@ class NativeSymbolicTests(unittest.TestCase):
         self.assertEqual(engine.add_case(case),engine.add_case(fresh))
         self.assertEqual(engine.add_case(case),engine.add_case(case))
 
+    def test_cache_eviction_preserves_results_and_read_traces(self):
+        engine=Engine(self.library,max_cases=2)
+        try:
+            engine.configure(self.python.table)
+            # Revisit evicted objects and content-equal fresh tuples. The table
+            # remains configured throughout automatic C-context replacement.
+            for i in [0,1,2,0,3,2,1,4,0]:
+                case=self.python.cases[i]
+                fresh=(list(case[0]),case[1],case[2],case[3])
+                trace=(ctypes.c_uint8*(2*engine.n))()
+                self.assertTrue(engine.run_case(fresh,trace))
+                seen={(engine.names[k//2],k%2)for k,v in enumerate(trace)if v}
+                self.assertEqual(seen,{k for k,v in self.python.by_edge.items()if i in v})
+                self.assertLessEqual(len(engine.cache),2)
+            invalid=self.python.table.copy();invalid['96',0]=(0,'R','254')
+            engine.configure(invalid)
+            for i in range(6):
+                old=self.python.ns['T'];self.python.ns['T']=invalid
+                try:expected=bool(self.python.run_case(i))
+                finally:self.python.ns['T']=old
+                self.assertEqual(engine.run_case(self.python.cases[i]),expected)
+        finally:engine.close()
+
     def test_bootstrap_root_classification(self):
         root=bootstrap_root(self.python.table)
         self.assertEqual(root['status'],'unproved_root')

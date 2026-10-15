@@ -7,7 +7,10 @@ from mira_global import SKIP,state_key
 
 class Engine:
     """Cache symbolic cases and evaluate arbitrary table/case subsets in C++."""
-    def __init__(self,library):
+    def __init__(self,library,max_cases=32768):
+        if type(max_cases) is not int or max_cases<1:
+            raise ValueError('max_cases must be a positive integer')
+        self.max_cases=max_cases
         self.lib=ctypes.CDLL(str(Path(library).resolve()))
         self.lib.mira_context_new.restype=ctypes.c_void_p
         self.lib.mira_context_delete.argtypes=[ctypes.c_void_p]
@@ -22,6 +25,12 @@ class Engine:
 
     def close(self):
         if self.context:self.lib.mira_context_delete(self.context);self.context=None
+        self.cache.clear();self.identity.clear()
+
+    def clear_cases(self):
+        """Release old layouts' Python/C++ cases; keep the configured machine."""
+        self.close()
+        self.context=self.lib.mira_context_new()
 
     def __del__(self):
         if getattr(self,'context',None):self.close()
@@ -36,6 +45,7 @@ class Engine:
             if len(self.identity)>=65536:self.identity.clear()
             self.identity[id(case)]=(case,index)
             return index
+        if len(self.cache)>=self.max_cases:self.clear_cases()
         pc=[];i=0
         while i<len(tape) and tape[i][0]=='b':pc.append(str(tape[i][1]));i+=1
         if (len(tape)!=i+3 or tape[i][:3]!=('r',0,1) or
@@ -75,8 +85,11 @@ class Engine:
             -1 if t=='254' else self.ids.get(t,-2)]
 
     def run_case(self,case,trace=None):
+        # add_case may replace the C context when its cache is full. Obtain the
+        # index before evaluating the context argument, avoiding a freed pointer.
+        index=self.add_case(case)
         return bool(self.lib.mira_run_case(self.context,self.buffer,self.n,self.skip,
-            self.fixed,self.add_case(case),2000,trace))
+            self.fixed,index,2000,trace))
 
     def check_cases(self,table,cases,indices=None):
         self.configure(table)
