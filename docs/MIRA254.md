@@ -1,14 +1,35 @@
-# From Mira's 254-state construction to a verified 253-state machine
+# From Mira's 254-state construction to a verified 252-state machine
 
 Compared 15 October 2026 against
 [busy-beaver commit 297ab8d](https://github.com/jeff87654/busy-beaver/tree/297ab8df7e5de329605c3875b4934643b371a5e3/ZF/m254).
-**The new forward-decrement machine has 253 states and a complete Coq proof of
+**The new local-carry machine has 252 states and a complete Coq proof of
 blank-tape halting equivalence to ZF/ZFC inconsistency.** Its
-[table](../candidates/mira253-forward.tm), [unchanged decoder tree](../candidates/mira253-forward.tree.json),
-and [proof record](../reference/mira253-forward-coq.json) are included. The
+[table](../candidates/mira252-local.tm), [unchanged decoder tree](../candidates/mira252-local.tree.json),
+and [proof record](../reference/mira252-local-coq.json) are included. The
 earlier decoder-layout experiment also produced a checked 254-state variant.
 
-## The 253-state reduction
+## The 252-state reduction
+
+The smallest proved machine uses a two-state positive-decrement loop. State
+112 fills the gap, and state 85 erases the next one. When that next cell is
+followed by another one, a three-step local swap moves the gap one cell farther
+right. The loop reaches each separator with exactly the register encoding
+required by the existing suffix-induction proof. A separate run-scanning state
+is unnecessary.
+
+Starting from the 253-state stream below, change `112:0` to `1 R 85`, `112:1`
+to `1 L 112`, `85:0` to `0 L 63`, and `85:1` to `0 R 112`, then remove state 97.
+The [local carry lemma](../formal/coq/local_decrement.v) proves this behavior
+for arbitrary run lengths. The complete Coq build checks all dependent proofs
+and all three ZF/ZFC/SIR endpoints. Exact blank-tape initialization takes
+**267,192 steps**. The program tree and source interpreter are unchanged.
+
+A bounded constraint search proposed the small transducer; independent kernel,
+instruction and bootstrap checks screened it before the unbounded Coq proof.
+The finite synthesis bounds are not part of the final theorem.
+[`mira_forward.py --mode local`](../tools/mira_forward.py) reproduces the table.
+
+## The 253-state block-streaming reduction
 
 The original positive-decrement routine scans to the end of the register file
 and shifts the suffix backward. The new routine moves the deleted-cell gap

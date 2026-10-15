@@ -24,6 +24,7 @@ ANCHORS = frozenset({0, 1, 2, 3, 4, 6, 28, 31, 38, 40, 43, 44, 48, 56,
                      59, 60, 63, 64, 69, 73, 75, 83, 85, 95, 96, 97, 109,
                      112, 131})
 FORWARD_ANCHORS = ANCHORS - {131}
+LOCAL_ANCHORS = FORWARD_ANCHORS - {97}
 BOOT_REGS = (0, 0, 0, 0, 0, 0, 2, 0, 0) + (0,) * 136
 
 
@@ -222,7 +223,7 @@ def install_min_gap(directory, minimum):
 def install_forward_decrement(directory):
     """Prove the streaming decrement kernel with a uniform return state 48.
 
-    Only this explicit mode drops state 131 from the canonicalization anchors.
+    The forward and local modes drop state 131 from the canonicalization anchors.
     Its replacement proof handles unbounded register values and arbitrary
     left context; all literal transitions and subsequent sites are checked by
     Coq. The source interpreter and the exact initial tape remain unchanged.
@@ -252,6 +253,29 @@ def install_forward_decrement(directory):
     return {path.resolve(), symbolic.resolve()}, [
         "positive decrement streams the gap rightward and returns in state 48 for every register",
         "forward-decrement proof fragment SHA256 " + hashlib.sha256(fragment.encode()).hexdigest()]
+
+
+def install_local_decrement(directory):
+    """Replace the forward block scan with a local erased-cell carry.
+
+    The block contract is identical: the carry moves right through each
+    register without changing its value. This permits removing state 97;
+    all remaining unbounded file and operation proofs are reused and rebuilt.
+    """
+    dirty, adjustments = install_forward_decrement(directory)
+    fragment = Path(__file__).with_name("local_decrement.v").read_text()
+    path = directory / "coq/tm/Box.v"
+    source = path.read_text()
+    marker = "Lemma forward_dec_block "
+    if source.count(marker) != 1:
+        raise ValueError("unexpected forward-decrement block proof")
+    start = source.index(marker)
+    end = source.index("Qed.", start) + len("Qed.")
+    path.write_text(source[:start] + fragment.rstrip() + source[end:])
+    adjustments.extend([
+        "positive decrement carries an erased cell by local swaps, eliminating state 97",
+        "local-decrement proof fragment SHA256 " + hashlib.sha256(fragment.encode()).hexdigest()])
+    return dirty, adjustments
 
 
 def compile_closure(checker, coqc, dirty, reuse):
@@ -301,8 +325,8 @@ def main():
     parser.add_argument("--tree", type=Path,
                         help="optional decoder tree JSON; also proves equivalence to the pinned source")
     parser.add_argument("--halt", default="254")
-    parser.add_argument("--decrement-mode", choices=("reverse", "forward"), default="reverse",
-                        help="register kernel proof: original reverse shift or proved forward stream")
+    parser.add_argument("--decrement-mode", choices=("reverse", "forward", "local"), default="reverse",
+                        help="register kernel proof: reverse shift, forward stream, or local carry")
     parser.add_argument("--coqc", default=os.environ.get("COQC", "coqc"))
     parser.add_argument("--bootstrap-limit", type=int, default=2_000_000)
     parser.add_argument("--min-gap", type=int, choices=(40, 62), default=62,
@@ -322,7 +346,8 @@ def main():
     input_bytes = args.table.read_bytes()
     rows = parse_table(input_bytes.decode(), args.halt)
     steps = bootstrap(rows, args.bootstrap_limit)
-    anchors = FORWARD_ANCHORS if args.decrement_mode == "forward" else ANCHORS
+    anchors = {"reverse": ANCHORS, "forward": FORWARD_ANCHORS,
+               "local": LOCAL_ANCHORS}[args.decrement_mode]
     canonical, mapping = canonicalize(rows, args.halt, anchors)
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
@@ -348,8 +373,10 @@ def main():
         dirty.update(tree_dirty)
     box_dirty, proof_adjustments = adapt_skip_lemma(directory, canonical)
     dirty.update(box_dirty)
-    if args.decrement_mode == "forward":
-        forward_dirty, forward_adjustments = install_forward_decrement(directory)
+    if args.decrement_mode in ("forward", "local"):
+        installer = (install_local_decrement if args.decrement_mode == "local"
+                     else install_forward_decrement)
+        forward_dirty, forward_adjustments = installer(directory)
         dirty.update(forward_dirty)
         proof_adjustments.extend(forward_adjustments)
     gap_dirty, gap_adjustments = install_min_gap(directory, args.min_gap)

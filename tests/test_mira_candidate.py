@@ -81,6 +81,19 @@ class CandidateAcceptance(unittest.TestCase):
         for q in candidate.FORWARD_ANCHORS:
             self.assertEqual(mapping[str(q)], q)
 
+    def test_removed_scan_state_requires_local_carry_proof_mode(self):
+        states = [str(q) for q in candidate.LOCAL_ANCHORS] + [f"program{i}" for i in range(110)]
+        rows = {(q, b): (b, "R", "0") for q in states for b in (0, 1)}
+        for anchors in (candidate.ANCHORS, candidate.FORWARD_ANCHORS):
+            with self.subTest(anchors=anchors), self.assertRaises(ValueError):
+                candidate.canonicalize(rows, anchors=anchors)
+        table, mapping = candidate.canonicalize(rows, anchors=candidate.LOCAL_ANCHORS)
+        self.assertNotIn("131", mapping)
+        self.assertNotIn("97", mapping)
+        self.assertEqual(len(table), len(rows))
+        for q in candidate.LOCAL_ANCHORS:
+            self.assertEqual(mapping[str(q)], q)
+
     def test_forward_mode_replaces_kernel_and_symbolic_contract_together(self):
         with tempfile.TemporaryDirectory() as name:
             directory = Path(name)
@@ -106,6 +119,31 @@ class CandidateAcceptance(unittest.TestCase):
             self.assertEqual(len(adjustments), 2)
             with self.assertRaises(ValueError):
                 candidate.install_forward_decrement(directory)
+
+    def test_local_mode_preserves_file_contract_and_replaces_only_block_proof(self):
+        with tempfile.TemporaryDirectory() as name:
+            directory = Path(name)
+            tm = directory / "coq/tm"
+            tm.mkdir(parents=True)
+            box = tm / "Box.v"
+            symbolic = tm / "SymExec.v"
+            box.write_text(
+                "(** ** Positive decrement: shifting the later blocks left *)\n"
+                "old reverse helpers\n(** ** The four excursions *)\n"
+                "other operation contracts\nLemma box_decp old_contract.\n"
+                "(** No axioms: *)\nPrint Assumptions box_decp.\n")
+            symbolic.write_text("Definition decp_exit (r : nat) : nat := if Nat.eqb r 0 then 63 else 48.\n")
+            dirty, adjustments = candidate.install_local_decrement(directory)
+            self.assertEqual(dirty, {box.resolve(), symbolic.resolve()})
+            installed = box.read_text()
+            self.assertEqual(installed.count("Lemma forward_dec_block "), 1)
+            self.assertEqual(installed.count("Lemma local_dec_ones "), 1)
+            self.assertIn("Lemma forward_dec rest K", installed)
+            self.assertIn("Lemma box_decp ", installed)
+            self.assertIn("other operation contracts", installed)
+            self.assertIn("Print Assumptions box_decp.", installed)
+            self.assertEqual(symbolic.read_text(), "Definition decp_exit (r : nat) : nat := 48.\n")
+            self.assertEqual(len(adjustments), 4)
 
     def test_dirty_dependency_closure_always_rebuilds_headline(self):
         with tempfile.TemporaryDirectory() as name:

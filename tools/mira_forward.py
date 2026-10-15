@@ -1,4 +1,4 @@
-"""Reproduce the Coq-verified 253-state forward-decrement machine.
+"""Reproduce the Coq-verified 252- and 253-state forward-decrement machines.
 
 The pinned 254-state machine supplies the decoder and source program. This
 construction changes the positive-decrement loop, shares its gap state, and
@@ -22,7 +22,7 @@ def acceptance_module():
     return module
 
 
-def build(checkout):
+def build(checkout, mode='forward'):
     """Return the canonical literal table and unchanged, validated decoder tree."""
     directory = checked_inputs(checkout)
     acceptance = acceptance_module()
@@ -38,7 +38,18 @@ def build(checkout):
     })
     rows = {(q, b): (w, d, '112' if target == '131' else target)
             for (q, b), (w, d, target) in rows.items() if q != '131'}
-    canonical, _ = acceptance.canonicalize(rows, anchors=acceptance.FORWARD_ANCHORS)
+    if mode == 'local':
+        # Swap the gap past one cell at a time. This needs two states instead
+        # of a separate run scanner, end test and gap state.
+        rows.update({('112', 0): (1, 'R', '85'), ('112', 1): (1, 'L', '112'),
+                     ('85', 0): (0, 'L', '63'), ('85', 1): (0, 'R', '112')})
+        rows = {key: edge for key, edge in rows.items() if key[0] != '97'}
+        anchors = acceptance.LOCAL_ANCHORS
+    elif mode == 'forward':
+        anchors = acceptance.FORWARD_ANCHORS
+    else:
+        raise ValueError('unknown decrement implementation')
+    canonical, _ = acceptance.canonicalize(rows, anchors=anchors)
     tree, root, _ = recover((directory / 'coq/tm/Prog254.v').read_text(), True)
     return acceptance.table_text(canonical), tree.export(root)
 
@@ -47,17 +58,22 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--upstream', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--mode', choices=('forward', 'local'), default='forward',
+                        help='253-state block stream or 252-state local gap carry')
     args = parser.parse_args()
-    table, tree = build(args.upstream)
+    table, tree = build(args.upstream, args.mode)
     tree_text = json.dumps(tree, indent=2) + '\n'
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(table)
     args.output.with_suffix('.tree.json').write_text(tree_text)
     print(json.dumps({
-        'working_states': 253, 'terminal': 253,
+        'working_states': 252 if args.mode == 'local' else 253,
+        'terminal': 252 if args.mode == 'local' else 253,
         'machine_sha256': hashlib.sha256(table.encode()).hexdigest(),
         'instruction_tree_sha256': hashlib.sha256(tree_text.encode()).hexdigest(),
-        'formal_verification': 'Run formal/coq/candidate.py with --halt 253 --decrement-mode forward',
+        'formal_verification': 'Run formal/coq/candidate.py with --halt '
+                               + ('252' if args.mode == 'local' else '253')
+                               + ' --decrement-mode ' + args.mode,
     }, indent=2))
 
 

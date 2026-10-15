@@ -3,6 +3,11 @@
 These are small, curated metadata files, not execution logs or exhaustive search
 traces. All final counts include the local reduction pipeline.
 
+[mira252-local-coq.json](mira252-local-coq.json) records the complete Coq proof
+of the 252-state local-carry machine, including both kernel proof fragments,
+the exact table and decoder tree, and all three closed ZF/ZFC/SIR endpoints.
+[Reproduction instructions](../formal/coq/README.md#verify-a-changed-machine).
+
 [mira253-forward-coq.json](mira253-forward-coq.json) records the complete Coq
 proof of the 253-state forward-decrement machine. It identifies the exact
 committed table, decoder tree, replacement kernel proof and pinned upstream

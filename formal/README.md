@@ -27,10 +27,10 @@ relationship to ZF, and the metatheoretic independence conclusion remain outside
 the proved statement. None is supplied as a hypothesis or an axiom.
 
 The separate [Coq verification guide](coq/README.md) reproduces the stronger
-end-to-end ZF/ZFC theorem for our **253-state forward-decrement machine**,
+end-to-end ZF/ZFC theorem for our **252-state local-carry decrement machine**,
 Mira-Cult's 254-state machine, and a matching-size decoder variant. The candidate
 proof establishes a 62-cell lower bound on program-counter capacity, proves the
-new streaming decrement kernel, and checks the exact table and decoder tree.
+new local-carry decrement kernel, and checks the exact table and decoder tree.
 These Coq results do not change this Lean theorem.
 
 ## Proof flow
@@ -107,7 +107,7 @@ artifacts, or caches belong in Git.
 ## Reference and remaining mathematical scope
 
 The separate [Coq acceptance workflow](coq/README.md) checks the Mira-based
-253-state construction through conventional ZF and ZFC inconsistency. Its
+252-state construction through conventional ZF and ZFC inconsistency. Its
 literal table and source calculus differ from this directory's 308-state Lean
 headline. The Coq result does not fill the ICS-to-ZF gap for the Lean machine.
 

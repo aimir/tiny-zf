@@ -1,9 +1,10 @@
 # Tools
 
-`mira_forward.py` reproduces the **253-state Coq-verified machine** from the
-hash-pinned 254-state reference. It replaces the positive-decrement kernel,
-shares its gap state, and emits the canonical table and unchanged 203-node
-decoder tree. [Artifact and proof reproduction](../formal/coq/README.md#verify-a-changed-machine).
+`mira_forward.py --mode local` reproduces the **252-state Coq-verified machine**
+from the hash-pinned 254-state reference. It replaces the positive-decrement
+kernel with a two-state gap-carry loop and emits the canonical table and
+unchanged 203-node decoder tree. Its default `--mode forward` reproduces the
+earlier 253-state block-streaming version. [Artifact and proof reproduction](../formal/coq/README.md#verify-a-changed-machine).
 
 `compare_mira254.py` imports the hash-pinned Coq program definitions of the external
 254-state machine, compares both trees using Wade's backend, replays a beam,

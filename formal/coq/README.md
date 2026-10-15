@@ -1,6 +1,6 @@
-# Coq verification of the 253-state machine
+# Coq verification of the 252-state machine
 
-**The [253-state forward-decrement machine](../../candidates/mira253-forward.tm)
+**The [252-state local-carry machine](../../candidates/mira252-local.tm)
 halts on blank tape exactly when conventional ZF or ZFC is inconsistent.**
 The proof extends Jeffrey Ketchersid's pinned Coq development for Mira-Cult's
 254-state machine with a new unbounded decrement kernel. Its source interpreter
@@ -19,7 +19,7 @@ Theorem zf254_halts_iff_SIR : halts tm c0 <-> SIR ⊢TC ⊥.
 The literal table, bootstrap, unbounded register operations, all instruction
 sites, source interpreter, proof calculus, and set-theoretic interpretation
 are covered. The inherited theorem names retain `254`, but the candidate build
-replaces `tm` with the exact 253-state table. These Coq results do not change
+replaces `tm` with the exact 252-state table. These Coq results do not change
 the statement of [our 308-state Lean headline](../TinyZF.lean).
 
 ## Rebuild the pinned reference
@@ -53,9 +53,9 @@ this successful reference build does not certify a candidate mutation.
 
 ## Verify a changed machine
 
-The [253-state table](../../candidates/mira253-forward.tm),
-[203-node decoder tree](../../candidates/mira253-forward.tree.json), and
-[verification record](../../reference/mira253-forward-coq.json) describe the
+The [252-state table](../../candidates/mira252-local.tm),
+[203-node decoder tree](../../candidates/mira252-local.tree.json), and
+[verification record](../../reference/mira252-local-coq.json) describe the
 current smallest proved machine in this repository. The decoder tree is the
 original pinned program. Only the tape-level positive decrement changes.
 
@@ -63,43 +63,45 @@ After obtaining the pinned checkout above, run from this repository:
 
 ```sh
 python3 formal/coq/candidate.py --upstream /tmp/zf-reference --coqc coqc \
-  --table candidates/mira253-forward.tm --halt 253 \
-  --tree candidates/mira253-forward.tree.json --decrement-mode forward \
-  --output scratch/forward253-proof
+  --table candidates/mira252-local.tm --halt 252 \
+  --tree candidates/mira252-local.tree.json --decrement-mode local \
+  --output scratch/local252-proof
 ```
 
 The output directory must be new. By default this copies the pinned sources
 and rebuilds their entire dependency closure, excluding existing compiled
-objects. The checked table is written to `scratch/forward253-proof/candidate.tm`;
+objects. The checked table is written to `scratch/local252-proof/candidate.tm`;
 its bytes must match the committed table. The original upstream files stay
 unchanged. To reproduce the two input artifacts independently:
 
 ```sh
-python3 tools/mira_forward.py --upstream /tmp/zf-reference \
-  --output scratch/reproduced-forward253.tm
-cmp scratch/reproduced-forward253.tm candidates/mira253-forward.tm
-cmp scratch/reproduced-forward253.tree.json candidates/mira253-forward.tree.json
+python3 tools/mira_forward.py --upstream /tmp/zf-reference --mode local \
+  --output scratch/reproduced-local252.tm
+cmp scratch/reproduced-local252.tm candidates/mira252-local.tm
+cmp scratch/reproduced-local252.tree.json candidates/mira252-local.tree.json
 ```
 
 The driver checks the complete blank-tape bootstrap, including every trailing
 register. The machine reaches its prescribed initial configuration after
-**284,880 steps**. It has working states 0 through 252 and undefined terminal
-state 253; state names referenced in the register proofs are preserved during
+**267,192 steps**. It has working states 0 through 251 and undefined terminal
+state 252; state names referenced in the register proofs are preserved during
 renumbering.
 
 ### New decrement proof
 
 Registers are separated runs of ones. Decrement deletes one cell and shifts
 all later blocks one position left, appending a zero register. The new routine
-carries the gap forward: it fills the previous gap, scans the next run, and
-erases that run's final one. A single state handles both the gap and the
-transition to the next block. Positive decrement always returns in state 48.
+carries the gap forward by local swaps: it fills the gap, erases the next one,
+and moves the gap farther through a run without a separate scanning state.
+The loop uses states 112 and 85. Positive decrement always returns in state 48.
 
-[`forward_decrement.v`](forward_decrement.v) proves the unbounded operation.
-`forward_dec_block` carries the gap across one positive run;
+[`local_decrement.v`](local_decrement.v) proves `local_dec_ones` by induction
+on the run length, then derives `forward_dec_block` for one register block.
+The remaining [forward-decrement lemmas](forward_decrement.v) prove the whole
+unbounded operation:
 `forward_dec` inducts over the arbitrary suffix of registers; `sepsL_forward`
 reconciles the tape encodings; and `box_decp` supplies the interpreter contract
-for every positive selected register. The remaining helper exposes the final
+for every positive selected register. A padding helper exposes the final
 separator. These are ordinary Coq proofs checked against the literal table.
 The driver installs them together with the corresponding symbolic return-state
 definition and rebuilds all dependents.
@@ -125,6 +127,15 @@ assumption audits. `--reuse-upstream-build` enables that faster mode; the
 default performs a full source rebuild. The record identifies the input and
 canonical table, exact tree, replacement proof fragment, pinned sources and
 compiled dependency count. A failed build writes no verification record.
+
+### The 253-state block-streaming variant
+
+The [253-state table](../../candidates/mira253-forward.tm) uses a separate
+run scanner, with its [matching tree](../../candidates/mira253-forward.tree.json)
+and [Coq record](../../reference/mira253-forward-coq.json). To reproduce its
+artifacts, omit `--mode local` from the generator. To rebuild its proof, supply
+those table/tree paths, `--halt 253 --decrement-mode forward`, and a fresh
+output directory to `candidate.py`. Its bootstrap takes 284,880 steps.
 
 ### Decoder-layout comparison
 
