@@ -14,6 +14,8 @@ headline theorems closed under the global context. Our
 [comparison and combined experiments](docs/MIRA254.md) reproduce the architectural
 savings and compile a smaller register-program tree into an independently
 checked 254-state variant. No machine below 254 has been established here.
+The candidate proof now uses the bootstrap's full 62-cell program-counter
+capacity, enabling searches with a stronger formally checked invariant.
 
 **Lean formally verifies the literal 308-state machine: it halts on blank tape
 if and only if the independently defined numeric source calculus proves code 1.

@@ -1,11 +1,12 @@
 {
   "upstream_commit": "297ab8df7e5de329605c3875b4934643b371a5e3",
-  "input_machine_sha256": "37a84d71a1435142afcd1b4fd16b83c5623810db69a2bab34192136cd565507a",
+  "input_machine_sha256": "39b74f8c67a327e820e9aed166fea2fd53565059ee5a61041343dbc0b81fd21c",
   "canonical_machine_sha256": "39b74f8c67a327e820e9aed166fea2fd53565059ee5a61041343dbc0b81fd21c",
   "working_states": 254,
   "prover": "The Coq Proof Assistant, version 8.20.1\ncompiled with OCaml 4.14.1",
   "bootstrap_steps": 264982,
   "exact_initial_tape": true,
+  "minimum_pc_capacity": 62,
   "preserved_state_anchors": [
     0,
     1,
@@ -38,7 +39,9 @@
     131
   ],
   "clean_source_rebuild": false,
-  "proof_adjustments": [],
+  "proof_adjustments": [
+    "minimum PC capacity strengthened from 40 to the exact boot capacity 62"
+  ],
   "reused_upstream_objects": true,
   "rebuilt_modules": 15,
   "theorems": [

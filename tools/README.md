@@ -292,3 +292,48 @@ It writes a matching tree and hashes alongside the table, and screens every
 symbolic instruction case. Full acceptance uses
 [`formal/coq/candidate.py`](../formal/coq/candidate.py), which rebuilds the
 Coq machine-to-ZF/ZFC theorem. See [the complete workflow](../formal/coq/README.md).
+
+`mira_global.py` learns alternative transition rows by checking every affected
+symbolic instruction case, then searches for compatible state partitions.
+Checkpoint identities include the table, program, protected states and minimum
+PC capacity, so incompatible search runs cannot silently share results.
+`--relax-dispatch --relax-anchor-rows` permits changes beyond the register-box
+proof boundary. The stronger `--d0 62` bound is justified by the exact bootstrap
+and the rebuilt Coq simulation. Search failures concern only the chosen
+transition menus and partition model; they are not lower bounds on machines.
+
+An optional C++17 engine, `mira_global_native.cpp` with its Python adapter,
+accelerates the same symbolic checks. On macOS, build and use it with:
+
+```sh
+c++ -O3 -std=c++17 -dynamiclib tools/mira_global_native.cpp -o scratch/mira-symbolic.dylib
+python3 tools/mira_global.py --upstream /tmp/zf-reference \
+  --output scratch/mira-global --learn all --solve --target 253 \
+  --relax-dispatch --relax-anchor-rows --d0 62 \
+  --native scratch/mira-symbolic.dylib
+```
+
+On Linux, replace `-dynamiclib` with `-shared -fPIC`. The partition solver uses
+the optional `z3-solver` package. The compiled engine is a search filter: emitted
+candidates are checked again with the pinned Python executor, and acceptance
+still requires the complete Coq proof. Keep compiled libraries and search
+output under ignored `scratch/`.
+
+`mira_global_pairs.py` goes beyond independent row rewrites: it chooses one
+shared branch from the learned menus and synthesizes the other branch in the
+already-merged machine. For example, after the learning command above:
+
+```sh
+python3 tools/mira_global_pairs.py --upstream /tmp/zf-reference \
+  --table /tmp/zf-reference/ZF/m254/machine/zfc_254.tm \
+  --options scratch/mira-global/options.json --d0 62 \
+  --native scratch/mira-symbolic.dylib --output scratch/mira-pairs
+```
+
+By default this focuses on newly shared branches and excludes bootstrap state
+8; `--include-original` and `--include-bootstrap` broaden those choices.
+Its `body-only/` outputs are explicitly unproved experiments: they pass the
+instruction cases but fail the required bootstrap. A general root-shape
+diagnostic is not a replacement initialization proof. `mira_global_transfer.py`
+rechecks and extends existing transition menus on other decoder layouts; that
+faster transfer deliberately explores only a subset of possible rewrites.

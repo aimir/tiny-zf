@@ -78,3 +78,16 @@ failed, incomplete, axiom-bearing, or malformed success reports.
 canonical state renumbering, exact bootstrap tapes including distant garbage,
 and propagation of changed proof modules through to the final theorem audit.
 These regression tests complement the actual Coq build; they do not replace it.
+
+`test_mira_global_native.py` differentially checks the compiled symbolic search
+engine against the pinned Python executor. It covers full instruction suites,
+read-transition traces, changed decoder trees, invalid grafts, random mutations,
+successful rewrites, and the 40-cell and 62-cell invariants. Run its optional
+integration tests with a C++17 compiler and the pinned checkout available:
+
+```sh
+MIRA254_UPSTREAM=/tmp/zf-reference python3 -m unittest discover -s tests -p 'test_mira_global_native.py'
+```
+
+The tests compile their library in a temporary directory; no compiled library
+or search log belongs in the repository.

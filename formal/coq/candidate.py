@@ -202,6 +202,23 @@ def adapt_skip_lemma(directory, table):
     return {path.resolve()}, ["sk_self only asserts the eight intermediate skip self-loops"]
 
 
+def install_min_gap(directory, minimum):
+    """Use a PC-capacity lower bound established by the exact blank-tape boot.
+
+    The boot supplies 62 cells between its PC marker and register header. The
+    Sim invariant preserves this capacity, so the sharper bound needs no new
+    premise in the headline theorem. Every dependent proof is rebuilt below.
+    Forty remains available to reproduce the upstream symbolic abstraction.
+    """
+    if minimum not in (40, 62):
+        raise ValueError("minimum PC capacity must be 40 or 62")
+    if minimum == 40:
+        return set(), []
+    path = directory / "coq/tm/Site.v"
+    replace_exact(path, "Definition D0 := 40.", "Definition D0 := 62.", 1)
+    return {path.resolve()}, ["minimum PC capacity strengthened from 40 to the exact boot capacity 62"]
+
+
 def compile_closure(checker, coqc, dirty, reuse):
     """Rebuild every dependent module, including the final assumption audit."""
     dirty = {path.resolve() for path in dirty}
@@ -251,6 +268,8 @@ def main():
     parser.add_argument("--halt", default="254")
     parser.add_argument("--coqc", default=os.environ.get("COQC", "coqc"))
     parser.add_argument("--bootstrap-limit", type=int, default=2_000_000)
+    parser.add_argument("--min-gap", type=int, choices=(40, 62), default=62,
+                        help="minimum PC capacity proved by the invariant (default: exact boot capacity 62)")
     parser.add_argument("--output", type=Path, required=True,
                         help="new persistent proof workspace (must not exist)")
     parser.add_argument("--reuse-upstream-build", action="store_true",
@@ -291,6 +310,9 @@ def main():
         dirty.update(tree_dirty)
     box_dirty, proof_adjustments = adapt_skip_lemma(directory, canonical)
     dirty.update(box_dirty)
+    gap_dirty, gap_adjustments = install_min_gap(directory, args.min_gap)
+    dirty.update(gap_dirty)
+    proof_adjustments.extend(gap_adjustments)
     checker = load_module(directory / "check.py", "candidate_upstream_check")
     rebuilt = compile_closure(checker, coqc, dirty, args.reuse_upstream_build)
     report = {
@@ -299,6 +321,7 @@ def main():
         "canonical_machine_sha256": hashlib.sha256(canonical_bytes).hexdigest(),
         "working_states": len(rows) // 2, "prover": version,
         "bootstrap_steps": steps, "exact_initial_tape": True,
+        "minimum_pc_capacity": args.min_gap,
         "preserved_state_anchors": sorted(ANCHORS),
         "clean_source_rebuild": not args.reuse_upstream_build,
         "proof_adjustments": proof_adjustments,

@@ -26,9 +26,11 @@ numeric calculus in a conventional ICS/ZF derivation system, its claimed
 relationship to ZF, and the metatheoretic independence conclusion remain outside
 the proved statement. None is supplied as a hypothesis or an axiom.
 
-The separate [Coq reference guide](coq/README.md) reproduces the stronger
-end-to-end ZF/ZFC theorem for Mira-Cult's 254-state machine. It is the verified
-reference for the new optimization search; it does not change this Lean theorem.
+The separate [Coq verification guide](coq/README.md) reproduces the stronger
+end-to-end ZF/ZFC theorem for Mira-Cult's 254-state machine and our matching-size
+decoder variant. The candidate proof establishes a 62-cell lower bound on
+program-counter capacity and checks changed literal tables and decoder trees.
+These Coq results do not change this Lean theorem.
 
 ## Proof flow
 

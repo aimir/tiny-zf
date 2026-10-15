@@ -93,6 +93,25 @@ class CandidateAcceptance(unittest.TestCase):
             with patch.object(candidate.subprocess, "run", return_value=success), self.assertRaises(ValueError):
                 candidate.compile_closure(checker, "coqc", set(), True)
 
+    def test_minimum_capacity_cannot_exceed_exact_boot(self):
+        with tempfile.TemporaryDirectory() as name:
+            directory = Path(name)
+            site = directory / "coq/tm/Site.v"
+            site.parent.mkdir(parents=True)
+            site.write_text("Definition D0 := 40.\n")
+            self.assertEqual(candidate.install_min_gap(directory, 40), (set(), []))
+            for unsupported in (0, 34, 41, 63):
+                with self.subTest(minimum=unsupported), self.assertRaises(ValueError):
+                    candidate.install_min_gap(directory, unsupported)
+            dirty, adjustments = candidate.install_min_gap(directory, 62)
+            self.assertEqual(dirty, {site.resolve()})
+            self.assertEqual(site.read_text(), "Definition D0 := 62.\n")
+            self.assertEqual(len(adjustments), 1)
+            # Fail on unexpected input instead of silently accepting a stale
+            # proof workspace whose dependency objects may describe D0=40.
+            with self.assertRaises(ValueError):
+                candidate.install_min_gap(directory, 62)
+
 
 if __name__ == "__main__":
     unittest.main()

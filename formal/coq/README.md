@@ -89,11 +89,18 @@ excursions, every instruction site, whole-run simulation, the source certificate
 and the complete connection to ZF/ZFC. Neither Python's symbolic executor nor
 the generator is an assumed compiler-correctness theorem.
 
+The candidate checker uses the stronger invariant that the space from the
+program-counter marker to the register header is at least **62 cells**. The
+literal bootstrap establishes that bound, and the whole-run simulation
+preserves it. Coq rebuilds the instruction checks and simulation with this
+bound; no additional hypothesis is added to the headline theorems. Use
+`--min-gap 40` to reproduce the upstream's more conservative abstraction.
+
 The recorded run reused objects from a freshly rebuilt upstream proof and
 recompiled all 15 affected modules, including the three final assumption
 audits. `--reuse-upstream-build` enables that faster mode; the default performs
-a full source rebuild. The record contains both the generated named-table hash
-and `canonical_machine_sha256`, which identifies the committed literal table.
+a full source rebuild. The record contains the input-table hash and
+`canonical_machine_sha256`, which identifies the committed literal table.
 The `zf254_*` theorem names are inherited from the pinned proof; their machine
 definition is replaced by the candidate's exact table.
 

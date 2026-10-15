@@ -138,6 +138,13 @@ proof. All three headline theorems are closed; the
 [record](../reference/mira254-rotation-coq.json) identifies the exact table and
 tree. See [how to rebuild](../formal/coq/README.md#verify-a-changed-machine).
 
+The candidate proof also establishes the stronger 62-cell minimum PC-capacity
+invariant supplied by the bootstrap. The upstream instruction checker used
+40 cells. The larger bound allows searches to consider layouts and transition
+rewrites needing more padding, while preserving the same blank-tape theorem.
+The accelerated symbolic checker is tested against the pinned Python model;
+its search results still require the complete Coq acceptance run.
+
 The proof check also caught an actual integration error during development:
 the older saved 202-node tree was initially paired with this new table. That
 combination fails 136 symbolic cases and Coq's instruction-site theorem. The
