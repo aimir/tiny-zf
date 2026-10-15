@@ -1,5 +1,6 @@
 # Documentation
 
+- [254-state comparison](MIRA254.md): Mira-Cult's architecture, Ketchersid's Coq proof, reproduced counts, combined search and rejected transplant.
 - [Experiments](EXPERIMENTS.md): the current 308-state candidate, transformations, combined-search results, and replay commands.
 - [Survey](SURVEY.md): source history, competing formulations, and known correctness issues.
 - [Verification](VERIFICATION.md): the complete Lean implementation theorem, computational checks and the remaining theory bridge.

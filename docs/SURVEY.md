@@ -1,16 +1,18 @@
 # Survey: ZF-independent Turing machines
 
-Surveyed 22 September 2026. State counts below distinguish published claims,
+Updated 15 October 2026. State counts below distinguish published claims,
 locally counted tables, and exact local reproduction. None is a lower bound.
-The smallest upstream table located and reproduced here has **393 states**;
-our conservative source candidate has **392**. A subsequent experimental ICS
-port and subsequent arithmetic/factoring work reached **308**; see [the experiments](EXPERIMENTS.md). None carries an
-end-to-end formal verification in this repository.
+The smallest table inspected here is Mira-Cult's **254-state** machine, with
+Ketchersid's external end-to-end Coq proof to ZFC inconsistency. Our **308-state**
+ICS candidate has a Lean proof of tape-to-source equivalence; its source theory
+bridge to conventional ZF remains open. See the [254-state comparison](MIRA254.md)
+and [local experiments](EXPERIMENTS.md).
 
 ## Sources and development lines
 
 | Construction | Size | What to take from it |
 | --- | ---: | --- |
+| [Mira-Cult, September 2026; Ketchersid verification](https://github.com/jeff87654/busy-beaver/tree/297ab8df7e5de329605c3875b4934643b371a5e3/ZF/m254) | **254** | New logical basis, proof enumeration, four-tag coding, single-marker interpreter and contextual sharing. Coq theorem to conventional ZF/ZFC inconsistency; see the dedicated comparison for local checks. |
 | [Yedidia–Aaronson, 2016](https://arxiv.org/abs/1605.04343) | 7,910 | Laconic compilation and introspective encoding; the original construction uses a stronger-theory/combinatorial route. |
 | [O'Rear, 2016](https://github.com/sorear/metamath-turing-machines/blob/master/machines/2016-zf-sorear-1919/zf.nql) | 1,919 | Direct search for a contradiction in set theory. |
 | [O'Rear, 2017](https://github.com/sorear/metamath-turing-machines/blob/master/machines/2017-zf-sorear-748/zf2.nql) | 748 | Detailed source-level explanation of the predicate calculus, set axioms, pairing, and proof enumeration. |

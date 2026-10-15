@@ -1,6 +1,9 @@
 # Regression tests
 
-Run `python3 -m unittest discover -s tests` from the root. The 93 tests cover:
+Run `python3 -m unittest discover -s tests` from the root. The 99 tests cover:
+
+- External Coq program import: matching formats and rejected cycles, missing nodes,
+  duplicate nodes, invalid registers and changed register effects.
 
 - Strict table parsing, missing-read totalization and rejected malformed inputs.
 - Valid and invalid quotient certificates and local tape-cell preservation.

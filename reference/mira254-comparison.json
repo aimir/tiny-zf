@@ -1,0 +1,147 @@
+{
+  "upstream_commit": "297ab8df7e5de329605c3875b4934643b371a5e3",
+  "input_sha256": {
+    "machine/zfc_254.tm": "d655ce2cf8cccebd21caa21a49f0f9f010960a44b95c17aae6cc425c518954eb",
+    "coq/tm/Prog254.v": "1fbc30fcf82a1442ed88d1a1dde412630a431d32a7265d22bdf8517bffe01746",
+    "coq/prog/Dag254.v": "538ddaddd932058c2b319011126579d77783231f54331772377c05848a0599e3",
+    "tools/tm/symexec.py": "5bf83da419c47b9c8d79fcc755e40048f599255c2f1b2cb4656dc04bb02bb85d",
+    "tools/tm/tmlib.py": "d66c407bfa9e78b01a3cd1f363beb3d68d6091eabc007caabc915ff972b4ca00"
+  },
+  "source_wade_states": 281,
+  "optimized_wade_states": 265,
+  "upstream_states": 254,
+  "all_tape_reduced_states": 254,
+  "windows": [
+    {
+      "left": 3,
+      "right": 3,
+      "contexts": 10347,
+      "excluded_reads": 0
+    },
+    {
+      "left": 4,
+      "right": 4,
+      "contexts": 31849,
+      "excluded_reads": 0
+    },
+    {
+      "left": 5,
+      "right": 5,
+      "contexts": 101835,
+      "excluded_reads": 0
+    },
+    {
+      "left": 8,
+      "right": 2,
+      "contexts": 71237,
+      "excluded_reads": 0
+    },
+    {
+      "left": 2,
+      "right": 8,
+      "contexts": 219517,
+      "excluded_reads": 0
+    },
+    {
+      "left": 6,
+      "right": 6,
+      "contexts": 335583,
+      "excluded_reads": 0
+    },
+    {
+      "left": 8,
+      "right": 8,
+      "contexts": 3881903,
+      "excluded_reads": 0
+    }
+  ],
+  "upstream_symbolic_check": {
+    "passed": true,
+    "cases": 8391,
+    "outcomes": {
+      "ok normal": 8387,
+      "halt": 1,
+      "ok overflow": 3
+    },
+    "returncode": 0
+  },
+  "retained_tree": {
+    "sha256": "2a40aeb375b06dddc6e4a22c6ad430be4b152eb131a0141449fd146baf09b20c",
+    "states_wade_backend": 264,
+    "dag_nodes": 202,
+    "matched_segments": 3863
+  },
+  "rejected_graft": {
+    "proposed_states": 253,
+    "matched_register_segments": 3863,
+    "tape_check": {
+      "passed": false,
+      "cases": 8391,
+      "outcomes": {
+        "ok normal": 7667,
+        "FAIL fuel": 360,
+        "FAIL peel right symbolic run in 0": 70,
+        "FAIL peel right symbolic run in 14": 32,
+        "FAIL peel right symbolic run in 60": 79,
+        "FAIL peel right symbolic run in 44": 55,
+        "FAIL peel right symbolic run in 31": 44,
+        "FAIL peel right symbolic run in 56": 39,
+        "FAIL peel right symbolic run in 38": 24,
+        "FAIL peel right symbolic run in 40": 10,
+        "FAIL peel right symbolic run in 75": 1,
+        "FAIL peel right symbolic run in 59": 6,
+        "halt": 1,
+        "ok overflow": 3
+      },
+      "returncode": 0
+    },
+    "accepted": false,
+    "instruction_counterexample": {
+      "site": 894,
+      "operation": "3.topwff.decnz",
+      "initial_pc": "11101001001010100111000000",
+      "initial_register_values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "marker_to_header_gap": 62,
+      "steps": 588,
+      "expected_pc": "1110100100101010011100001",
+      "actual_pc": "11101001001010100111000001",
+      "scope": "instruction contract; not a blank-tape counterexample"
+    },
+    "reason": "shared tape states depend on PC contexts changed by the transplant"
+  },
+  "retained_tree_search": {
+    "states_wade_backend": 264,
+    "dag_nodes": 202,
+    "matched_segments": 3863,
+    "fully_reduced": 424,
+    "seed": 25420261015,
+    "generations": 120,
+    "batch": 256,
+    "width": 64,
+    "mutation_attempts": 30720
+  },
+  "regression_tests": 99,
+  "new_sub254_machine_established": false,
+  "upstream_coq_rebuilt_locally": false
+}

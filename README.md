@@ -2,6 +2,11 @@
 
 **Current experimental candidate: 308 states — 84 fewer than our 392-state baseline (21.4% smaller).**
 
+**External benchmark: Mira-Cult's 254-state machine, with an end-to-end ZFC
+inconsistency proof in Jeffrey Ketchersid's Coq development.** Our
+[comparison and combined experiments](docs/MIRA254.md) reproduce the architectural
+savings and improve one register-program tree, but establish no machine below 254.
+
 **Lean formally verifies the literal 308-state machine: it halts on blank tape
 if and only if the independently defined numeric source calculus proves code 1.
 The source calculus’s connection to conventional ZF remains unproved.** Start with the
@@ -28,6 +33,7 @@ equiconsistency with ZF.
 
 | Machine | States | Artifact and scope |
 | --- | ---: | --- |
+| Mira-Cult / external benchmark | **254** | [Upstream table and Coq proof](https://github.com/jeff87654/busy-beaver/tree/297ab8df7e5de329605c3875b4934643b371a5e3/ZF/m254); [local comparison](docs/MIRA254.md). Not the machine of this repository's Lean headline. |
 | Current ICS candidate | **308** | [Table](candidates/ics-best.tm), [configuration and hashes](candidates/ics-best.json), [instruction tree](candidates/ics-tree.json). Lean-verified tape-to-source equivalence; changed axiomatization and formula coding. |
 | Conservative baseline | 392 | [Table](candidates/best.tm), [configuration](candidates/best.json). Same distinct axiom clauses as Wade's source, deduplicated and reordered. |
 | Pinned Wade reference | 393 | [Unmodified source/table](vendor/wade/), [provenance](reference/upstream.json). Reproduced transition for transition. |
@@ -116,7 +122,7 @@ audits decoder register allocation, checks **1,000 decoder boundaries**, and
 simulates one million literal tape steps. It also compares all ten registers
 at **512 decrement boundaries** against the pre-tree source, covering about
 12.8 million tape steps per machine. The second checks the conservative 392/393 pair.
-The regression suite has **93 tests**, including checks for separate dyadic pairing
+The regression suite has **99 tests**, including checks for the external-program importer and separate dyadic pairing
 experiments. These checks do not establish end-to-end
 halting equivalence or the mathematical equivalence of the axiom systems.
 [Verification scope](docs/VERIFICATION.md) states the remaining obligations.

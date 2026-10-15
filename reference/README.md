@@ -3,6 +3,11 @@
 These are small, curated metadata files, not execution logs or exhaustive search
 traces. All final counts include the local reduction pipeline.
 
+The [254-state comparison](mira254-comparison.json) records pinned external
+inputs, actual recompilation counts and checks. Its [202-node tree](mira254-tree202.json)
+is a register-program experiment, not a new record TM. The compared backends
+and the rejected transplant are explained [here](../docs/MIRA254.md).
+
 | File | What it records |
 | --- | --- |
 | [upstream.json](upstream.json) | Exact source commit, file hashes, reference order, and 393 = 69 + 324 state split. |
@@ -41,7 +46,7 @@ machine. They do not exercise an unbounded proof search or prove tape separation
 | [ics-checks.json](ics-checks.json) | Curated rebuild, local differential, finite simulation and reachability results for the 308-state table (without a new window experiment). |
 | [../candidates/ics-best.json](../candidates/ics-best.json) | Current 308-state candidate configuration, table hash and state breakdown. |
 | [coq-verification.json](coq-verification.json) | Pinned Coq reference and inspected proof layers; reference only, not rebuilt or imported as Lean axioms. |
-| [../formal/verification.json](../formal/verification.json) | Checked Lean source hashes, headline, axiom dependencies and explicit incomplete end-to-end status. |
+| [../formal/verification.json](../formal/verification.json) | Checked Lean source hashes, headline, axiom dependencies, complete tape-to-source proof and open conventional-ZF theory bridge. |
 
 These add to the initial survey experiments above. Full generation traces and
 beam frontiers are intentionally absent. Use `python3 tools/experiment.py ID` to

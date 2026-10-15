@@ -1,5 +1,11 @@
 # Tools
 
+`compare_mira254.py` imports the hash-pinned Coq program definitions of the external
+254-state machine, compares both trees using Wade's backend, replays a beam,
+and optionally runs the upstream symbolic instruction checker. Its retained
+202-node tree is a program improvement, not a sub-254 tape machine. See
+[comparison, scope and commands](../docs/MIRA254.md).
+
 Rebuilding, verification and beam search use the Python standard library.
 The optional global solver needs OR-Tools. Invoke commands from the repository root.
 
