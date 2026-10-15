@@ -3,6 +3,12 @@
 These are small, curated metadata files, not execution logs or exhaustive search
 traces. All final counts include the local reduction pipeline.
 
+[mira251-startup-coq.json](mira251-startup-coq.json) records the complete Coq
+proof of the 251-state machine: the exact table and tree, kernel proofs,
+182,904-step bootstrap, third-enumerator-state bridge, and all three closed
+ZF/ZFC/SIR endpoints.
+[Reproduction instructions](../formal/coq/README.md#verify-a-changed-machine).
+
 [mira252-local-coq.json](mira252-local-coq.json) records the complete Coq proof
 of the 252-state local-carry machine, including both kernel proof fragments,
 the exact table and decoder tree, and all three closed ZF/ZFC/SIR endpoints.

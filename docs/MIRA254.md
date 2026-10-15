@@ -1,16 +1,37 @@
-# From Mira's 254-state construction to a verified 252-state machine
+# From Mira's 254-state construction to a verified 251-state machine
 
 Compared 15 October 2026 against
 [busy-beaver commit 297ab8d](https://github.com/jeff87654/busy-beaver/tree/297ab8df7e5de329605c3875b4934643b371a5e3/ZF/m254).
-**The new local-carry machine has 252 states and a complete Coq proof of
+**The shared-startup machine has 251 states and a complete Coq proof of
 blank-tape halting equivalence to ZF/ZFC inconsistency.** Its
-[table](../candidates/mira252-local.tm), [unchanged decoder tree](../candidates/mira252-local.tree.json),
-and [proof record](../reference/mira252-local-coq.json) are included. The
+[table](../candidates/mira251-startup.tm), [unchanged decoder tree](../candidates/mira251-startup.tree.json),
+and [proof record](../reference/mira251-startup-coq.json) are included. The
 earlier decoder-layout experiment also produced a checked 254-state variant.
 
-## The 252-state reduction
+## The 251-state reduction
 
-The smallest proved machine uses a two-state positive-decrement loop. State
+Starting from the 252-state machine below, change `0:1` to `0 L 4`, `5:1`
+to `0 L 5`, and `109:0` to `0 R 85`, then remove state 8. Marking register
+zero now returns through state 6, and increment takes a short detour through
+the existing decrement state at the end of the file. These changes allow
+initialization to share the remaining interpreter states.
+
+Blank-tape execution reaches its exact initial configuration in **182,904
+steps**: a 40-cell program-counter gap, `nextproof = 3`, `param1 = 1`, the
+other seven active registers zero, and 95 extra zero registers. This is the
+source enumerator's state after its first three commands. A finite Coq proof
+connects it to the original start; the complete unbounded tape-to-ZF/ZFC chain
+is then rebuilt. The program's 203-node tree is unchanged.
+
+The [increment proof](../formal/coq/startup_increment.v) establishes the new
+return path for arbitrary register suffixes. The acceptance driver also checks
+the changed mark return and the exact bootstrap. This is a complete machine
+proof, not acceptance based on a plausible initial tape shape.
+[`mira_forward.py --mode startup`](../tools/mira_forward.py) reproduces the table.
+
+## The 252-state decrement reduction
+
+The decrement routine uses a two-state positive-decrement loop. State
 112 fills the gap, and state 85 erases the next one. When that next cell is
 followed by another one, a three-step local swap moves the gap one cell farther
 right. The loop reaches each separator with exactly the register encoding
@@ -41,7 +62,7 @@ to share a single state, saving one working state.
 The exact change from the pinned table redirects `75:1` to `1 L 112`, changes
 `112:0` to `1 R 97`, `112:1` to `0 R 112`, `97:0` to `0 L 63`, and `85:0` to
 `0 L 112`, then removes state 131 and redirects its incoming edges to 112.
-[`mira_forward.py`](../tools/mira_forward.py) applies these changes and renumbers
+[`mira_forward.py --mode forward`](../tools/mira_forward.py) applies these changes and renumbers
 the table while preserving the proof's named operation states.
 
 The source program and its 203-node decoder tree are unchanged. The complete

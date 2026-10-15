@@ -1,7 +1,7 @@
 """Prove a replacement table implements the pinned Mira program and ZF/ZFC search.
 
 The candidate may change its control states and run time.  It must reach the
-exact upstream initial tape and retain the named register-operation anchors.
+exact initial tape specified by its proof mode and retain the named register-operation anchors.
 Coq then checks the entire interpreter-to-set-theory proof with the new table.
 """
 import argparse
@@ -25,7 +25,9 @@ ANCHORS = frozenset({0, 1, 2, 3, 4, 6, 28, 31, 38, 40, 43, 44, 48, 56,
                      112, 131})
 FORWARD_ANCHORS = ANCHORS - {131}
 LOCAL_ANCHORS = FORWARD_ANCHORS - {97}
+STARTUP_ANCHORS = LOCAL_ANCHORS
 BOOT_REGS = (0, 0, 0, 0, 0, 0, 2, 0, 0) + (0,) * 136
+STARTUP_REGS = (0, 1, 0, 0, 0, 0, 3, 0, 0) + (0,) * 95
 
 
 def load_module(path, name):
@@ -71,19 +73,19 @@ def parse_table(text, halt="254"):
     return rows
 
 
-def boot_tape():
+def boot_tape(gap=62, registers=BOOT_REGS):
     """All occupied cells, relative to dispatch head; all other cells are blank."""
-    occupied, cursor = {-1, 62}, 63
-    for value in BOOT_REGS:
+    occupied, cursor = {-1, gap}, gap + 1
+    for value in registers:
         cursor += 1
         occupied.update(range(cursor, cursor + value + 1))
         cursor += value + 1
     return frozenset(occupied)
 
 
-def bootstrap(rows, limit):
+def bootstrap(rows, limit, gap=62, registers=BOOT_REGS):
     """Require the complete infinite tape, not merely the first nine registers."""
-    expected, tape, state, head = boot_tape(), set(), "0", 0
+    expected, tape, state, head = boot_tape(gap, registers), set(), "0", 0
     for steps in range(limit + 1):
         if state == "96" and len(tape) == len(expected):
             if frozenset(cell - head for cell in tape) == expected:
@@ -206,10 +208,9 @@ def adapt_skip_lemma(directory, table):
 def install_min_gap(directory, minimum):
     """Use a PC-capacity lower bound established by the exact blank-tape boot.
 
-    The boot supplies 62 cells between its PC marker and register header. The
-    Sim invariant preserves this capacity, so the sharper bound needs no new
-    premise in the headline theorem. Every dependent proof is rebuilt below.
-    Forty remains available to reproduce the upstream symbolic abstraction.
+    The caller rejects a requested capacity exceeding the exact boot tape's
+    capacity. The Sim invariant then preserves it, without a new premise in
+    the headline theorem. Every dependent proof is rebuilt below.
     """
     if minimum not in (40, 62):
         raise ValueError("minimum PC capacity must be 40 or 62")
@@ -278,6 +279,68 @@ def install_local_decrement(directory):
     return dirty, adjustments
 
 
+def install_startup(directory):
+    """Prove the shared startup and its exact third enumerator state.
+
+    The increment detour and uniform mark exit are checked for unbounded
+    register files. The frozen abstract enumerator is unchanged: a computed
+    nonhalting step connects its old initial state s2 to the new state s3.
+    """
+    dirty, adjustments = install_local_decrement(directory)
+    tm = directory / "coq/tm"
+    fragment = Path(__file__).with_name("startup_increment.v").read_text()
+    path = tm / "Box.v"
+    source = path.read_text()
+    if source.count("Lemma shift_inc ") != 1:
+        raise ValueError("unexpected increment proof")
+    start = source.index("Lemma shift_inc ")
+    end = source.index("Qed.", start) + len("Qed.")
+    path.write_text(source[:start] + fragment.rstrip() + source[end:])
+    replace_exact(tm / "SymExec.v",
+                  "Definition mark_exit (r : nat) : nat := if Nat.eqb r 0 then 2 else 6.",
+                  "Definition mark_exit (r : nat) : nat := 6.", 1)
+    replace_exact(tm / "Prog254.v", "Definition R0 : regs := upd regs0 0 2.",
+                  "Definition R0 : regs := upd (upd regs0 0 3) 4 1.", 1)
+    replace_exact(tm / "Boot.v", "[0; 0; 0; 0; 0; 0; 2; 0; 0] ++ repeat 0 136",
+                  "[0; 1; 0; 0; 0; 0; 3; 0; 0] ++ repeat 0 95", 1)
+    replace_exact(tm / "Boot.v", "zeros 62 ++ true :: sepsR boot_regs",
+                  "zeros 40 ++ true :: sepsR boot_regs", 1)
+    replace_exact(tm / "Boot.v", "62 zero cells, the header 1, then 145 register blocks",
+                  "40 zero cells, the header 1, then 104 register blocks", 1)
+    replace_exact(tm / "Boot.v", "136 extra) with values 0,0,0,0,0,0,2,0,0 and 136 zeros.",
+                  "95 extra) with values 0,1,0,0,0,0,3,0,0 and 95 zeros.", 1)
+    replace_exact(tm / "Sim.v", "exists (@nil bool), R0, 62, (repeat 0 136).",
+                  "exists (@nil bool), R0, 40, (repeat 0 95).", 1)
+    main = directory / "coq/prog/Main254.v"
+    replace_exact(main, "Definition s2 : state := mkState 0 2 0 0 0 0.",
+                  "Definition s2 : state := mkState 0 2 0 0 0 0.\n"
+                  "Definition s3 : state := mkState 0 3 0 0 1 0.", 1)
+    replace_exact(main, "Lemma R0_enc : approx R0 (enc s2).",
+                  "Lemma R0_enc : approx R0 (enc s3).", 1)
+    bridge = """(** The third enumerator step is nonhalting and reaches exactly the
+    startup register values. The equivalence preserves both halting directions. *)
+Lemma s2_step3 : enum_step s2 = Some s3.
+Proof. vm_compute. reflexivity. Qed.
+
+Lemma enum_s3 : enum254_halts <-> halts_from s3.
+Proof. rewrite enum_s2. apply halts_from_step, s2_step3. Qed.
+
+"""
+    replace_exact(main, "Theorem prog254 :", bridge + "Theorem prog254 :", 1)
+    replace_exact(main, "iter_halts_dag s2 R0 R0_enc", "iter_halts_dag s3 R0 R0_enc", 1)
+    replace_exact(main, "symmetry. exact enum_s2.", "symmetry. exact enum_s3.", 1)
+    replace_exact(main, "R0 = nextproof 2, all other registers 0",
+                  "R0 = nextproof 3, param1 1, all other registers 0", 1)
+    replace_exact(main, "the boot state R0 encodes s2, which s0 reaches in two steps.",
+                  "the boot state R0 encodes s3, which s0 reaches in three steps.", 1)
+    dirty.update(p.resolve() for p in (tm / "Prog254.v", tm / "Boot.v", tm / "Sim.v", main))
+    adjustments.extend([
+        "mark returns uniformly in state 6; increment returns through the shared scanner",
+        "startup-increment proof fragment SHA256 " + hashlib.sha256(fragment.encode()).hexdigest(),
+        "exact initial registers encode s3, proved to follow s2 by one nonhalting enumerator step"])
+    return dirty, adjustments
+
+
 def compile_closure(checker, coqc, dirty, reuse):
     """Rebuild every dependent module, including the final assumption audit."""
     dirty = {path.resolve() for path in dirty}
@@ -325,17 +388,23 @@ def main():
     parser.add_argument("--tree", type=Path,
                         help="optional decoder tree JSON; also proves equivalence to the pinned source")
     parser.add_argument("--halt", default="254")
-    parser.add_argument("--decrement-mode", choices=("reverse", "forward", "local"), default="reverse",
-                        help="register kernel proof: reverse shift, forward stream, or local carry")
+    parser.add_argument("--decrement-mode", choices=("reverse", "forward", "local", "startup"), default="reverse",
+                        help="kernel proof: reverse, forward, local carry, or local carry with shared startup")
     parser.add_argument("--coqc", default=os.environ.get("COQC", "coqc"))
     parser.add_argument("--bootstrap-limit", type=int, default=2_000_000)
-    parser.add_argument("--min-gap", type=int, choices=(40, 62), default=62,
-                        help="minimum PC capacity proved by the invariant (default: exact boot capacity 62)")
+    parser.add_argument("--min-gap", type=int, choices=(40, 62),
+                        help="minimum PC capacity (default: exact boot capacity, 40 in startup mode, else 62)")
     parser.add_argument("--output", type=Path, required=True,
                         help="new persistent proof workspace (must not exist)")
     parser.add_argument("--reuse-upstream-build", action="store_true",
                         help="reuse existing upstream Coq objects; otherwise rebuild every source")
     args = parser.parse_args()
+    boot_gap, boot_registers = ((40, STARTUP_REGS) if args.decrement_mode == "startup"
+                                else (62, BOOT_REGS))
+    if args.min_gap is None:
+        args.min_gap = boot_gap
+    if args.min_gap > boot_gap:
+        raise ValueError("minimum PC capacity exceeds the proof mode's exact boot capacity")
     coqc = shutil.which(args.coqc)
     if coqc is None:
         raise ValueError(f"Coq compiler not found: {args.coqc}")
@@ -345,9 +414,9 @@ def main():
     _, version = reference.inspect(upstream, coqc)
     input_bytes = args.table.read_bytes()
     rows = parse_table(input_bytes.decode(), args.halt)
-    steps = bootstrap(rows, args.bootstrap_limit)
+    steps = bootstrap(rows, args.bootstrap_limit, boot_gap, boot_registers)
     anchors = {"reverse": ANCHORS, "forward": FORWARD_ANCHORS,
-               "local": LOCAL_ANCHORS}[args.decrement_mode]
+               "local": LOCAL_ANCHORS, "startup": STARTUP_ANCHORS}[args.decrement_mode]
     canonical, mapping = canonicalize(rows, args.halt, anchors)
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
@@ -373,9 +442,9 @@ def main():
         dirty.update(tree_dirty)
     box_dirty, proof_adjustments = adapt_skip_lemma(directory, canonical)
     dirty.update(box_dirty)
-    if args.decrement_mode in ("forward", "local"):
-        installer = (install_local_decrement if args.decrement_mode == "local"
-                     else install_forward_decrement)
+    if args.decrement_mode in ("forward", "local", "startup"):
+        installer = {"forward": install_forward_decrement, "local": install_local_decrement,
+                     "startup": install_startup}[args.decrement_mode]
         forward_dirty, forward_adjustments = installer(directory)
         dirty.update(forward_dirty)
         proof_adjustments.extend(forward_adjustments)
@@ -390,6 +459,8 @@ def main():
         "canonical_machine_sha256": hashlib.sha256(canonical_bytes).hexdigest(),
         "working_states": len(rows) // 2, "prover": version,
         "bootstrap_steps": steps, "exact_initial_tape": True,
+        "bootstrap_pc_capacity": boot_gap,
+        "initial_enumerator_steps": 3 if args.decrement_mode == "startup" else 2,
         "minimum_pc_capacity": args.min_gap,
         "preserved_state_anchors": sorted(anchors),
         "positive_decrement_implementation": args.decrement_mode,

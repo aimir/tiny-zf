@@ -14,7 +14,8 @@ from mira_forward import acceptance_module, build
 class ForwardMachine(unittest.TestCase):
     def test_public_artifact_identity_and_bootstrap(self):
         acceptance = acceptance_module()
-        for size, mode, steps in ((253, 'forward', 284880), (252, 'local', 267192)):
+        for size, mode, steps in ((253, 'forward', 284880), (252, 'local', 267192),
+                                  (251, 'startup', 182904)):
             with self.subTest(mode=mode):
                 name = f'mira{size}-{mode}'
                 table = (ROOT / f'candidates/{name}.tm').read_bytes()
@@ -24,17 +25,25 @@ class ForwardMachine(unittest.TestCase):
                 self.assertEqual(hashlib.sha256(tree).hexdigest(), record['instruction_tree_sha256'])
                 rows = acceptance.parse_table(table.decode(), halt=str(size))
                 self.assertEqual({q for q, _ in rows}, {str(q) for q in range(size)})
-                self.assertEqual(acceptance.bootstrap(rows, record['bootstrap_steps']), steps)
-                for fragment in ('forward', 'local') if mode == 'local' else ('forward',):
-                    proof = (ROOT / f'formal/coq/{fragment}_decrement.v').read_bytes()
-                    self.assertIn(fragment + '-decrement proof fragment SHA256 '
+                registers = acceptance.STARTUP_REGS if mode == 'startup' else acceptance.BOOT_REGS
+                self.assertEqual(acceptance.bootstrap(rows, record['bootstrap_steps'],
+                                                      gap=record.get('bootstrap_pc_capacity', 62),
+                                                      registers=registers), steps)
+                fragments = ['forward_decrement']
+                if mode in ('local', 'startup'):
+                    fragments.append('local_decrement')
+                if mode == 'startup':
+                    fragments.append('startup_increment')
+                for fragment in fragments:
+                    proof = (ROOT / f'formal/coq/{fragment}.v').read_bytes()
+                    self.assertIn(fragment.replace('_', '-') + ' proof fragment SHA256 '
                                   + hashlib.sha256(proof).hexdigest(), record['proof_adjustments'])
 
-    def test_generator_reproduces_both_committed_artifacts(self):
+    def test_generator_reproduces_committed_artifacts(self):
         location = os.environ.get('MIRA254_UPSTREAM')
         if not location:
             self.skipTest('set MIRA254_UPSTREAM to the pinned checkout')
-        for size, mode in ((253, 'forward'), (252, 'local')):
+        for size, mode in ((253, 'forward'), (252, 'local'), (251, 'startup')):
             with self.subTest(mode=mode):
                 table, tree = build(Path(location), mode)
                 self.assertEqual(table, (ROOT / f'candidates/mira{size}-{mode}.tm').read_text())

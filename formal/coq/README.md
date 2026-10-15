@@ -1,9 +1,10 @@
-# Coq verification of the 252-state machine
+# Coq verification of the 251-state machine
 
-**The [252-state local-carry machine](../../candidates/mira252-local.tm)
+**The [251-state machine with shared startup](../../candidates/mira251-startup.tm)
 halts on blank tape exactly when conventional ZF or ZFC is inconsistent.**
 The proof extends Jeffrey Ketchersid's pinned Coq development for Mira-Cult's
-254-state machine with a new unbounded decrement kernel. Its source interpreter
+254-state machine with unbounded decrement and increment proofs and a shared
+startup routine. Its source interpreter
 and set-theoretic interpretation are unchanged. All three headline theorems
 report `Closed under the global context` with Coq 8.20.1.
 
@@ -19,7 +20,7 @@ Theorem zf254_halts_iff_SIR : halts tm c0 <-> SIR ⊢TC ⊥.
 The literal table, bootstrap, unbounded register operations, all instruction
 sites, source interpreter, proof calculus, and set-theoretic interpretation
 are covered. The inherited theorem names retain `254`, but the candidate build
-replaces `tm` with the exact 252-state table. These Coq results do not change
+replaces `tm` with the exact 251-state table. These Coq results do not change
 the statement of [our 308-state Lean headline](../TinyZF.lean).
 
 ## Rebuild the pinned reference
@@ -53,39 +54,57 @@ this successful reference build does not certify a candidate mutation.
 
 ## Verify a changed machine
 
-The [252-state table](../../candidates/mira252-local.tm),
-[203-node decoder tree](../../candidates/mira252-local.tree.json), and
-[verification record](../../reference/mira252-local-coq.json) describe the
+The [251-state table](../../candidates/mira251-startup.tm),
+[203-node decoder tree](../../candidates/mira251-startup.tree.json), and
+[verification record](../../reference/mira251-startup-coq.json) describe the
 current smallest proved machine in this repository. The decoder tree is the
-original pinned program. Only the tape-level positive decrement changes.
+original pinned program. The tape-level arithmetic and initialization change.
 
 After obtaining the pinned checkout above, run from this repository:
 
 ```sh
 python3 formal/coq/candidate.py --upstream /tmp/zf-reference --coqc coqc \
-  --table candidates/mira252-local.tm --halt 252 \
-  --tree candidates/mira252-local.tree.json --decrement-mode local \
-  --output scratch/local252-proof
+  --table candidates/mira251-startup.tm --halt 251 \
+  --tree candidates/mira251-startup.tree.json --decrement-mode startup \
+  --output scratch/startup251-proof
 ```
 
 The output directory must be new. By default this copies the pinned sources
 and rebuilds their entire dependency closure, excluding existing compiled
-objects. The checked table is written to `scratch/local252-proof/candidate.tm`;
+objects. The checked table is written to `scratch/startup251-proof/candidate.tm`;
 its bytes must match the committed table. The original upstream files stay
 unchanged. To reproduce the two input artifacts independently:
 
 ```sh
-python3 tools/mira_forward.py --upstream /tmp/zf-reference --mode local \
-  --output scratch/reproduced-local252.tm
-cmp scratch/reproduced-local252.tm candidates/mira252-local.tm
-cmp scratch/reproduced-local252.tree.json candidates/mira252-local.tree.json
+python3 tools/mira_forward.py --upstream /tmp/zf-reference --mode startup \
+  --output scratch/reproduced-startup251.tm
+cmp scratch/reproduced-startup251.tm candidates/mira251-startup.tm
+cmp scratch/reproduced-startup251.tree.json candidates/mira251-startup.tree.json
 ```
 
 The driver checks the complete blank-tape bootstrap, including every trailing
 register. The machine reaches its prescribed initial configuration after
-**267,192 steps**. It has working states 0 through 251 and undefined terminal
-state 252; state names referenced in the register proofs are preserved during
+**182,904 steps**. It has working states 0 through 250 and undefined terminal
+state 251; state names referenced in the register proofs are preserved during
 renumbering.
+
+### Shared startup and increment proof
+
+The initializer uses the existing arithmetic routines, eliminating a dedicated
+startup state. It reaches the source enumerator's state `s3`, after three
+commands from its initial state: the next-proof counter is 3, the first parameter
+register is 1, and the other seven registers are zero. The exact tape has a
+40-cell program-counter gap and 95 additional zero registers. The driver proves
+the nonhalting step from `s2` to `s3` and uses it to transport the original
+halting equivalence; it does not assume that skipping a command is harmless.
+
+Marking now returns uniformly in state 6, and increment shares the decrement
+scanner on its return path. [`startup_increment.v`](startup_increment.v)
+proves the replacement `shift_inc` lemma by induction on the arbitrary suffix
+of registers. Its base case checks the four extra transitions, and its output
+connects to the existing state-48 return proof. The local decrement proof below
+is unchanged. These universal lemmas justify the shared routines on unbounded
+tapes, beyond the finite bootstrap computation.
 
 ### New decrement proof
 
@@ -114,12 +133,14 @@ register excursions, every instruction site, whole-run simulation, the source
 certificate, and the complete connection to ZF/ZFC. Neither Python's symbolic
 executor nor the generator is an assumed compiler-correctness theorem.
 
-The candidate checker uses the stronger invariant that the space from the
-program-counter marker to the register header is at least **62 cells**. The
+The candidate checker uses the invariant that the space from the
+program-counter marker to the register header is at least **40 cells**. The
 literal bootstrap establishes that bound, and the whole-run simulation
 preserves it. Coq rebuilds the instruction checks and simulation with this
-bound; no additional hypothesis is added to the headline theorems. Use
-`--min-gap 40` to reproduce the upstream's more conservative abstraction.
+bound; no additional hypothesis is added to the headline theorems. Startup mode
+selects this bound automatically and rejects `--min-gap 62`, which its literal
+initializer does not establish. The 252- and 253-state modes default to 62;
+they also accept `--min-gap 40` for the upstream's more conservative abstraction.
 
 The recorded candidate run reused objects from a freshly rebuilt upstream
 proof and recompiled every affected module, including the three final
@@ -128,12 +149,22 @@ default performs a full source rebuild. The record identifies the input and
 canonical table, exact tree, replacement proof fragment, pinned sources and
 compiled dependency count. A failed build writes no verification record.
 
+### The 252-state local-carry variant
+
+The [252-state table](../../candidates/mira252-local.tm),
+[matching tree](../../candidates/mira252-local.tree.json), and
+[Coq record](../../reference/mira252-local-coq.json) use the same local decrement
+without shared startup. Reproduce its artifacts with generator `--mode local`.
+To rebuild its proof, supply these table/tree paths, `--halt 252
+--decrement-mode local`, and a fresh output directory to `candidate.py`.
+Its bootstrap takes 267,192 steps and reaches `s2` with a 62-cell gap.
+
 ### The 253-state block-streaming variant
 
 The [253-state table](../../candidates/mira253-forward.tm) uses a separate
 run scanner, with its [matching tree](../../candidates/mira253-forward.tree.json)
 and [Coq record](../../reference/mira253-forward-coq.json). To reproduce its
-artifacts, omit `--mode local` from the generator. To rebuild its proof, supply
+artifacts, pass `--mode forward` to the generator. To rebuild its proof, supply
 those table/tree paths, `--halt 253 --decrement-mode forward`, and a fresh
 output directory to `candidate.py`. Its bootstrap takes 284,880 steps.
 

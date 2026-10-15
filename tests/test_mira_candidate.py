@@ -13,10 +13,10 @@ candidate = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(candidate)
 
 
-def boot_writer(stray=False):
+def boot_writer(stray=False, gap=62, registers=candidate.BOOT_REGS):
     """A transparent fixture writing the specified tape then moving to dispatch."""
-    bits = [1] + [0] * 62 + [1]
-    for value in [0] * 6 + [2] + [0] * 138:
+    bits = [1] + [0] * gap + [1]
+    for value in registers:
         bits.extend([0] + [1] * (value + 1))
     if stray:
         bits.extend([0, 0, 1])
@@ -69,6 +69,26 @@ class CandidateAcceptance(unittest.TestCase):
         broken, broken_steps = boot_writer(stray=True)
         with self.assertRaises(ValueError):
             candidate.bootstrap(broken, broken_steps)
+
+    def test_startup_requires_its_exact_third_enumerator_configuration(self):
+        rows, steps = boot_writer(gap=40, registers=candidate.STARTUP_REGS)
+        self.assertEqual(candidate.bootstrap(rows, steps, 40, candidate.STARTUP_REGS), steps)
+        with self.assertRaises(ValueError):
+            candidate.bootstrap(rows, steps)
+        for registers in (candidate.STARTUP_REGS[:-1],
+                          candidate.STARTUP_REGS[:6] + (2,) + candidate.STARTUP_REGS[7:]):
+            with self.subTest(registers=registers), self.assertRaises(ValueError):
+                candidate.bootstrap(rows, steps, 40, registers)
+        broken, fuel = boot_writer(stray=True, gap=40, registers=candidate.STARTUP_REGS)
+        with self.assertRaises(ValueError):
+            candidate.bootstrap(broken, fuel, 40, candidate.STARTUP_REGS)
+
+    def test_startup_rejects_larger_capacity_before_reading_inputs(self):
+        with patch.object(candidate.sys, "argv", ["candidate.py", "--upstream", "missing",
+                          "--table", "missing", "--output", "unused",
+                          "--decrement-mode", "startup", "--min-gap", "62"]):
+            with self.assertRaisesRegex(ValueError, "exceeds.*exact boot capacity"):
+                candidate.main()
 
     def test_removed_reverse_state_requires_forward_proof_mode(self):
         states = [str(q) for q in candidate.FORWARD_ANCHORS] + [f"program{i}" for i in range(110)]

@@ -1,5 +1,12 @@
 # Candidate tables
 
+- **Shared-startup machine: 251 states**, in [mira251-startup.tm](mira251-startup.tm),
+  with its [203-node decoder tree](mira251-startup.tree.json) and
+  [Coq verification record](../reference/mira251-startup-coq.json). It removes a
+  startup state from the 252-state machine and reaches the source enumerator's
+  third state. Complete blank-tape halting equivalence to ZF/ZFC inconsistency.
+  [Reproduce the artifacts and proof](../formal/coq/README.md#verify-a-changed-machine).
+
 - **Local-carry machine: 252 states**, in [mira252-local.tm](mira252-local.tm),
   with its [203-node decoder tree](mira252-local.tree.json) and
   [Coq verification record](../reference/mira252-local-coq.json). A two-state
@@ -29,7 +36,8 @@
   [configuration](best.json). Retains all distinct Wade axiom clauses. Run
   `python3 tools/verify.py`. This table has no end-to-end formal proof here.
 
-All tables start on a blank two-way binary tape. The 252-state table has working states 0 through 251 and undefined terminal
+All tables start on a blank two-way binary tape. The 251-state table has working
+states 0 through 250 and undefined terminal state 251. The 252-state table has working states 0 through 251 and undefined terminal
 state 252. The 253-state table has working
 states 0 through 252 and undefined terminal state 253; the 254-state table uses
 working states 0 through 253 and undefined terminal state 254. The ICS and Wade tables retain
@@ -37,7 +45,7 @@ the upstream named partial-transition format. No post-compilation reduction is
 needed for their advertised counts.
 
 The 392-state baseline avoids the ICS theory/encoding changes, making it a useful
-comparison. The 308-state Lean machine and 252-state Coq machine use different
+comparison. The 308-state Lean machine and 251-state Coq machine use different
 source calculi; neither theorem silently changes the other's scope.
 
 See [experiments](../docs/EXPERIMENTS.md) and [verification scope](../docs/VERIFICATION.md).
