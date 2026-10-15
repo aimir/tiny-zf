@@ -106,6 +106,33 @@ connects to the existing state-48 return proof. The local decrement proof below
 is unchanged. These universal lemmas justify the shared routines on unbounded
 tapes, beyond the finite bootstrap computation.
 
+### General initialization theorem
+
+[`general_initialization.v`](general_initialization.v) separately proves
+`clean_state_halts_iff`: the source enumerator halts iff it derives contradiction
+from any initial proof-list value, candidate counter and additive parameter,
+provided the current formula, cached formula and formula stack are zero.
+This permits future initializers beyond a known finite prefix of the original
+run. It does not certify a different transition table or tape representation.
+
+Completeness pads the unused suffix of a halting proof program so its numeric
+code exceeds the initial counter, and proves that enumeration eventually reaches
+that code or halts earlier. Soundness uses the original invariant on the formula
+registers and stack. All helper lemmas are documented in the same file.
+After rebuilding the pinned reference above, check this auxiliary theorem with:
+
+```sh
+mkdir -p scratch/general-initialization
+cp formal/coq/general_initialization.v scratch/general-initialization/GeneralInit.v
+coqc -Q /tmp/zf-reference/ZF/m254/coq/logic M254L \
+  scratch/general-initialization/GeneralInit.v
+```
+
+The command must report `Closed under the global context`.
+The [verification record](../../reference/mira-general-initialization-coq.json)
+identifies the exact source. The published 251-state proof continues to use its
+explicit three-command initialization bridge.
+
 ### New decrement proof
 
 Registers are separated runs of ones. Decrement deletes one cell and shifts

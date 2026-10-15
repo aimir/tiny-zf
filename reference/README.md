@@ -9,6 +9,12 @@ proof of the 251-state machine: the exact table and tree, kernel proofs,
 ZF/ZFC/SIR endpoints.
 [Reproduction instructions](../formal/coq/README.md#verify-a-changed-machine).
 
+[mira-general-initialization-coq.json](mira-general-initialization-coq.json)
+records the auxiliary source-enumerator theorem for arbitrary clean initial
+states. It broadens the available initialization proof without changing the
+published machine or replacing its exact blank-tape proof.
+[Theorem and reproduction](../formal/coq/README.md#general-initialization-theorem).
+
 [mira252-local-coq.json](mira252-local-coq.json) records the complete Coq proof
 of the 252-state local-carry machine, including both kernel proof fragments,
 the exact table and decoder tree, and all three closed ZF/ZFC/SIR endpoints.

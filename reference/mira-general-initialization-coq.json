@@ -1,0 +1,11 @@
+{
+  "upstream_commit": "297ab8df7e5de329605c3875b4934643b371a5e3",
+  "source": "formal/coq/general_initialization.v",
+  "source_sha256": "f56a7d02ab8e949acde167e5d4eee13630c04db1fb8c5934620cdba138c77ba3",
+  "prover": "The Coq Proof Assistant, version 8.20.1\ncompiled with OCaml 4.14.1",
+  "theorem": "clean_state_halts_iff",
+  "statement": "forall pl0 np0 d0, halts_from (mkState pl0 np0 0 0 d0 0) <-> thm254 1",
+  "closed_under_global_context": 1,
+  "check_pass": true,
+  "scope": "source-enumerator initialization; does not certify a changed machine table or tape representation"
+}

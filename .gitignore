@@ -18,3 +18,4 @@ logs/
 .logs/
 *.olean
 *.ilean
+.lia.cache
