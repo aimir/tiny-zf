@@ -1,10 +1,35 @@
-# The 254-state construction and combined experiments
+# From Mira's 254-state construction to a verified 253-state machine
 
 Compared 15 October 2026 against
 [busy-beaver commit 297ab8d](https://github.com/jeff87654/busy-beaver/tree/297ab8df7e5de329605c3875b4934643b371a5e3/ZF/m254).
-**No machine smaller than 254 states was established in this experiment.**
-The retained program-tree changes now include a native 254-state variant with
-a complete Coq proof. This matches the reference size, rather than improving it.
+**The new forward-decrement machine has 253 states and a complete Coq proof of
+blank-tape halting equivalence to ZF/ZFC inconsistency.** Its
+[table](../candidates/mira253-forward.tm), [unchanged decoder tree](../candidates/mira253-forward.tree.json),
+and [proof record](../reference/mira253-forward-coq.json) are included. The
+earlier decoder-layout experiment also produced a checked 254-state variant.
+
+## The 253-state reduction
+
+The original positive-decrement routine scans to the end of the register file
+and shifts the suffix backward. The new routine moves the deleted-cell gap
+forward through the suffix. It restores the gap to one, scans the next run of
+ones, and erases its last one. At the end it appends the same zero register as
+the original operation. This permits the gap state and one continuation state
+to share a single state, saving one working state.
+
+The exact change from the pinned table redirects `75:1` to `1 L 112`, changes
+`112:0` to `1 R 97`, `112:1` to `0 R 112`, `97:0` to `0 L 63`, and `85:0` to
+`0 L 112`, then removes state 131 and redirects its incoming edges to 112.
+[`mira_forward.py`](../tools/mira_forward.py) applies these changes and renumbers
+the table while preserving the proof's named operation states.
+
+The source program and its 203-node decoder tree are unchanged. The complete
+blank-tape bootstrap takes 284,880 steps. The
+[new kernel proof](../formal/coq/forward_decrement.v) covers arbitrary register
+values and suffixes, including the uniform positive-decrement return in state
+48. Coq then checks the interpreter and the entire source-to-ZF/ZFC chain.
+All three headline theorems are closed under the global context.
+[Artifact and proof reproduction](../formal/coq/README.md#verify-a-changed-machine).
 
 ## Attribution and verification
 
@@ -187,5 +212,5 @@ The native compiler and candidate proof driver now support that next step.
 Reassociation must recheck or undo contextual sharing and score the actual
 final table. Multiple checked layouts are retained for further merging.
 The repaired variant accounts for the extra state needed by one such rewrite;
-a smaller register tree alone is not enough. Further search continues toward
-a machine below 254, with full formal acceptance required for each result.
+a smaller register tree alone is not enough. Further search targets
+250 states or fewer, with full formal acceptance required for each result.

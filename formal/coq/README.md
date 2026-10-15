@@ -1,10 +1,11 @@
-# Verified reference for the 254-state search
+# Coq verification of the 253-state machine
 
-Mira-Cult's 254-state machine has a stronger endpoint than our 308-state Lean
-theorem: Jeffrey Ketchersid's Coq development proves that it halts from blank
-tape exactly when conventional ZF, or ZFC, is inconsistent. We rebuilt the
-complete pinned development with Coq 8.20.1 on 15 October 2026. All three
-headline theorems reported `Closed under the global context`.
+**The [253-state forward-decrement machine](../../candidates/mira253-forward.tm)
+halts on blank tape exactly when conventional ZF or ZFC is inconsistent.**
+The proof extends Jeffrey Ketchersid's pinned Coq development for Mira-Cult's
+254-state machine with a new unbounded decrement kernel. Its source interpreter
+and set-theoretic interpretation are unchanged. All three headline theorems
+report `Closed under the global context` with Coq 8.20.1.
 
 The [upstream headline](https://github.com/jeff87654/busy-beaver/blob/297ab8df7e5de329605c3875b4934643b371a5e3/ZF/m254/coq/e2e/E2E254.v)
 is:
@@ -17,10 +18,11 @@ Theorem zf254_halts_iff_SIR : halts tm c0 <-> SIR ⊢TC ⊥.
 
 The literal table, bootstrap, unbounded register operations, all instruction
 sites, source interpreter, proof calculus, and set-theoretic interpretation
-are covered. These are Coq theorems about the upstream table; they do not
-change the statement of [our Lean headline](../TinyZF.lean).
+are covered. The inherited theorem names retain `254`, but the candidate build
+replaces `tm` with the exact 253-state table. These Coq results do not change
+the statement of [our 308-state Lean headline](../TinyZF.lean).
 
-## Rebuild
+## Rebuild the pinned reference
 
 Install Coq 8.20.x and Python 3, then obtain the pinned proof sources outside
 this repository:
@@ -51,43 +53,64 @@ this successful reference build does not certify a candidate mutation.
 
 ## Verify a changed machine
 
-The [254-state tree variant](../../candidates/mira254-rotation.tm) has also
-passed the complete proof with its own literal transition table and
-[exact decoder tree](../../candidates/mira254-rotation.tree.json). Its
-[verification record](../../reference/mira254-rotation-coq.json) reports all
-three endpoints closed. It changes the decoder layout while preserving the
-same source interpreter and set theory. Its size equals the upstream record.
+The [253-state table](../../candidates/mira253-forward.tm),
+[203-node decoder tree](../../candidates/mira253-forward.tree.json), and
+[verification record](../../reference/mira253-forward-coq.json) describe the
+current smallest proved machine in this repository. The decoder tree is the
+original pinned program. Only the tape-level positive decrement changes.
 
 After obtaining the pinned checkout above, run from this repository:
 
 ```sh
 python3 formal/coq/candidate.py --upstream /tmp/zf-reference --coqc coqc \
-  --table candidates/mira254-rotation.tm \
-  --tree candidates/mira254-rotation.tree.json \
-  --output scratch/rotation-proof
+  --table candidates/mira253-forward.tm --halt 253 \
+  --tree candidates/mira253-forward.tree.json --decrement-mode forward \
+  --output scratch/forward253-proof
 ```
 
 The output directory must be new. By default this copies the pinned sources
 and rebuilds their entire dependency closure, excluding existing compiled
-objects. The checked table is written to `scratch/rotation-proof/candidate.tm`;
+objects. The checked table is written to `scratch/forward253-proof/candidate.tm`;
 its bytes must match the committed table. The original upstream files stay
-unchanged. To reproduce the named compiler output as well:
+unchanged. To reproduce the two input artifacts independently:
 
 ```sh
-python3 tools/mira_native.py --upstream /tmp/zf-reference \
-  --backend contextual --rotate --output scratch/rotation.tm
-python3 formal/coq/candidate.py --upstream /tmp/zf-reference --coqc coqc \
-  --table scratch/rotation.tm --tree scratch/rotation.tree.json \
-  --output scratch/generated-rotation-proof
+python3 tools/mira_forward.py --upstream /tmp/zf-reference \
+  --output scratch/reproduced-forward253.tm
+cmp scratch/reproduced-forward253.tm candidates/mira253-forward.tm
+cmp scratch/reproduced-forward253.tree.json candidates/mira253-forward.tree.json
 ```
 
 The driver checks the complete blank-tape bootstrap, including every trailing
-register, and renumbers states while preserving the identities referenced by
-proof lemmas. It generates the decoder definition and a two-way bisimulation
-certificate against the unchanged source program. Coq checks the register
-excursions, every instruction site, whole-run simulation, the source certificate,
-and the complete connection to ZF/ZFC. Neither Python's symbolic executor nor
-the generator is an assumed compiler-correctness theorem.
+register. The machine reaches its prescribed initial configuration after
+**284,880 steps**. It has working states 0 through 252 and undefined terminal
+state 253; state names referenced in the register proofs are preserved during
+renumbering.
+
+### New decrement proof
+
+Registers are separated runs of ones. Decrement deletes one cell and shifts
+all later blocks one position left, appending a zero register. The new routine
+carries the gap forward: it fills the previous gap, scans the next run, and
+erases that run's final one. A single state handles both the gap and the
+transition to the next block. Positive decrement always returns in state 48.
+
+[`forward_decrement.v`](forward_decrement.v) proves the unbounded operation.
+`forward_dec_block` carries the gap across one positive run;
+`forward_dec` inducts over the arbitrary suffix of registers; `sepsL_forward`
+reconciles the tape encodings; and `box_decp` supplies the interpreter contract
+for every positive selected register. The remaining helper exposes the final
+separator. These are ordinary Coq proofs checked against the literal table.
+The driver installs them together with the corresponding symbolic return-state
+definition and rebuilds all dependents.
+
+### Complete acceptance chain
+
+The driver generates the decoder definition and a two-way bisimulation
+certificate against the unchanged 219-node source program. Coq checks the
+register excursions, every instruction site, whole-run simulation, the source
+certificate, and the complete connection to ZF/ZFC. Neither Python's symbolic
+executor nor the generator is an assumed compiler-correctness theorem.
 
 The candidate checker uses the stronger invariant that the space from the
 program-counter marker to the register header is at least **62 cells**. The
@@ -96,17 +119,28 @@ preserves it. Coq rebuilds the instruction checks and simulation with this
 bound; no additional hypothesis is added to the headline theorems. Use
 `--min-gap 40` to reproduce the upstream's more conservative abstraction.
 
-The recorded run reused objects from a freshly rebuilt upstream proof and
-recompiled all 15 affected modules, including the three final assumption
-audits. `--reuse-upstream-build` enables that faster mode; the default performs
-a full source rebuild. The record contains the input-table hash and
-`canonical_machine_sha256`, which identifies the committed literal table.
-The `zf254_*` theorem names are inherited from the pinned proof; their machine
-definition is replaced by the candidate's exact table.
+The recorded candidate run reused objects from a freshly rebuilt upstream
+proof and recompiled every affected module, including the three final
+assumption audits. `--reuse-upstream-build` enables that faster mode; the
+default performs a full source rebuild. The record identifies the input and
+canonical table, exact tree, replacement proof fragment, pinned sources and
+compiled dependency count. A failed build writes no verification record.
 
-Always pair a machine with its matching tree. The older
-`reference/mira254-tree202.json` is a different 202-node layout: pairing it with
-this table fails Coq's instruction check. A failed build writes no verification
-record. The independent backend in `mira_native.py` also supplies an explicit
-compiler and six search transformations; its symbolic results alone are not
-formal acceptance.
+### Decoder-layout comparison
+
+The earlier [254-state decoder variant](../../candidates/mira254-rotation.tm)
+also has a complete [Coq verification record](../../reference/mira254-rotation-coq.json).
+It has its own [202-node tree](../../candidates/mira254-rotation.tree.json) and
+uses the original reverse-shifting decrement. Reproduce its proof with:
+
+```sh
+python3 formal/coq/candidate.py --upstream /tmp/zf-reference --coqc coqc \
+  --table candidates/mira254-rotation.tm \
+  --tree candidates/mira254-rotation.tree.json \
+  --output scratch/rotation-proof
+```
+
+`tools/mira_native.py --backend contextual --rotate` reproduces its named
+compiler output when supplied `--upstream` and `--output`. Always pair a table
+with its matching tree: `reference/mira254-tree202.json` is a different layout
+and fails the instruction check when paired with this table.

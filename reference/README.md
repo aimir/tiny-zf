@@ -3,6 +3,12 @@
 These are small, curated metadata files, not execution logs or exhaustive search
 traces. All final counts include the local reduction pipeline.
 
+[mira253-forward-coq.json](mira253-forward-coq.json) records the complete Coq
+proof of the 253-state forward-decrement machine. It identifies the exact
+committed table, decoder tree, replacement kernel proof and pinned upstream
+dependencies, and records all three closed ZF/ZFC/SIR headline theorems.
+[Reproduction instructions](../formal/coq/README.md#verify-a-changed-machine).
+
 The [254-state comparison](mira254-comparison.json) records pinned external
 inputs, actual recompilation counts and checks. Its [202-node tree](mira254-tree202.json)
 is a register-program experiment, not a new record TM. The compared backends

@@ -1,6 +1,7 @@
 # Documentation
 
-- [254-state comparison](MIRA254.md): Mira-Cult's architecture, Ketchersid's Coq proof, reproduced counts, combined search and rejected transplant.
+- [Mira-based reduction](MIRA254.md): the Coq-verified 253-state forward-decrement machine, Mira-Cult's 254-state architecture, reproduced counts and combined experiments.
+- [Coq proof guide](../formal/coq/README.md): reproduce the 253-state table and its complete ZF/ZFC equivalence proof.
 - [Experiments](EXPERIMENTS.md): the current 308-state candidate, transformations, combined-search results, and replay commands.
 - [Survey](SURVEY.md): source history, competing formulations, and known correctness issues.
 - [Verification](VERIFICATION.md): the complete Lean implementation theorem, computational checks and the remaining theory bridge.

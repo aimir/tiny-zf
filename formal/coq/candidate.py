@@ -3,7 +3,6 @@
 The candidate may change its control states and run time.  It must reach the
 exact upstream initial tape and retain the named register-operation anchors.
 Coq then checks the entire interpreter-to-set-theory proof with the new table.
-This tool does not claim that a smaller table has been found.
 """
 import argparse
 import hashlib
@@ -24,6 +23,7 @@ import time
 ANCHORS = frozenset({0, 1, 2, 3, 4, 6, 28, 31, 38, 40, 43, 44, 48, 56,
                      59, 60, 63, 64, 69, 73, 75, 83, 85, 95, 96, 97, 109,
                      112, 131})
+FORWARD_ANCHORS = ANCHORS - {131}
 BOOT_REGS = (0, 0, 0, 0, 0, 0, 2, 0, 0) + (0,) * 136
 
 
@@ -98,14 +98,14 @@ def bootstrap(rows, limit):
     raise ValueError(f"candidate did not reach the exact initial configuration within {limit} steps")
 
 
-def canonicalize(rows, halt="254"):
+def canonicalize(rows, halt="254", anchors=ANCHORS):
     """Give Coq a dense table while preserving the proof's conservative anchors."""
     states = {q for q, _ in rows}
-    missing = {str(q) for q in ANCHORS} - states
-    if missing or max(ANCHORS) >= len(states):
+    missing = {str(q) for q in anchors} - states
+    if missing or max(anchors) >= len(states):
         raise ValueError(f"candidate is missing required proof anchors: {sorted(missing)}")
-    mapping = {str(q): q for q in ANCHORS}
-    vacant = iter(q for q in range(len(states)) if q not in ANCHORS)
+    mapping = {str(q): q for q in anchors}
+    vacant = iter(q for q in range(len(states)) if q not in anchors)
     def sort_key(q):
         return (0, int(q)) if q.isdecimal() else (1, q)
     for q in sorted(states - mapping.keys(), key=sort_key):
@@ -219,6 +219,41 @@ def install_min_gap(directory, minimum):
     return {path.resolve()}, ["minimum PC capacity strengthened from 40 to the exact boot capacity 62"]
 
 
+def install_forward_decrement(directory):
+    """Prove the streaming decrement kernel with a uniform return state 48.
+
+    Only this explicit mode drops state 131 from the canonicalization anchors.
+    Its replacement proof handles unbounded register values and arbitrary
+    left context; all literal transitions and subsequent sites are checked by
+    Coq. The source interpreter and the exact initial tape remain unchanged.
+    """
+    fragment = Path(__file__).with_name("forward_decrement.v").read_text()
+    helpers, separator, contract = fragment.partition("Lemma box_decp ")
+    if not separator or "Lemma box_decp " in contract:
+        raise ValueError("invalid forward-decrement proof fragments")
+    path = directory / "coq/tm/Box.v"
+    source = path.read_text()
+    start = "(** ** Positive decrement: shifting the later blocks left *)"
+    end = "(** ** The four excursions *)"
+    if source.count(start) != 1 or source.count(end) != 1:
+        raise ValueError("unexpected pinned positive-decrement helper section")
+    before, rest = source.split(start)
+    _, after = rest.split(end)
+    source = before + helpers + "\n" + end + after
+    if source.count("Lemma box_decp ") != 1 or source.count("(** No axioms: *)") != 1:
+        raise ValueError("unexpected pinned positive-decrement contract")
+    before, rest = source.split("Lemma box_decp ")
+    _, after = rest.split("(** No axioms: *)")
+    path.write_text(before + separator + contract + "\n(** No axioms: *)" + after)
+    symbolic = directory / "coq/tm/SymExec.v"
+    replace_exact(symbolic,
+                  "Definition decp_exit (r : nat) : nat := if Nat.eqb r 0 then 63 else 48.",
+                  "Definition decp_exit (r : nat) : nat := 48.", 1)
+    return {path.resolve(), symbolic.resolve()}, [
+        "positive decrement streams the gap rightward and returns in state 48 for every register",
+        "forward-decrement proof fragment SHA256 " + hashlib.sha256(fragment.encode()).hexdigest()]
+
+
 def compile_closure(checker, coqc, dirty, reuse):
     """Rebuild every dependent module, including the final assumption audit."""
     dirty = {path.resolve() for path in dirty}
@@ -266,6 +301,8 @@ def main():
     parser.add_argument("--tree", type=Path,
                         help="optional decoder tree JSON; also proves equivalence to the pinned source")
     parser.add_argument("--halt", default="254")
+    parser.add_argument("--decrement-mode", choices=("reverse", "forward"), default="reverse",
+                        help="register kernel proof: original reverse shift or proved forward stream")
     parser.add_argument("--coqc", default=os.environ.get("COQC", "coqc"))
     parser.add_argument("--bootstrap-limit", type=int, default=2_000_000)
     parser.add_argument("--min-gap", type=int, choices=(40, 62), default=62,
@@ -285,7 +322,8 @@ def main():
     input_bytes = args.table.read_bytes()
     rows = parse_table(input_bytes.decode(), args.halt)
     steps = bootstrap(rows, args.bootstrap_limit)
-    canonical, mapping = canonicalize(rows, args.halt)
+    anchors = FORWARD_ANCHORS if args.decrement_mode == "forward" else ANCHORS
+    canonical, mapping = canonicalize(rows, args.halt, anchors)
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
     ignore = (shutil.ignore_patterns("__pycache__") if args.reuse_upstream_build else
@@ -310,6 +348,10 @@ def main():
         dirty.update(tree_dirty)
     box_dirty, proof_adjustments = adapt_skip_lemma(directory, canonical)
     dirty.update(box_dirty)
+    if args.decrement_mode == "forward":
+        forward_dirty, forward_adjustments = install_forward_decrement(directory)
+        dirty.update(forward_dirty)
+        proof_adjustments.extend(forward_adjustments)
     gap_dirty, gap_adjustments = install_min_gap(directory, args.min_gap)
     dirty.update(gap_dirty)
     proof_adjustments.extend(gap_adjustments)
@@ -322,7 +364,8 @@ def main():
         "working_states": len(rows) // 2, "prover": version,
         "bootstrap_steps": steps, "exact_initial_tape": True,
         "minimum_pc_capacity": args.min_gap,
-        "preserved_state_anchors": sorted(ANCHORS),
+        "preserved_state_anchors": sorted(anchors),
+        "positive_decrement_implementation": args.decrement_mode,
         "clean_source_rebuild": not args.reuse_upstream_build,
         "proof_adjustments": proof_adjustments,
         "reused_upstream_objects": args.reuse_upstream_build, "rebuilt_modules": rebuilt,

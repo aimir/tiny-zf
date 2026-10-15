@@ -1,19 +1,21 @@
 # Smaller ZF proof-search Turing machines
 
-**Formally checked Mira-based variant: 254 states, with a complete Coq proof
+**253 states, with a complete Coq proof
 that it halts on blank tape exactly when ZF or ZFC is inconsistent.**
-The [literal table](candidates/mira254-rotation.tm),
-[matching program tree](candidates/mira254-rotation.tree.json), and
-[verification instructions](formal/coq/README.md#verify-a-changed-machine) are included.
-This matches Mira-Cult's state count; it is not a smaller record.
+The [literal table](candidates/mira253-forward.tm),
+[matching program tree](candidates/mira253-forward.tree.json),
+[verification record](reference/mira253-forward-coq.json), and
+[reproduction instructions](formal/coq/README.md#verify-a-changed-machine) are included.
+A forward-streaming decrement routine saves one state over Mira-Cult's pinned
+254-state construction. The source program and mathematical endpoint are unchanged.
 
 **External benchmark: Mira-Cult's 254-state machine, with an end-to-end ZFC
 inconsistency proof in Jeffrey Ketchersid's Coq development.** We have
 [rebuilt that complete proof from source](formal/coq/README.md), with all three
 headline theorems closed under the global context. Our
 [comparison and combined experiments](docs/MIRA254.md) reproduce the architectural
-savings and compile a smaller register-program tree into an independently
-checked 254-state variant. No machine below 254 has been established here.
+savings, check a 254-state decoder variant, and establish the new 253-state
+machine by changing the register-operation kernel.
 The candidate proof now uses the bootstrap's full 62-cell program-counter
 capacity, enabling searches with a stronger formally checked invariant.
 
@@ -43,6 +45,7 @@ equiconsistency with ZF.
 
 | Machine | States | Artifact and scope |
 | --- | ---: | --- |
+| Forward-decrement machine | **253** | [Table](candidates/mira253-forward.tm), [tree](candidates/mira253-forward.tree.json), [Coq record](reference/mira253-forward-coq.json). Complete blank-tape halting equivalence to ZF/ZFC inconsistency. |
 | Mira-based tree variant | **254** | [Table](candidates/mira254-rotation.tm), [tree](candidates/mira254-rotation.tree.json), [Coq record](reference/mira254-rotation-coq.json). Complete blank-tape halting equivalence to ZF/ZFC inconsistency; equals the external record. |
 | Mira-Cult / external benchmark | **254** | [Upstream table and Coq proof](https://github.com/jeff87654/busy-beaver/tree/297ab8df7e5de329605c3875b4934643b371a5e3/ZF/m254); [local comparison](docs/MIRA254.md). Not the machine of this repository's Lean headline. |
 | Current ICS candidate | **308** | [Table](candidates/ics-best.tm), [configuration and hashes](candidates/ics-best.json), [instruction tree](candidates/ics-tree.json). Lean-verified tape-to-source equivalence; changed axiomatization and formula coding. |
@@ -100,6 +103,11 @@ ordinary instructions also bottomed out at 308.
 [Experiments](docs/EXPERIMENTS.md) explains what worked, what failed, and how to repeat the searches. Search limits are not lower bounds.
 
 ## Reproduce and check
+
+For the 253-state result, follow the [Coq verification guide](formal/coq/README.md#verify-a-changed-machine).
+It rebuilds the proof against the exact committed transition table and program
+tree using Coq 8.20.x and pinned upstream sources. The local
+[`mira_forward.py`](tools/mira_forward.py) generator reproduces both artifacts.
 
 For the Lean development, install elan, then run:
 
