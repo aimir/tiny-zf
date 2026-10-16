@@ -85,3 +85,10 @@ machine and instruction-tree hashes identify the committed artifacts. The
 initial named-table hash identifies the compiler output before renumbering.
 The build reused freshly checked upstream dependencies and recompiled all
 affected modules. [Rebuild instructions](../formal/coq/README.md).
+
+[mira-stack-protection-coq.json](mira-stack-protection-coq.json) records the
+closed Coq proof that enumeration from candidate zero can retain any original
+stack tail when its current formula and cache are derivable. It identifies the
+single [proof file](../formal/coq/stack_protection.v), its general-initialization
+dependency, both exact theorem statements and reproduction instructions.
+This auxiliary source theorem does not certify a different machine table.

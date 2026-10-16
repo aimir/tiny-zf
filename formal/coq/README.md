@@ -133,6 +133,39 @@ The [verification record](../../reference/mira-general-initialization-coq.json)
 identifies the exact source. The published 251-state proof continues to use its
 explicit three-command initialization bridge.
 
+### Protected initial stack
+
+[`stack_protection.v`](stack_protection.v) proves
+`arbitrary_initial_stack_halts_iff`: from candidate counter zero and an empty
+remaining proof list, the source enumerator halts iff it derives contradiction,
+for **any initial stack and additive parameter**, provided the current formula
+and cache are derivable. `arbitrary_stack_zero_head_halts_iff` discharges both
+hypotheses when the current formula and cache are zero.
+
+The proof has five parts in one file, with every helper theorem documented:
+exact command coding; a distinct earlier DROP partner for each NIP; the resulting
+finite-prefix count bound; correspondence with the source decoder; and a
+certified stack prefix above the arbitrary original tail. Replacing selector 2
+(NIP) by selector 1 (DROP) preserves its fields and position while strictly
+lowering the candidate code. Every NIP therefore has DROP credit already
+available, and never reads the original tail. Completeness uses
+`GeneralInit.complete_from_any`.
+
+After compiling `GeneralInit.v` above, run:
+
+```sh
+cp formal/coq/stack_protection.v scratch/general-initialization/StackProtection.v
+coqc -Q /tmp/zf-reference/ZF/m254/coq/logic M254L \
+  -Q scratch/general-initialization "" \
+  scratch/general-initialization/StackProtection.v
+```
+
+Both headline reports must say `Closed under the global context`.
+The [verification record](../../reference/mira-stack-protection-coq.json) pins
+both source files. This proves a source initialization contract; a new machine
+still requires its complete binary-tape initialization and interpreter proof.
+The published machine remains the separately verified 251-state table.
+
 ### New decrement proof
 
 Registers are separated runs of ones. Decrement deletes one cell and shifts

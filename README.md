@@ -105,6 +105,12 @@ an additional search seeded with the entire validated incumbent tree. Across
 ordinary instructions also bottomed out at 308.
 [Experiments](docs/EXPERIMENTS.md) explains what worked, what failed, and how to repeat the searches. Search limits are not lower bounds.
 
+The [source stack-protection theorem](formal/coq/stack_protection.v) also proves
+that enumeration starting at candidate zero preserves halting equivalence with
+an arbitrary initial stack, provided the current formula and cache are derivable.
+Each NIP has a distinct earlier DROP partner, so only newly pushed formulas can
+be popped. [Reproduction and scope](formal/coq/README.md#protected-initial-stack).
+
 ## Reproduce and check
 
 For the 251-state result, follow the [Coq verification guide](formal/coq/README.md#verify-a-changed-machine).

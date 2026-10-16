@@ -1,0 +1,24 @@
+{
+  "upstream_commit": "297ab8df7e5de329605c3875b4934643b371a5e3",
+  "source": "formal/coq/stack_protection.v",
+  "source_sha256": "e950b16586ede8ac124c81f6c4d24e037cd0da9e250c949e2c27ef35dfa7d919",
+  "dependency": {
+    "source": "formal/coq/general_initialization.v",
+    "module": "GeneralInit",
+    "source_sha256": "f56a7d02ab8e949acde167e5d4eee13630c04db1fb8c5934620cdba138c77ba3"
+  },
+  "prover": "The Coq Proof Assistant, version 8.20.1\ncompiled with OCaml 4.14.1",
+  "theorems": [
+    {
+      "name": "arbitrary_initial_stack_halts_iff",
+      "statement": "forall t base dd hh, thm254 t -> thm254 hh -> (halts_from (mkState 0 0 t base dd hh) <-> thm254 1)"
+    },
+    {
+      "name": "arbitrary_stack_zero_head_halts_iff",
+      "statement": "forall base dd, halts_from (mkState 0 0 0 base dd 0) <-> thm254 1"
+    }
+  ],
+  "closed_under_global_context": 2,
+  "check_pass": true,
+  "scope": "Source-enumerator stack-tail protection; candidate counter and remaining proof list initially zero. A changed binary machine still needs its complete initialization and interpreter proof."
+}
