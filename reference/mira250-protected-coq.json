@@ -39,7 +39,7 @@
     112
   ],
   "positive_decrement_implementation": "protected",
-  "clean_source_rebuild": false,
+  "clean_source_rebuild": true,
   "proof_adjustments": [
     "positive decrement streams the gap rightward and returns in state 48 for every register",
     "forward-decrement proof fragment SHA256 caa171e1495157b9b70ee2fbcae6be7d42457977263e03ed3bfd5af15e49ad4f",
@@ -55,8 +55,8 @@
     "two candidate RM steps, certificate entry 148, and 347 original-source RM steps",
     "unbounded structured AX suffix, three return steps, and protected initial stack at candidate zero"
   ],
-  "reused_upstream_objects": true,
-  "rebuilt_modules": 17,
+  "reused_upstream_objects": false,
+  "rebuilt_modules": 159,
   "theorems": [
     "zf254_halts_iff_ZF",
     "zf254_halts_iff_ZFC",

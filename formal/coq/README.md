@@ -250,12 +250,13 @@ select this 40-cell lower bound automatically and reject `--min-gap 62`, which
 neither literal initializer establishes. The 252- and 253-state modes default to 62;
 they also accept `--min-gap 40` for the upstream's more conservative abstraction.
 
-The recorded candidate run reused objects from a freshly rebuilt upstream
-proof and recompiled every affected module, including the three final
-assumption audits. `--reuse-upstream-build` enables that faster mode; the
-default performs a full source rebuild. The record identifies the input and
-canonical table, exact tree, replacement proof fragment, pinned sources and
-compiled dependency count. A failed build writes no verification record.
+The recorded 250-state run rebuilt all **159 dependency modules from source**,
+including the three final assumption audits. It reused no upstream compiled
+proof objects. This is the driver's default. `--reuse-upstream-build` enables
+a faster alternative that rebuilds every affected module and the final audits.
+The record identifies the input and canonical table, exact tree, replacement
+proof fragments, pinned sources and compiled dependency count. A failed build
+writes no verification record.
 
 ### The 252-state local-carry variant
 
