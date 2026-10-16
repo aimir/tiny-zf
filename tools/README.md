@@ -1,9 +1,10 @@
 # Tools
 
-`mira_forward.py` reproduces the **251-state Coq-verified machine** from the
-hash-pinned 254-state reference. Its default `--mode startup` combines a
-two-state decrement loop with a shared startup path and emits the canonical
-table and unchanged 203-node decoder tree. `--mode local` reproduces the
+`mira_forward.py` reproduces the **250-state Coq-verified machine** from the
+hash-pinned 254-state reference. Its default `--mode protected` combines a
+two-state decrement loop, shared startup/return paths and register placement,
+and emits the canonical table and unchanged 203-node decoder tree.
+`--mode startup` reproduces the 251-state version; `--mode local` reproduces the
 252-state version; `--mode forward` reproduces the 253-state block stream.
 [Artifact and proof reproduction](../formal/coq/README.md#verify-a-changed-machine).
 

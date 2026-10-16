@@ -73,9 +73,12 @@ def parse_table(text, halt="254"):
     return rows
 
 
-def boot_tape(gap=62, registers=BOOT_REGS):
+def boot_tape(gap=62, registers=BOOT_REGS, pc=()):
     """All occupied cells, relative to dispatch head; all other cells are blank."""
+    if gap < len(pc) or any(bit not in (False, True) for bit in pc):
+        raise ValueError("the binary program counter must fit in its capacity")
     occupied, cursor = {-1, gap}, gap + 1
+    occupied.update(i for i, bit in enumerate(pc) if bit)
     for value in registers:
         cursor += 1
         occupied.update(range(cursor, cursor + value + 1))
@@ -83,9 +86,9 @@ def boot_tape(gap=62, registers=BOOT_REGS):
     return frozenset(occupied)
 
 
-def bootstrap(rows, limit, gap=62, registers=BOOT_REGS):
+def bootstrap(rows, limit, gap=62, registers=BOOT_REGS, pc=()):
     """Require the complete infinite tape, not merely the first nine registers."""
-    expected, tape, state, head = boot_tape(gap, registers), set(), "0", 0
+    expected, tape, state, head = boot_tape(gap, registers, pc), set(), "0", 0
     for steps in range(limit + 1):
         if state == "96" and len(tape) == len(expected):
             if frozenset(cell - head for cell in tape) == expected:
@@ -388,21 +391,27 @@ def main():
     parser.add_argument("--tree", type=Path,
                         help="optional decoder tree JSON; also proves equivalence to the pinned source")
     parser.add_argument("--halt", default="254")
-    parser.add_argument("--decrement-mode", choices=("reverse", "forward", "local", "startup"), default="reverse",
-                        help="kernel proof: reverse, forward, local carry, or local carry with shared startup")
+    parser.add_argument("--decrement-mode", choices=("reverse", "forward", "local", "startup", "protected"), default="reverse",
+                        help="kernel proof, with startup or protected nonempty-PC initialization")
     parser.add_argument("--coqc", default=os.environ.get("COQC", "coqc"))
-    parser.add_argument("--bootstrap-limit", type=int, default=2_000_000)
+    parser.add_argument("--bootstrap-limit", type=int)
     parser.add_argument("--min-gap", type=int, choices=(40, 62),
-                        help="minimum PC capacity (default: exact boot capacity, 40 in startup mode, else 62)")
+                        help="minimum PC capacity (default: 40 in startup/protected modes, otherwise 62)")
     parser.add_argument("--output", type=Path, required=True,
                         help="new persistent proof workspace (must not exist)")
     parser.add_argument("--reuse-upstream-build", action="store_true",
                         help="reuse existing upstream Coq objects; otherwise rebuild every source")
     args = parser.parse_args()
-    boot_gap, boot_registers = ((40, STARTUP_REGS) if args.decrement_mode == "startup"
+    protected = (load_module(Path(__file__).with_name("protected.py"), "protected_startup")
+                 if args.decrement_mode == "protected" else None)
+    boot_gap, boot_registers = ((protected.CAPACITY, protected.REGISTERS) if protected else
+                                (40, STARTUP_REGS) if args.decrement_mode == "startup"
                                 else (62, BOOT_REGS))
+    boot_pc = protected.PC if protected else ()
+    if args.bootstrap_limit is None:
+        args.bootstrap_limit = 3_000_000 if protected else 2_000_000
     if args.min_gap is None:
-        args.min_gap = boot_gap
+        args.min_gap = 40 if protected else boot_gap
     if args.min_gap > boot_gap:
         raise ValueError("minimum PC capacity exceeds the proof mode's exact boot capacity")
     coqc = shutil.which(args.coqc)
@@ -414,9 +423,12 @@ def main():
     _, version = reference.inspect(upstream, coqc)
     input_bytes = args.table.read_bytes()
     rows = parse_table(input_bytes.decode(), args.halt)
-    steps = bootstrap(rows, args.bootstrap_limit, boot_gap, boot_registers)
+    steps = bootstrap(rows, args.bootstrap_limit, boot_gap, boot_registers, boot_pc)
+    if protected and steps != protected.STEPS:
+        raise ValueError("protected startup requires the proof's exact literal step count")
     anchors = {"reverse": ANCHORS, "forward": FORWARD_ANCHORS,
-               "local": LOCAL_ANCHORS, "startup": STARTUP_ANCHORS}[args.decrement_mode]
+               "local": LOCAL_ANCHORS, "startup": STARTUP_ANCHORS,
+               "protected": STARTUP_ANCHORS}[args.decrement_mode]
     canonical, mapping = canonicalize(rows, args.halt, anchors)
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
@@ -442,7 +454,11 @@ def main():
         dirty.update(tree_dirty)
     box_dirty, proof_adjustments = adapt_skip_lemma(directory, canonical)
     dirty.update(box_dirty)
-    if args.decrement_mode in ("forward", "local", "startup"):
+    if protected:
+        forward_dirty, forward_adjustments = protected.install(directory, install_startup, replace_exact)
+        dirty.update(forward_dirty)
+        proof_adjustments.extend(forward_adjustments)
+    elif args.decrement_mode in ("forward", "local", "startup"):
         installer = {"forward": install_forward_decrement, "local": install_local_decrement,
                      "startup": install_startup}[args.decrement_mode]
         forward_dirty, forward_adjustments = installer(directory)
@@ -460,7 +476,7 @@ def main():
         "working_states": len(rows) // 2, "prover": version,
         "bootstrap_steps": steps, "exact_initial_tape": True,
         "bootstrap_pc_capacity": boot_gap,
-        "initial_enumerator_steps": 3 if args.decrement_mode == "startup" else 2,
+        "initial_enumerator_steps": None if protected else 3 if args.decrement_mode == "startup" else 2,
         "minimum_pc_capacity": args.min_gap,
         "preserved_state_anchors": sorted(anchors),
         "positive_decrement_implementation": args.decrement_mode,
@@ -471,6 +487,15 @@ def main():
         "check_pass": True, "scope": "candidate table implements the unchanged pinned source interpreter",
         **tree_report
     }
+    if protected:
+        report.update({"bootstrap_pc_bits": list(boot_pc),
+                       "bootstrap_physical_registers": list(boot_registers[:9]),
+                       "inactive_register_count": len(protected.TAIL),
+                       "inactive_nonzero_registers": {str(i): x for i, x in enumerate(protected.TAIL) if x},
+                       "physical_of": list(protected.PHYSICAL_OF),
+                       "physical_order": list(protected.PHYSICAL_ORDER),
+                       "initial_source_contract": "candidate zero, zero head/cache, arbitrary protected stack",
+                       "source_bridge_theorem": "M254P.ProtectedStartup.tm250_thm"})
     (output / "verification.json").write_text(json.dumps(report, indent=2) + "\n")
     print(f"CANDIDATE PROOF PASS: {len(rows) // 2} states, {rebuilt} rebuilt modules", flush=True)
     return report

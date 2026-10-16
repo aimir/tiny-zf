@@ -13,9 +13,9 @@ candidate = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(candidate)
 
 
-def boot_writer(stray=False, gap=62, registers=candidate.BOOT_REGS):
+def boot_writer(stray=False, gap=62, registers=candidate.BOOT_REGS, pc=()):
     """A transparent fixture writing the specified tape then moving to dispatch."""
-    bits = [1] + [0] * gap + [1]
+    bits = [1] + list(pc) + [0] * (gap - len(pc)) + [1]
     for value in registers:
         bits.extend([0] + [1] * (value + 1))
     if stray:
@@ -82,6 +82,20 @@ class CandidateAcceptance(unittest.TestCase):
         broken, fuel = boot_writer(stray=True, gap=40, registers=candidate.STARTUP_REGS)
         with self.assertRaises(ValueError):
             candidate.bootstrap(broken, fuel, 40, candidate.STARTUP_REGS)
+
+    def test_nonempty_counter_and_inactive_tail_are_checked_exactly(self):
+        pc, registers = (True, False, True), (3, 0, 0, 1, 0)
+        rows, steps = boot_writer(gap=6, registers=registers, pc=pc)
+        self.assertEqual(candidate.bootstrap(rows, steps, 6, registers, pc), steps)
+        for wrong in ((), (True, True, True), (False, False, True)):
+            with self.subTest(pc=wrong), self.assertRaises(ValueError):
+                candidate.bootstrap(rows, steps, 6, registers, wrong)
+        with self.assertRaises(ValueError):
+            candidate.bootstrap(rows, steps, 6, registers[:-2] + (0, 0), pc)
+        with self.assertRaisesRegex(ValueError, "must fit"):
+            candidate.boot_tape(2, registers, pc)
+        with self.assertRaisesRegex(ValueError, "binary"):
+            candidate.boot_tape(6, registers, (2,))
 
     def test_startup_rejects_larger_capacity_before_reading_inputs(self):
         with patch.object(candidate.sys, "argv", ["candidate.py", "--upstream", "missing",

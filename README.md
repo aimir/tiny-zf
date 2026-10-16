@@ -1,24 +1,26 @@
 # Smaller ZF proof-search Turing machines
 
-**251 states, with a complete Coq proof
+**250 states, with a complete Coq proof
 that it halts on blank tape exactly when ZF or ZFC is inconsistent.**
-The [literal table](candidates/mira251-startup.tm),
-[matching program tree](candidates/mira251-startup.tree.json),
-[verification record](reference/mira251-startup-coq.json), and
+The [literal table](candidates/mira250-protected.tm),
+[matching program tree](candidates/mira250-protected.tree.json),
+[verification record](reference/mira250-protected-coq.json), and
 [reproduction instructions](formal/coq/README.md#verify-a-changed-machine) are included.
-A two-state decrement loop and a shared startup path save three states over
-Mira-Cult's pinned 254-state construction. The source program and mathematical
-endpoint are unchanged. Initialization reaches exactly the source enumerator's
-state after three commands; Coq checks that connection too.
+A two-state decrement loop, shared startup, register placement and shared
+return paths save four states over Mira-Cult's pinned 254-state construction.
+The source program and mathematical endpoint are unchanged. Initialization
+enters partway through axiom construction; Coq proves its complete continuation
+and that subsequent enumeration safely protects the arbitrary initial stack.
 
 **External benchmark: Mira-Cult's 254-state machine, with an end-to-end ZFC
 inconsistency proof in Jeffrey Ketchersid's Coq development.** We have
 [rebuilt that complete proof from source](formal/coq/README.md), with all three
 headline theorems closed under the global context. Our
 [comparison and combined experiments](docs/MIRA254.md) reproduce the architectural
-savings, check a 254-state decoder variant, and establish the 251-state
-machine by changing the register-operation kernel and removing a startup state.
-Its proof uses the 40-cell program-counter capacity supplied by its bootstrap.
+savings, check a 254-state decoder variant, and establish the 250-state
+machine by changing the arithmetic kernel, register placement and shared
+startup/return paths. Its bootstrap supplies a 57-cell program-counter capacity;
+the proof preserves the required 40-cell lower bound.
 
 **Lean formally verifies the literal 308-state machine: it halts on blank tape
 if and only if the independently defined numeric source calculus proves code 1.
@@ -46,6 +48,7 @@ equiconsistency with ZF.
 
 | Machine | States | Artifact and scope |
 | --- | ---: | --- |
+| Protected-startup machine | **250** | [Table](candidates/mira250-protected.tm), [tree](candidates/mira250-protected.tree.json), [Coq record](reference/mira250-protected-coq.json). Complete blank-tape halting equivalence to ZF/ZFC inconsistency. |
 | Shared-startup machine | **251** | [Table](candidates/mira251-startup.tm), [tree](candidates/mira251-startup.tree.json), [Coq record](reference/mira251-startup-coq.json). Complete blank-tape halting equivalence to ZF/ZFC inconsistency. |
 | Local-carry decrement machine | **252** | [Table](candidates/mira252-local.tm), [tree](candidates/mira252-local.tree.json), [Coq record](reference/mira252-local-coq.json). Complete blank-tape halting equivalence to ZF/ZFC inconsistency. |
 | Forward-decrement machine | **253** | [Table](candidates/mira253-forward.tm), [tree](candidates/mira253-forward.tree.json), [Coq record](reference/mira253-forward-coq.json). Complete blank-tape halting equivalence to ZF/ZFC inconsistency. |
@@ -113,10 +116,10 @@ be popped. [Reproduction and scope](formal/coq/README.md#protected-initial-stack
 
 ## Reproduce and check
 
-For the 251-state result, follow the [Coq verification guide](formal/coq/README.md#verify-a-changed-machine).
+For the 250-state result, follow the [Coq verification guide](formal/coq/README.md#verify-a-changed-machine).
 It rebuilds the proof against the exact committed transition table and program
 tree using Coq 8.20.x and pinned upstream sources. The local
-[`mira_forward.py`](tools/mira_forward.py) generator with `--mode startup` reproduces both artifacts.
+[`mira_forward.py`](tools/mira_forward.py) generator with `--mode protected` reproduces both artifacts.
 
 For the Lean development, install elan, then run:
 

@@ -1,12 +1,48 @@
-# From Mira's 254-state construction to a verified 251-state machine
+# From Mira's 254-state construction to a verified 250-state machine
 
-Compared 15 October 2026 against
-[busy-beaver commit 297ab8d](https://github.com/jeff87654/busy-beaver/tree/297ab8df7e5de329605c3875b4934643b371a5e3/ZF/m254).
-**The shared-startup machine has 251 states and a complete Coq proof of
+Pinned to [busy-beaver commit 297ab8d](https://github.com/jeff87654/busy-beaver/tree/297ab8df7e5de329605c3875b4934643b371a5e3/ZF/m254).
+**The protected-startup machine has 250 states and a complete Coq proof of
 blank-tape halting equivalence to ZF/ZFC inconsistency.** Its
-[table](../candidates/mira251-startup.tm), [unchanged decoder tree](../candidates/mira251-startup.tree.json),
-and [proof record](../reference/mira251-startup-coq.json) are included. The
-earlier decoder-layout experiment also produced a checked 254-state variant.
+[table](../candidates/mira250-protected.tm),
+[unchanged decoder tree](../candidates/mira250-protected.tree.json), and
+[proof record](../reference/mira250-protected-coq.json) are included.
+
+## The 250-state reduction
+
+Register placement and global constraint solving permit the return state 5 to
+share state 48. The physical permutation of the original nine register slots is
+`[0,3,1,4,2,5,6,8,7]`. Eight transition changes choose compatible decoder and
+return paths; [`mira_forward.py --mode protected`](../tools/mira_forward.py)
+contains the complete deterministic recipe, starting from the pinned table.
+The underlying 203-node program tree and arithmetic contracts are unchanged.
+
+The shared startup reaches a nonempty program counter after **2,187,238 steps**,
+with a 57-cell counter area, physical active registers `[3,1,6,1,0,0,0,0,0]`,
+and 619 inactive registers. The inactive tail contains a one, and is included
+exactly in both the independent simulation and Coq bootstrap theorem.
+Initialization enters partway through AX construction rather than at a source
+iteration boundary.
+
+The [complete source bridge](../formal/coq/protected_startup.v) executes two
+candidate RM steps, transports through the checked bisimulation's entry 148,
+computes 347 small source steps, and proves the remaining structured AX suffix
+with unbounded arithmetic lemmas. Three control steps then return to enumeration
+at candidate zero with zero current and cached formulas, but an arbitrary stack.
+No giant formula code needs to be computed.
+
+The [stack-protection theorem](../formal/coq/stack_protection.v) supplies the
+necessary source contract. For every NIP, replacing selector 2 by selector 1
+produces a distinct earlier DROP in the enumerated programs. Consequently each
+prefix has enough newly pushed derivable formulas that NIP never reads the
+arbitrary original stack. Completeness follows from the general initialization
+proof. This discharges the initialization obligation without assuming that the
+stack contains only theorems.
+
+The final build checks all 6,460 instruction sites, complete tape simulation,
+source equivalence and all three ZF/ZFC/SIR theorems. Every final assumption audit
+reports `Closed under the global context`. The bounded search proposed the
+sharing; it is not part of the trusted proof or a lower bound on smaller machines.
+[Reproduction instructions](../formal/coq/README.md#verify-a-changed-machine).
 
 ## The 251-state reduction
 

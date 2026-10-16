@@ -3,6 +3,13 @@
 These are small, curated metadata files, not execution logs or exhaustive search
 traces. All final counts include the local reduction pipeline.
 
+[mira250-protected-coq.json](mira250-protected-coq.json) records the complete
+250-state Coq proof, exact nonempty program counter, all inactive registers,
+physical register permutation, source bridge and three closed theory endpoints.
+The public [proof adapter](../formal/coq/protected.py) and
+[source bridge](../formal/coq/protected_startup.v) reproduce the result from
+pinned upstream sources; no scratch logs or compiled objects are needed.
+
 [mira251-startup-coq.json](mira251-startup-coq.json) records the complete Coq
 proof of the 251-state machine: the exact table and tree, kernel proofs,
 182,904-step bootstrap, third-enumerator-state bridge, and all three closed
@@ -11,8 +18,8 @@ ZF/ZFC/SIR endpoints.
 
 [mira-general-initialization-coq.json](mira-general-initialization-coq.json)
 records the auxiliary source-enumerator theorem for arbitrary clean initial
-states. It broadens the available initialization proof without changing the
-published machine or replacing its exact blank-tape proof.
+states. Its completeness result is used by the 250-state protected-stack
+initialization proof, alongside the exact blank-tape machine proof.
 [Theorem and reproduction](../formal/coq/README.md#general-initialization-theorem).
 
 [mira252-local-coq.json](mira252-local-coq.json) records the complete Coq proof

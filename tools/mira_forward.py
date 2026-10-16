@@ -1,4 +1,4 @@
-"""Reproduce the Coq-verified 251-, 252- and 253-state native machines.
+"""Reproduce the Coq-verified 250-, 251-, 252- and 253-state native machines.
 
 The pinned 254-state machine supplies the decoder and source program. This
 construction changes the positive-decrement loop and optionally removes the
@@ -23,7 +23,11 @@ def acceptance_module():
 
 
 def build(checkout, mode='forward'):
-    """Return the canonical literal table and unchanged, validated decoder tree."""
+    """Return the literal table and unchanged, validated decoder tree.
+
+    Protected startup also changes register placement and decoder returns.
+    Its exact entry configuration needs the separate protected-startup proof.
+    """
     directory = checked_inputs(checkout)
     acceptance = acceptance_module()
     rows = acceptance.parse_table((directory / 'machine/zfc_254.tm').read_text())
@@ -38,14 +42,14 @@ def build(checkout, mode='forward'):
     })
     rows = {(q, b): (w, d, '112' if target == '131' else target)
             for (q, b), (w, d, target) in rows.items() if q != '131'}
-    if mode in ('local', 'startup'):
+    if mode in ('local', 'startup', 'protected'):
         # Swap the gap past one cell at a time. This needs two states instead
         # of a separate run scanner, end test and gap state.
         rows.update({('112', 0): (1, 'R', '85'), ('112', 1): (1, 'L', '112'),
                      ('85', 0): (0, 'L', '63'), ('85', 1): (0, 'R', '112')})
         rows = {key: edge for key, edge in rows.items() if key[0] != '97'}
         anchors = acceptance.LOCAL_ANCHORS
-        if mode == 'startup':
+        if mode in ('startup', 'protected'):
             # The shared mark-return path and increment detour permit startup
             # without state 8. The machine reaches the third enumerator state:
             # nextproof=3, param1=1, other active registers zero, PC gap 40.
@@ -54,6 +58,28 @@ def build(checkout, mode='forward'):
                          ('109', 0): (0, 'R', '85')})
             rows = {key: edge for key, edge in rows.items() if key[0] != '8'}
             anchors = acceptance.STARTUP_ANCHORS
+        if mode == 'protected':
+            # Logical arithmetic is unchanged. Relocate only the decoder's
+            # register selectors; the skip chain itself retains its meaning.
+            from mira_global import BOX_KERNEL
+            skips = ('60', '44', '31', '56', '38', '40', '28', '64', '69')
+            placement = (0, 3, 1, 4, 2, 5, 6, 8, 7)
+            target = dict(zip(skips, (skips[i] for i in placement)))
+            rows = {key: (w, d, target[t] if key[0] not in BOX_KERNEL
+                          and w == 0 and d == 'R' and t in target else t)
+                    for key, (w, d, t) in rows.items()}
+            # A checked global quotient shares state 5 with state 48 and
+            # chooses compatible decoder return paths. Startup then enters
+            # partway through AX; its correctness uses stack protection.
+            rows.update({('3', 0): (0, 'L', '48'),
+                         ('16', 0): (0, 'L', '219'),
+                         ('30', 1): (0, 'R', '59'),
+                         ('52', 0): (0, 'L', '105'),
+                         ('113', 0): (0, 'L', '219'),
+                         ('126', 1): (1, 'L', '110'),
+                         ('221', 0): (0, 'L', '228'),
+                         ('240', 1): (1, 'L', '241')})
+            rows = {key: edge for key, edge in rows.items() if key[0] != '5'}
     elif mode == 'forward':
         anchors = acceptance.FORWARD_ANCHORS
     else:
@@ -67,11 +93,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--upstream', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
-    parser.add_argument('--mode', choices=('forward', 'local', 'startup'), default='startup',
-                        help='251-state startup, 252-state local gap carry or 253-state block stream')
+    parser.add_argument('--mode', choices=('forward', 'local', 'startup', 'protected'), default='protected',
+                        help='250-state protected startup, 251-state startup, 252-state local carry or 253-state stream')
     args = parser.parse_args()
     table, tree = build(args.upstream, args.mode)
-    size = {'startup': 251, 'local': 252, 'forward': 253}[args.mode]
+    size = {'protected': 250, 'startup': 251, 'local': 252, 'forward': 253}[args.mode]
     tree_text = json.dumps(tree, indent=2) + '\n'
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(table)

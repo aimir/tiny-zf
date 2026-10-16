@@ -1,11 +1,11 @@
 # Verification scope and intended contract
 
-**The 251-state machine has a complete Coq proof of blank-tape
+**The 250-state machine has a complete Coq proof of blank-tape
 halting equivalence to conventional ZF/ZFC inconsistency.** Its literal table,
 bootstrap, unbounded register operations, instruction execution, source program
 and set-theory connection are checked together. See the
 [Coq acceptance workflow](../formal/coq/README.md#verify-a-changed-machine) and
-[verification record](../reference/mira251-startup-coq.json).
+[verification record](../reference/mira250-protected-coq.json).
 
 **Status: the literal 308-state machine is formally verified against its numeric
 source calculus in Lean.** The exact headline is:

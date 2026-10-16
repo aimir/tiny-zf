@@ -1,12 +1,13 @@
-# Coq verification of the 251-state machine
+# Coq verification of the 250-state machine
 
-**The [251-state machine with shared startup](../../candidates/mira251-startup.tm)
+**The [250-state machine with protected startup](../../candidates/mira250-protected.tm)
 halts on blank tape exactly when conventional ZF or ZFC is inconsistent.**
 The proof extends Jeffrey Ketchersid's pinned Coq development for Mira-Cult's
-254-state machine with unbounded decrement and increment proofs and a shared
-startup routine. Its source interpreter
-and set-theoretic interpretation are unchanged. All three headline theorems
-report `Closed under the global context` with Coq 8.20.1.
+254-state machine. It checks unbounded arithmetic, shared startup and return
+paths, register placement, the complete partial-AX continuation, and protection
+of the arbitrary initial stack. The source interpreter and set-theoretic
+interpretation are unchanged. All three headline theorems report
+`Closed under the global context` with Coq 8.20.1.
 
 The [upstream headline](https://github.com/jeff87654/busy-beaver/blob/297ab8df7e5de329605c3875b4934643b371a5e3/ZF/m254/coq/e2e/E2E254.v)
 is:
@@ -20,7 +21,7 @@ Theorem zf254_halts_iff_SIR : halts tm c0 <-> SIR ⊢TC ⊥.
 The literal table, bootstrap, unbounded register operations, all instruction
 sites, source interpreter, proof calculus, and set-theoretic interpretation
 are covered. The inherited theorem names retain `254`, but the candidate build
-replaces `tm` with the exact 251-state table. These Coq results do not change
+replaces `tm` with the exact 250-state table. These Coq results do not change
 the statement of [our 308-state Lean headline](../TinyZF.lean).
 
 ## Rebuild the pinned reference
@@ -54,39 +55,86 @@ this successful reference build does not certify a candidate mutation.
 
 ## Verify a changed machine
 
-The [251-state table](../../candidates/mira251-startup.tm),
-[203-node decoder tree](../../candidates/mira251-startup.tree.json), and
-[verification record](../../reference/mira251-startup-coq.json) describe the
-current smallest proved machine in this repository. The decoder tree is the
-original pinned program. The tape-level arithmetic and initialization change.
+The [250-state table](../../candidates/mira250-protected.tm),
+[203-node decoder tree](../../candidates/mira250-protected.tree.json), and
+[verification record](../../reference/mira250-protected-coq.json) describe the
+smallest proved machine in this repository. The decoder tree is the original
+pinned program. Tape arithmetic, physical register placement and initialization
+change.
 
 After obtaining the pinned checkout above, run from this repository:
 
 ```sh
 python3 formal/coq/candidate.py --upstream /tmp/zf-reference --coqc coqc \
-  --table candidates/mira251-startup.tm --halt 251 \
-  --tree candidates/mira251-startup.tree.json --decrement-mode startup \
-  --output scratch/startup251-proof
+  --table candidates/mira250-protected.tm --halt 250 \
+  --tree candidates/mira250-protected.tree.json --decrement-mode protected \
+  --output scratch/protected250-proof
 ```
 
 The output directory must be new. By default this copies the pinned sources
 and rebuilds their entire dependency closure, excluding existing compiled
-objects. The checked table is written to `scratch/startup251-proof/candidate.tm`;
+objects. The checked table is written to `scratch/protected250-proof/candidate.tm`;
 its bytes must match the committed table. The original upstream files stay
-unchanged. To reproduce the two input artifacts independently:
+unchanged. To reproduce both artifacts independently:
 
 ```sh
-python3 tools/mira_forward.py --upstream /tmp/zf-reference --mode startup \
-  --output scratch/reproduced-startup251.tm
-cmp scratch/reproduced-startup251.tm candidates/mira251-startup.tm
-cmp scratch/reproduced-startup251.tree.json candidates/mira251-startup.tree.json
+python3 tools/mira_forward.py --upstream /tmp/zf-reference --mode protected \
+  --output scratch/reproduced-protected250.tm
+cmp scratch/reproduced-protected250.tm candidates/mira250-protected.tm
+cmp scratch/reproduced-protected250.tree.json candidates/mira250-protected.tree.json
 ```
 
-The driver checks the complete blank-tape bootstrap, including every trailing
-register. The machine reaches its prescribed initial configuration after
-**182,904 steps**. It has working states 0 through 250 and undefined terminal
-state 251; state names referenced in the register proofs are preserved during
-renumbering.
+The machine has working states 0 through 249 and undefined terminal state 250.
+The driver checks the complete blank-tape bootstrap after **2,187,238 steps**,
+including the nonempty 29-bit counter, its 57-cell capacity, all nine active
+registers and all 619 inactive registers. The inactive tail contains one nonzero
+register; the proof retains it exactly. Nothing is replaced by an assumed
+canonical initial tape.
+
+### Protected startup and complete source bridge
+
+[`protected.py`](protected.py) installs the exact initial configuration,
+physical register permutation, generalized simulation invariant and documented
+[`protected_startup.v`](protected_startup.v) source proof. The latter keeps the
+complete source-entry argument in one file, with a comment for every helper.
+The build installs it as `M254P.ProtectedStartup`; its headline is:
+
+```coq
+Theorem tm250_thm : halts tm c0 <-> thm254 1.
+```
+
+The proof proceeds as follows:
+
+1. The literal tape reaches the checked nonempty program counter and register
+   file. Unbounded operation proofs and every instruction-site check then
+   establish whole-run tape-to-RM halting equivalence from that exact entry.
+2. Two RM steps reach certificate entry 148. Both directions of the existing
+   source bisimulation are applied at this entry, rather than assuming root
+   initialization. Another 347 literal source steps reach node 24 of AX.
+3. Existing unbounded structured-program lemmas execute the complete remaining
+   axiom construction. Pairing arithmetic stays opaque; the output stack need
+   not be evaluated. Three control steps return to enumeration with candidate
+   counter zero, empty remaining proof list, and zero current/cached formulas.
+4. [`stack_protection.v`](stack_protection.v) permits the arbitrary output stack:
+   each NIP has a distinct earlier DROP partner, so enumeration never exposes
+   an unproved formula from that initial tail. Completeness uses the separately
+   proved general initialization theorem. The conventional theory bridges then
+   give all three final endpoints.
+
+A finite arithmetic check alone would not establish step 3 or 4. Those are
+unbounded Coq proofs in the dependency closure of the final theorems. The new
+source initialization theorem replaces the earlier finite-prefix initialization
+argument; it adds no assumption to the final machine theorem.
+
+### The 251-state shared-startup variant
+
+The [251-state table](../../candidates/mira251-startup.tm),
+[matching tree](../../candidates/mira251-startup.tree.json) and
+[Coq record](../../reference/mira251-startup-coq.json) use the same arithmetic
+kernel, with the original register placement and a simpler source entry.
+Reproduce its artifacts with generator `--mode startup`. Rebuild its proof
+with these table/tree paths, `--halt 251 --decrement-mode startup`, and a new
+output directory. Its exact bootstrap takes 182,904 steps and reaches `s3`.
 
 ### Shared startup and increment proof
 
@@ -130,8 +178,8 @@ coqc -Q /tmp/zf-reference/ZF/m254/coq/logic M254L \
 
 The command must report `Closed under the global context`.
 The [verification record](../../reference/mira-general-initialization-coq.json)
-identifies the exact source. The published 251-state proof continues to use its
-explicit three-command initialization bridge.
+identifies the exact source. The 251-state variant uses its explicit three-command initialization bridge;
+the 250-state machine uses this completeness result through stack protection.
 
 ### Protected initial stack
 
@@ -162,9 +210,9 @@ coqc -Q /tmp/zf-reference/ZF/m254/coq/logic M254L \
 
 Both headline reports must say `Closed under the global context`.
 The [verification record](../../reference/mira-stack-protection-coq.json) pins
-both source files. This proves a source initialization contract; a new machine
-still requires its complete binary-tape initialization and interpreter proof.
-The published machine remains the separately verified 251-state table.
+both source files. This source initialization contract is used by the complete 250-state machine
+proof above, together with its checked binary-tape initialization and
+interpreter simulation.
 
 ### New decrement proof
 
@@ -195,11 +243,11 @@ executor nor the generator is an assumed compiler-correctness theorem.
 
 The candidate checker uses the invariant that the space from the
 program-counter marker to the register header is at least **40 cells**. The
-literal bootstrap establishes that bound, and the whole-run simulation
-preserves it. Coq rebuilds the instruction checks and simulation with this
-bound; no additional hypothesis is added to the headline theorems. Startup mode
-selects this bound automatically and rejects `--min-gap 62`, which its literal
-initializer does not establish. The 252- and 253-state modes default to 62;
+250-state literal bootstrap establishes capacity 57, and the whole-run simulation
+preserves the required 40-cell lower bound. Coq rebuilds the instruction checks and simulation with this
+bound; no additional hypothesis is added to the headline theorems. Startup and protected modes
+select this 40-cell lower bound automatically and reject `--min-gap 62`, which
+neither literal initializer establishes. The 252- and 253-state modes default to 62;
 they also accept `--min-gap 40` for the upstream's more conservative abstraction.
 
 The recorded candidate run reused objects from a freshly rebuilt upstream
